@@ -1,2 +1,2 @@
 [test]
-preload = ["./fixture.ts"]
+preload = ["./test/fixture.ts"]

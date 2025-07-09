@@ -233,5 +233,11 @@ export function createContext<const T extends ContextSchema>(
   schema: ((types: ContextTypes) => T) | T
 ): ContextInstance<T> {
   const actualSchema = typeof schema === "function" ? (schema as any)(types) : (schema as T)
-  return new Context(actualSchema)
+  const contextInstance = new Context(actualSchema)
+
+  return {
+    context: contextInstance.context,
+    update: contextInstance.update.bind(contextInstance),
+    onUpdate: contextInstance.onUpdate.bind(contextInstance),
+  }
 }
