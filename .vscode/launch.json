@@ -22,5 +22,12 @@
             ],
             "internalConsoleOptions": "openOnSessionStart"
         },
+        {
+            "type": "bun",
+            "request": "launch",
+            "name": "build",
+            "program": "${workspaceFolder}/script/build.ts",
+            "args": [],
+        }
     ]
 }

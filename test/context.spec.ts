@@ -1,6 +1,6 @@
-import { describe, it, expect, afterEach } from "bun:test"
-import { types, createContext } from "./context.ts"
-import type { JsonPatch } from "./context.t.ts"
+import { describe, it, expect } from "bun:test"
+import { types, createContext } from "../context"
+import type { JsonPatch } from "../types"
 
 describe("Контекст", () => {
   describe("Основная функциональность создания и обновления контекстов", () => {

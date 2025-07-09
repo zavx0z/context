@@ -1,9 +1,16 @@
 {
     "files.exclude": {
         "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
         "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/CVS": true,
+        "**/*.crswap": true,
         "**/node_modules": true,
-        "**/.vscode": true,
+        "**/__pycache__": true,
+        ".venv": true,
+        "**/.vscode": true
     },
     "hide-files.files": [],
     "explorer.fileNesting.enabled": false,

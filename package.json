@@ -1,8 +1,27 @@
 {
-  "name": "context",
-  "module": "context.ts",
+  "name": "@zavx0z/context",
+  "version": "0.0.1",
+  "description": "Reactive context",
+  "author": "zavx0z",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zavx0z/context.git"
+  },
+  "main": "dist/context.js",
+  "types": "dist/types/context.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/context.js",
+      "types": "./dist/types/context.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "README.md"
+  ],
   "type": "module",
-  "private": true,
+  "private": false,
   "devDependencies": {
     "@types/bun": "latest"
   },

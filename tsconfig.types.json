@@ -1,0 +1,22 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "emitDeclarationOnly": true,
+        "declaration": true,
+        "noEmit": false,
+        "outDir": "dist/types",
+        "skipLibCheck": true
+    },
+    "include": [
+        "context.ts"
+    ],
+    "exclude": [
+        "bun.test.d.ts",
+        "context.spec.ts",
+        "fixture.ts",
+        "script/**/*",
+        "test/**/*",
+        "node_modules/**/*",
+        "dist/**/*"
+    ]
+}
