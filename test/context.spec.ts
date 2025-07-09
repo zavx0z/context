@@ -13,12 +13,12 @@ describe("Контекст", () => {
         tags: types.array.optional({ default: [] }),
       })
 
-      expect(context.name).toBe("Гость")
-      expect(context.role).toBe("user")
-      expect(context.nickname).toBe(null)
-      expect(context.bio).toBe(null)
-      expect(context.priority).toBe(null)
-      expect(context.tags).toEqual([])
+      expect(context.name, 'Поле name должно быть "Гость" по умолчанию').toBe("Гость")
+      expect(context.role, 'Поле role должно быть "user" по умолчанию').toBe("user")
+      expect(context.nickname, "Поле nickname должно быть null по умолчанию").toBe(null)
+      expect(context.bio, "Поле bio должно быть null по умолчанию").toBe(null)
+      expect(context.priority, "Поле priority должно быть null по умолчанию").toBe(null)
+      expect(context.tags, "Поле tags должно быть [] по умолчанию").toEqual([])
     })
 
     it("корректно работает со всеми типами данных", () => {
@@ -36,24 +36,24 @@ describe("Контекст", () => {
         flags: types.array<boolean>(),
       })
 
-      expect(context.title).toBe("Заголовок")
-      expect(context.description).toBe(null)
-      expect(context.age).toBe(18)
-      expect(context.score).toBe(null)
-      expect(context.isActive).toBe(true)
-      expect(context.isVerified).toBe(null)
-      expect(context.status).toBe("draft")
-      expect(context.category).toBe(null)
-      expect(context.tags).toEqual([])
-      expect(context.permissions).toBe(null)
-      expect(context.flags).toBe(null)
+      expect(context.title, 'Поле title должно быть "Заголовок" по умолчанию').toBe("Заголовок")
+      expect(context.description, "Поле description должно быть null по умолчанию").toBe(null)
+      expect(context.age, "Поле age должно быть 18 по умолчанию").toBe(18)
+      expect(context.score, "Поле score должно быть null по умолчанию").toBe(null)
+      expect(context.isActive, "Поле isActive должно быть true по умолчанию").toBe(true)
+      expect(context.isVerified, "Поле isVerified должно быть null по умолчанию").toBe(null)
+      expect(context.status, 'Поле status должно быть "draft" по умолчанию').toBe("draft")
+      expect(context.category, "Поле category должно быть null по умолчанию").toBe(null)
+      expect(context.tags, "Поле tags должно быть [] по умолчанию").toEqual([])
+      expect(context.permissions, "Поле permissions должно быть null по умолчанию").toBe(null)
+      expect(context.flags, "Поле flags должно быть null по умолчанию").toBe(null)
     })
 
     it("проверяет типизацию enum", () => {
       const { context } = createContext({
         role: types.enum("user", "admin")(),
       })
-      expect(context.role).toBe(null)
+      expect(context.role, "Поле role должно быть null по умолчанию").toBe(null)
 
       // @ts-expect-error - enum должен принимать только строки
       types.enum(true, false)()
@@ -67,9 +67,9 @@ describe("Контекст", () => {
         numbers: types.array<number>(),
         flags: types.array<boolean>(),
       })
-      expect(context.tags).toEqual(["a", "b"])
-      expect(context.numbers).toBe(null)
-      expect(context.flags).toBe(null)
+      expect(context.tags, 'Поле tags должно быть ["a", "b"] по умолчанию').toEqual(["a", "b"])
+      expect(context.numbers, "Поле numbers должно быть null по умолчанию").toBe(null)
+      expect(context.flags, "Поле flags должно быть null по умолчанию").toBe(null)
 
       // @ts-expect-error - array должен принимать только примитивы
       types.array({ default: [{}] })
@@ -85,15 +85,15 @@ describe("Контекст", () => {
 
       expect(() => {
         ;(context as any).name = "Новое имя"
-      }).toThrow("Прямое изменение контекста запрещено")
+      }, "Должна быть ошибка при прямом изменении поля name").toThrow("Прямое изменение контекста запрещено")
 
       expect(() => {
         ;(context as any).status = "process"
-      }).toThrow("Прямое изменение контекста запрещено")
+      }, "Должна быть ошибка при прямом изменении поля status").toThrow("Прямое изменение контекста запрещено")
 
       expect(() => {
         ;(context as any).newField = "значение"
-      }).toThrow("Прямое изменение контекста запрещено")
+      }, "Должна быть ошибка при прямом добавлении нового поля").toThrow("Прямое изменение контекста запрещено")
     })
 
     it("запрещает удаление свойств", () => {
@@ -104,11 +104,11 @@ describe("Контекст", () => {
 
       expect(() => {
         delete (context as any).name
-      }).toThrow("Удаление свойств контекста запрещено")
+      }, "Должна быть ошибка при удалении поля name").toThrow("Удаление свойств контекста запрещено")
 
       expect(() => {
         delete (context as any).status
-      }).toThrow("Удаление свойств контекста запрещено")
+      }, "Должна быть ошибка при удалении поля status").toThrow("Удаление свойств контекста запрещено")
     })
 
     it("позволяет читать значения", () => {
@@ -117,8 +117,8 @@ describe("Контекст", () => {
         status: types.enum("start", "process", "end").required({ default: "start" }),
       })
 
-      expect(context.name).toBe("Гость")
-      expect(context.status).toBe("start")
+      expect(context.name, 'Поле name должно быть "Гость"').toBe("Гость")
+      expect(context.status, 'Поле status должно быть "start"').toBe("start")
     })
   })
 })
@@ -134,7 +134,7 @@ describe("Примеры использования", () => {
     }
     const { context, update } = createContext(schema)
 
-    expect(context).toPlainObjectEqual(schema, {
+    expect(context, "userContext должен содержать значения по умолчанию для всех полей").toPlainObjectEqual(schema, {
       name: "Гость",
       age: null,
       isActive: true,
@@ -143,7 +143,10 @@ describe("Примеры использования", () => {
     })
 
     const updated = update({ name: "Иван", age: 25 })
-    expect(updated).toPlainObjectEqual(schema, {
+    expect(
+      updated,
+      "После update должны обновиться только переданные поля, остальные остаться прежними"
+    ).toPlainObjectEqual(schema, {
       name: "Иван",
       age: 25,
       isActive: true,
@@ -163,7 +166,7 @@ describe("Примеры использования", () => {
     }
     const { context, update } = createContext(schema)
 
-    expect(context).toPlainObjectEqual(schema, {
+    expect(context, "productContext должен содержать значения по умолчанию для всех полей").toPlainObjectEqual(schema, {
       id: "",
       name: "Новый продукт",
       price: 0,
@@ -179,7 +182,10 @@ describe("Примеры использования", () => {
       inStock: true,
       category: "electronics",
     })
-    expect(updated).toPlainObjectEqual(schema, {
+    expect(
+      updated,
+      "После update должны обновиться только переданные поля, остальные остаться прежними"
+    ).toPlainObjectEqual(schema, {
       id: "prod-123",
       name: "iPhone 15",
       price: 99999,
@@ -198,7 +204,7 @@ describe("Примеры использования", () => {
     }
     const { context, update } = createContext(schema)
 
-    expect(context).toPlainObjectEqual(schema, {
+    expect(context, "articleContext должен содержать значения по умолчанию для всех полей").toPlainObjectEqual(schema, {
       title: "Заголовок",
       content: null,
       published: false,
@@ -210,7 +216,10 @@ describe("Примеры использования", () => {
       content: "Содержание статьи",
       published: true,
     })
-    expect(updated).toPlainObjectEqual(schema, {
+    expect(
+      updated,
+      "После update должны обновиться только переданные поля, остальные остаться прежними"
+    ).toPlainObjectEqual(schema, {
       title: "Новый заголовок",
       content: "Содержание статьи",
       published: true,

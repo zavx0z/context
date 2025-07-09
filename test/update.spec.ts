@@ -10,14 +10,14 @@ describe("update", () => {
     })
 
     update({ name: "Иван" })
-    expect(context.name).toBe("Иван")
-    expect(context.nickname).toBe(null)
-    expect(context.age).toBe(null)
+    expect(context.name, 'Поле name должно обновиться на "Иван"').toBe("Иван")
+    expect(context.nickname, "Поле nickname должно остаться null").toBe(null)
+    expect(context.age, "Поле age должно остаться null").toBe(null)
 
     update({ nickname: "nick", age: 25 })
-    expect(context.name).toBe("Иван")
-    expect(context.nickname).toBe("nick")
-    expect(context.age).toBe(25)
+    expect(context.name, 'Поле name должно остаться "Иван"').toBe("Иван")
+    expect(context.nickname, 'Поле nickname должно обновиться на "nick"').toBe("nick")
+    expect(context.age, "Поле age должно обновиться на 25").toBe(25)
   })
 
   it("игнорирует undefined значения", () => {
@@ -29,7 +29,7 @@ describe("update", () => {
     // @ts-expect-error - TypeScript должен запрещать undefined
     update({ name: undefined })
 
-    expect(context.name).toBe("Гость")
+    expect(context.name, 'Поле name должно остаться "Гость"').toBe("Гость")
   })
 
   it("позволяет устанавливать null для optional полей", () => {
@@ -39,16 +39,16 @@ describe("update", () => {
     })
 
     update({ nickname: "test" })
-    expect(context.nickname).toBe("test")
+    expect(context.nickname, 'Поле nickname должно обновиться на "test"').toBe("test")
 
     update({ nickname: null })
-    expect(context.nickname).toBe(null)
+    expect(context.nickname, "Поле nickname должно обновиться на null").toBe(null)
 
     update({ age: 25 })
-    expect(context.age).toBe(25)
+    expect(context.age, "Поле age должно обновиться на 25").toBe(25)
 
     update({ age: null })
-    expect(context.age).toBe(null)
+    expect(context.age, "Поле age должно обновиться на null").toBe(null)
   })
 
   it("работает со всеми типами данных", () => {
@@ -80,17 +80,17 @@ describe("update", () => {
       flags: [true, false, true],
     })
 
-    expect(context.title).toBe("Новый заголовок")
-    expect(context.description).toBe("Новое описание")
-    expect(context.age).toBe(25)
-    expect(context.score).toBe(100)
-    expect(context.isActive).toBe(false)
-    expect(context.isVerified).toBe(true)
-    expect(context.status).toBe("published")
-    expect(context.category).toBe("tech")
-    expect(context.tags).toEqual(["typescript", "library"])
-    expect(context.permissions).toEqual([1, 2, 3])
-    expect(context.flags).toEqual([true, false, true])
+    expect(context.title, 'Поле title должно обновиться на "Новый заголовок"').toBe("Новый заголовок")
+    expect(context.description, 'Поле description должно обновиться на "Новое описание"').toBe("Новое описание")
+    expect(context.age, "Поле age должно обновиться на 25").toBe(25)
+    expect(context.score, "Поле score должно обновиться на 100").toBe(100)
+    expect(context.isActive, "Поле isActive должно обновиться на false").toBe(false)
+    expect(context.isVerified, "Поле isVerified должно обновиться на true").toBe(true)
+    expect(context.status, 'Поле status должно обновиться на "published"').toBe("published")
+    expect(context.category, 'Поле category должно обновиться на "tech"').toBe("tech")
+    expect(context.tags, 'Поле tags должно обновиться на ["typescript", "library"]').toEqual(["typescript", "library"])
+    expect(context.permissions, "Поле permissions должно обновиться на [1, 2, 3]").toEqual([1, 2, 3])
+    expect(context.flags, "Поле flags должно обновиться на [true, false, true]").toEqual([true, false, true])
   })
 
   it.todo("возвращает обновленный контекст", () => {
@@ -101,9 +101,9 @@ describe("update", () => {
 
     const updated = update({ name: "Иван", age: 25 })
 
-    expect(updated).toBe(context)
-    expect(updated.name).toBe("Иван")
-    expect(updated.age).toBe(25)
+    expect(updated, "update должен возвращать тот же объект контекста").toBe(context)
+    expect(updated.name, 'Возвращенный контекст должен содержать обновленное имя "Иван"').toBe("Иван")
+    expect(updated.age, "Возвращенный контекст должен содержать обновленный возраст 25").toBe(25)
   })
 
   it("сохраняет иммутабельность после обновления", () => {
@@ -116,10 +116,12 @@ describe("update", () => {
 
     expect(() => {
       ;(context as any).name = "Другое имя"
-    }).toThrow("Прямое изменение контекста запрещено")
+    }, "Должна быть ошибка при прямом изменении поля name после update").toThrow("Прямое изменение контекста запрещено")
 
     expect(() => {
       ;(context as any).status = "end"
-    }).toThrow("Прямое изменение контекста запрещено")
+    }, "Должна быть ошибка при прямом изменении поля status после update").toThrow(
+      "Прямое изменение контекста запрещено"
+    )
   })
 })
