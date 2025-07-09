@@ -1,14 +1,15 @@
 {
   "name": "@zavx0z/context",
   "version": "0.0.6",
-  "description": "Reactive context library with TypeScript support",
+  "description": "Context library for creating typed, immutable contexts with schemas and change subscriptions",
   "author": "zavx0z",
   "keywords": [
     "context",
-    "reactive",
-    "typescript",
     "state",
-    "proxy"
+    "proxy",
+    "immutable",
+    "schema",
+    "subscription"
   ],
   "license": "MIT",
   "repository": {
