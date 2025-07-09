@@ -1,0 +1,17 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/node_modules": true,
+        "**/.vscode": true,
+    },
+    "hide-files.files": [],
+    "explorer.fileNesting.enabled": false,
+    "cSpell.words": [
+        "иммутабельности",
+        "коммита",
+        "коммитом",
+        "рефакторингом",
+        "снапшотов"
+    ]
+}
