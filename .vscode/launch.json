@@ -28,6 +28,22 @@
             "name": "build",
             "program": "${workspaceFolder}/script/build.ts",
             "args": [],
+        },
+        {
+            "type": "bun",
+            "request": "launch",
+            "name": "bump-version-and-push",
+            "program": "${workspaceFolder}/script/version.ts",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "strictEnv": false,
+            "watchMode": false,
+            "stopOnEntry": false,
+            "noDebug": false,
+            "runtime": "bun",
+            "internalConsoleOptions": "openOnSessionStart",
+            "postDebugTask": "git-push-version"
         }
     ]
 }
