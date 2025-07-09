@@ -183,24 +183,37 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
     const filteredValues = Object.fromEntries(
       Object.entries(values).filter(([_, value]) => value !== undefined)
     ) as Partial<ExtractValues<T>>
-    // Формируем JSON Patch
+
+    // Формируем JSON Patch только для реально измененных значений
     const patches: JsonPatch[] = []
     for (const [key, value] of Object.entries(filteredValues)) {
+      const currentValue = (this.contextData as any)[key]
+
+      // Проверяем, действительно ли значение изменилось
       if (value === null) {
-        patches.push({ op: "remove", path: `/${key}` })
+        // Для null — если текущее значение не null, делаем replace с value: null
+        if (currentValue !== null) {
+          patches.push({ op: "replace", path: `/${key}`, value: null })
+        }
       } else {
-        patches.push({ op: "replace", path: `/${key}`, value })
+        // Для обычных значений — сравниваем с текущим
+        if (currentValue !== value) {
+          patches.push({ op: "replace", path: `/${key}`, value })
+        }
       }
     }
-    Object.assign(this.contextData, filteredValues)
-    // Оповещаем подписчиков
+
+    // Обновляем данные только если есть реальные изменения
     if (patches.length > 0) {
+      Object.assign(this.contextData, filteredValues)
+      // Оповещаем подписчиков
       for (const cb of this.updateSubscribers) {
         try {
           cb(patches)
         } catch {}
       }
     }
+
     return { ...this.contextData }
   }
 

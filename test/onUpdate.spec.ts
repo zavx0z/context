@@ -22,8 +22,8 @@ describe("onUpdate", () => {
     ])
 
     update({ age: null })
-    expect(received, "onUpdate должен вызываться с патчем remove для null значений").toEqual([
-      { op: "remove", path: "/age" },
+    expect(received, "onUpdate должен вызываться с патчем replace для null значений").toEqual([
+      { op: "replace", path: "/age", value: null },
     ])
   })
 
@@ -71,7 +71,10 @@ describe("onUpdate", () => {
     })
 
     const patches: JsonPatch[] = []
-    onUpdate((p) => patches.push(...p))
+    onUpdate((p) => {
+      patches.length = 0
+      patches.push(...p)
+    })
 
     update({ name: "Лена" })
     let patch = patches[0]!
@@ -79,10 +82,17 @@ describe("onUpdate", () => {
     expect(patch.path, "path должен быть '/name' для поля name").toBe("/name")
     expect(patch, "patch должен содержать value с новым значением").toHaveProperty("value", "Лена")
 
+    update({ age: 42 })
+    patch = patches[0]!
+    expect(patch.op).toBe("replace")
+    expect(patch.path).toBe("/age")
+    if (patch.op === "replace") expect(patch.value).toBe(42)
+
     update({ age: null })
-    patch = patches[1]!
-    expect(patch.op, "op должен быть 'remove' для null значений").toBe("remove")
+    patch = patches[0]!
+    expect(patch.op, "op должен быть 'replace' для null значений").toBe("replace")
     expect(patch.path, "path должен быть '/age' для поля age").toBe("/age")
+    if (patch.op === "replace") expect(patch.value).toBe(null)
   })
 
   it("не вызывает коллбек при создании контекста", () => {
@@ -98,7 +108,7 @@ describe("onUpdate", () => {
     expect(called, "onUpdate не должен вызываться при создании контекста").toBe(false)
   })
 
-  it.todo("вызывает коллбек только при изменении значений", () => {
+  it("вызывает коллбек только при изменении значений", () => {
     const { update, onUpdate } = createContext({
       name: types.string.required({ default: "Гость" }),
       age: types.number.optional(),
@@ -115,7 +125,7 @@ describe("onUpdate", () => {
     update({ name: "Иван" }) // новое значение
     expect(callCount, "onUpdate должен быть вызван при изменении значения").toBe(1)
 
-    update({ age: null }) // установка null для optional поля
-    expect(callCount, "onUpdate должен быть вызван при установке null").toBe(2)
+    update({ age: null }) // установка null для optional поля (уже null)
+    expect(callCount, "onUpdate не должен вызываться при установке null для уже null поля").toBe(1)
   })
 })
