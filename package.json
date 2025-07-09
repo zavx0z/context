@@ -1,19 +1,29 @@
 {
   "name": "@zavx0z/context",
-  "version": "0.0.1",
-  "description": "Reactive context",
+  "version": "0.0.5",
+  "description": "Reactive context library with TypeScript support",
   "author": "zavx0z",
+  "keywords": [
+    "context",
+    "reactive",
+    "typescript",
+    "state",
+    "proxy"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/zavx0z/context.git"
   },
   "main": "dist/context.js",
-  "types": "dist/types/context.d.ts",
+  "types": "dist/context.d.ts",
   "exports": {
     ".": {
       "import": "./dist/context.js",
-      "types": "./dist/types/context.d.ts"
+      "types": "./dist/context.d.ts"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts"
     }
   },
   "files": [
@@ -27,5 +37,12 @@
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "scripts": {
+    "publish:npm": "bun run build && bun publish --access public",
+    "build": "bun run build:js && bun run build:types",
+    "build:js": "bun run script/build.ts",
+    "build:types": "tsc --project tsconfig.types.json",
+    "publish:dry": "bun run build && bun publish --dry-run"
   }
 }

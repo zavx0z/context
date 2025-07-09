@@ -4,16 +4,17 @@
         "emitDeclarationOnly": true,
         "declaration": true,
         "noEmit": false,
-        "outDir": "dist/types",
+        "outDir": "dist",
         "skipLibCheck": true
     },
     "include": [
-        "context.ts"
+        "context.ts",
     ],
     "exclude": [
         "bun.test.d.ts",
         "context.spec.ts",
         "fixture.ts",
+        "types.ts",
         "script/**/*",
         "test/**/*",
         "node_modules/**/*",

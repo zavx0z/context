@@ -3,23 +3,23 @@
  * @packageDocumentation
  */
 
-import type {ContextTypes, ContextSchema, ExtractValues, UpdateValues, JsonPatch} from "./types.ts"
+import type { ContextTypes, ContextSchema, ExtractValues, UpdateValues, JsonPatch, ContextInstance } from "./types.ts"
 
 const createStringType = {
-  required: (params = {}) => ({type: "string" as const, required: true as const, ...params}),
-  optional: (params = {}) => ({type: "string" as const, required: false as const, ...params}),
+  required: (params = {}) => ({ type: "string" as const, required: true as const, ...params }),
+  optional: (params = {}) => ({ type: "string" as const, required: false as const, ...params }),
 }
 const createNumberType = {
-  required: (params = {}) => ({type: "number" as const, required: true as const, ...params}),
-  optional: (params = {}) => ({type: "number" as const, required: false as const, ...params}),
+  required: (params = {}) => ({ type: "number" as const, required: true as const, ...params }),
+  optional: (params = {}) => ({ type: "number" as const, required: false as const, ...params }),
 }
 const createBooleanType = {
-  required: (params = {}) => ({type: "boolean" as const, required: true as const, ...params}),
-  optional: (params = {}) => ({type: "boolean" as const, required: false as const, ...params}),
+  required: (params = {}) => ({ type: "boolean" as const, required: true as const, ...params }),
+  optional: (params = {}) => ({ type: "boolean" as const, required: false as const, ...params }),
 }
 const createArrayType = {
-  required: (params = {}) => ({type: "array" as const, required: true as const, ...params}),
-  optional: (params = {}) => ({type: "array" as const, required: false as const, ...params}),
+  required: (params = {}) => ({ type: "array" as const, required: true as const, ...params }),
+  optional: (params = {}) => ({ type: "array" as const, required: false as const, ...params }),
 }
 
 /**
@@ -40,8 +40,8 @@ export const types: ContextTypes = {
   array: Object.assign((params = {}) => createArrayType.optional(params), createArrayType),
   enum: <const T extends readonly (string | number)[]>(...values: T) => {
     const enumBase = {
-      required: (options = {}) => ({type: "enum" as const, required: true as const, values, ...options}),
-      optional: (options = {}) => ({type: "enum" as const, required: false as const, values, ...options}),
+      required: (options = {}) => ({ type: "enum" as const, required: true as const, values, ...options }),
+      optional: (options = {}) => ({ type: "enum" as const, required: false as const, values, ...options }),
     }
     return Object.assign((options = {}) => enumBase.optional(options), enumBase)
   },
@@ -59,7 +59,7 @@ export const types: ContextTypes = {
  * ctx.context // доступ к значениям
  * ctx.update({name: 'Новое имя'})
  */
-export class Context<T extends ContextSchema> {
+export class Context<T extends ContextSchema> implements ContextInstance<T> {
   /** @internal */
   private contextData: ExtractValues<T>
   /** @internal */
@@ -187,9 +187,9 @@ export class Context<T extends ContextSchema> {
     const patches: JsonPatch[] = []
     for (const [key, value] of Object.entries(filteredValues)) {
       if (value === null) {
-        patches.push({op: "remove", path: `/${key}`})
+        patches.push({ op: "remove", path: `/${key}` })
       } else {
-        patches.push({op: "replace", path: `/${key}`, value})
+        patches.push({ op: "replace", path: `/${key}`, value })
       }
     }
     Object.assign(this.contextData, filteredValues)
@@ -198,11 +198,10 @@ export class Context<T extends ContextSchema> {
       for (const cb of this.updateSubscribers) {
         try {
           cb(patches)
-        } catch {
-        }
+        } catch {}
       }
     }
-    return {...this.contextData}
+    return { ...this.contextData }
   }
 
   /**
@@ -211,7 +210,7 @@ export class Context<T extends ContextSchema> {
    */
   clone(): Context<T> {
     const newContext = new Context({} as T)
-    newContext.contextData = {...this.contextData}
+    newContext.contextData = { ...this.contextData }
     newContext.immutableContext = newContext.createImmutableContext()
     return newContext
   }
@@ -232,30 +231,7 @@ export class Context<T extends ContextSchema> {
  */
 export function createContext<const T extends ContextSchema>(
   schema: ((types: ContextTypes) => T) | T
-): {
-  /** Текущее состояние контекста (только для чтения) */
-  context: ExtractValues<T>
-  /**
-   * Обновляет значения в контексте
-   * @param values - объект с новыми значениями
-   * @returns Обновленный контекст
-   */
-  update: (values: UpdateValues<ExtractValues<T>>) => ExtractValues<T>
-  /**
-   * Подписка на обновления контекста
-   * @param cb - функция, вызываемая при обновлении контекста
-   * @returns функция для отписки
-   */
-  onUpdate: (cb: (patches: JsonPatch[]) => void) => () => void
-} {
+): ContextInstance<T> {
   const actualSchema = typeof schema === "function" ? (schema as any)(types) : (schema as T)
-  const contextInstance = new Context(actualSchema)
-
-  return {
-    get context() {
-      return contextInstance.context
-    },
-    update: (values: UpdateValues<ExtractValues<T>>) => contextInstance.update(values),
-    onUpdate: (cb: (patches: JsonPatch[]) => void) => contextInstance.onUpdate(cb),
-  }
+  return new Context(actualSchema)
 }
