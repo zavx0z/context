@@ -1,6 +1,6 @@
 {
   "name": "@zavx0z/context",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Reactive context library with TypeScript support",
   "author": "zavx0z",
   "keywords": [
@@ -39,8 +39,9 @@
     "typescript": "^5"
   },
   "scripts": {
-    "publish:npm": "bun run build && bun publish --access public",
-    "build": "bun run build:js && bun run build:types",
+    "build:dev": "bun run build:js --dev && bun run build:types",
+    "build:prod": "bun run build:js --prod && bun run build:types",
+    "publish:npm": "bun run build:prod && bun script/version.ts && bun publish --access public",
     "build:js": "bun run script/build.ts",
     "build:types": "tsc --project tsconfig.types.json",
     "publish:dry": "bun run build && bun publish --dry-run"
