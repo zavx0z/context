@@ -27,10 +27,10 @@ npm install @zavx0z/context
 import { types, createContext } from "@zavx0z/context"
 
 const schema = {
-  name: types.string.required({ default: "Гость" }),
+  name: types.string.required("Гость"),
   age: types.number.optional(),
-  isActive: types.boolean.required({ default: true }),
-  role: types.enum("user", "admin", "moderator").required({ default: "user" }),
+  isActive: types.boolean.required(true),
+  role: types.enum("user", "admin", "moderator").required("user"),
   tags: types.array.optional(),
 }
 
@@ -52,6 +52,16 @@ update({ age: null }) // JSON Patch: [{ op: "replace", path: "/age", value: null
 unsubscribe()
 ```
 
+### Chainable API с title
+
+```ts
+const schema = {
+  name: types.string.required("Гость")({ title: "Имя пользователя" }),
+  role: types.enum("user", "admin", "moderator").required("user")({ title: "Роль" }),
+  nickname: types.string("Nic")({ title: "Псевдоним" }),
+}
+```
+
 ---
 
 ## Основные возможности
@@ -61,6 +71,7 @@ unsubscribe()
 - Метод update для безопасного и контролируемого обновления
 - Подписка на изменения (onUpdate) с поддержкой JSON Patch (RFC 6902) для отслеживания изменений
 - Поддержка типов: string, number, boolean, array, enum
+- Chainable API для удобного описания схем
 
 ---
 
@@ -70,16 +81,37 @@ unsubscribe()
 
 Фабрики для описания схемы:
 
-- `types.string.required({ default, title })` / `types.string.optional({ default, title })`
-- `types.number.required({ default, title })` / `types.number.optional({ default, title })`
-- `types.boolean.required({ default, title })` / `types.boolean.optional({ default, title })`
-- `types.array.required({ default, title })` / `types.array.optional({ default, title })`
-- `types.enum(...values).required({ default, title })` / `types.enum(...values).optional({ default, title })`
+**Строки:**
 
-**Параметры:**
+- `types.string.required(defaultValue?)` / `types.string.optional(defaultValue?)`
+- `types.string(defaultValue?)` — сокращение для optional
 
-- `default` — значение по умолчанию
-- `title` — опциональное название поля для документации
+**Числа:**
+
+- `types.number.required(defaultValue?)` / `types.number.optional(defaultValue?)`
+- `types.number(defaultValue?)` — сокращение для optional
+
+**Булевы:**
+
+- `types.boolean.required(defaultValue?)` / `types.boolean.optional(defaultValue?)`
+- `types.boolean(defaultValue?)` — сокращение для optional
+
+**Массивы:**
+
+- `types.array.required(defaultValue?)` / `types.array.optional(defaultValue?)`
+- `types.array(defaultValue?)` — сокращение для optional
+
+**Перечисления:**
+
+- `types.enum(...values).required(defaultValue?)` / `types.enum(...values).optional(defaultValue?)`
+- `types.enum(...values)(defaultValue?)` — сокращение для optional
+
+**Chainable API:**
+Все фабрики поддерживают цепочку вызовов для добавления дополнительных опций:
+
+```ts
+types.string.required("default")({ title: "Название поля" })
+```
 
 ### createContext(schema)
 
@@ -87,7 +119,7 @@ unsubscribe()
 
 **Параметры:**
 
-- `schema` — объект или функция, возвращающая схему с использованием types
+- `schema` — объект схемы с использованием types
 
 **Возвращает:**
 
@@ -103,11 +135,11 @@ unsubscribe()
 ```ts
 // Пользовательский контекст
 const userSchema = {
-  name: types.string.required({ default: "Гость", title: "Имя пользователя" }),
-  age: types.number.optional({ title: "Возраст" }),
-  isActive: types.boolean.required({ default: true, title: "Активен" }),
-  role: types.enum("user", "admin", "moderator").required({ default: "user", title: "Роль" }),
-  tags: types.array.optional({ title: "Теги" }),
+  name: types.string.required("Гость")({ title: "Имя пользователя" }),
+  age: types.number.optional()({ title: "Возраст" }),
+  isActive: types.boolean.required(true)({ title: "Активен" }),
+  role: types.enum("user", "admin", "moderator").required("user")({ title: "Роль" }),
+  tags: types.array.optional()({ title: "Теги" }),
 }
 
 const { context, update } = createContext(userSchema)
@@ -117,16 +149,23 @@ update({ age: 30 }) // { age: 30 }
 
 // Контекст продукта
 const productSchema = {
-  id: types.string.required({ title: "Уникальный идентификатор" }),
-  name: types.string.required({ default: "Новый продукт", title: "Название" }),
-  price: types.number.required({ default: 0, title: "Цена" }),
-  inStock: types.boolean.required({ default: false, title: "В наличии" }),
-  category: types.enum("electronics", "clothing", "books").optional({ title: "Категория" }),
-  images: types.array.required({ default: [], title: "Изображения" }),
+  id: types.string.required()({ title: "Уникальный идентификатор" }),
+  name: types.string.required("Новый продукт")({ title: "Название" }),
+  price: types.number.required(0)({ title: "Цена" }),
+  inStock: types.boolean.required(false)({ title: "В наличии" }),
+  category: types.enum("electronics", "clothing", "books").optional()({ title: "Категория" }),
+  images: types.array.required([])({ title: "Изображения" }),
 }
 
 const { update: updateProduct } = createContext(productSchema)
 updateProduct({ id: "prod-123", price: 999 }) // { id: "prod-123", price: 999 }
+
+// Простой синтаксис без title
+const simpleSchema = {
+  name: types.string.required("default"),
+  age: types.number(),
+  role: types.enum("user", "admin").required("user"),
+}
 ```
 
 ---
@@ -137,81 +176,78 @@ updateProduct({ id: "prod-123", price: 999 }) // { id: "prod-123", price: 999 }
 
 ```ts
 // Основной экспорт
-import { types, createContext } from "@zavx0z/context"
+import { createContext, types } from "@zavx0z/context"
 
-// Только типы (для TypeScript)
-import type { ContextSchema, ExtractValues, JsonPatch } from "@zavx0z/context/types"
+// Дополнительные экспорты типов
+import type { ContextSchema, ContextInstance, ExtractValues, JsonPatch } from "@zavx0z/context"
 ```
 
 ---
 
 ## Особенности
 
-- **Иммутабельность:** значения в context нельзя менять напрямую — только через update(). Попытка изменить или удалить свойство вызовет ошибку.
-- **Метод update:** возвращает только реально изменённые поля (а не весь контекст).
-- **Подписка:** onUpdate(cb) позволяет реагировать на любые изменения, cb получает массив JSON Patch операций (RFC 6902).
+### Возвращаемое значение update
 
-- **Типизация:** все значения строго типизированы, поддерживается автодополнение в редакторе.
-- **Документация:** поддержка title в схемах для улучшения документации.
+Метод `update()` **возвращает только те поля, которые действительно изменились**:
+
+```ts
+const { context, update } = createContext({
+  name: types.string.required("Гость"),
+  age: types.number.optional(),
+})
+
+// Если возраст был null, а имя "Гость"
+const result = update({ name: "Гость", age: 25 })
+console.log(result) // { age: 25 } - только изменившееся поле!
+```
+
+### Типизация опциональных полей
+
+Опциональные поля имеют тип `T | null`, где T — базовый тип:
+
+- `types.string()` → `string | null`
+- `types.number.optional()` → `number | null`
+
+Обязательные поля имеют строгий тип:
+
+- `types.string.required()` → `string`
+- `types.number.required()` → `number`
 
 ---
 
-## Для разработчиков
+## Сборка и разработка
 
-### Архитектура
-
-- **`types.ts`** — фабрики типов (runtime) и объект `types` для декларативного описания схемы.
-- **`types.t.ts`** — TypeScript-интерфейсы, описывающие декларативные типы схемы (RequiredStringDefinition, …​).
-- **`context.t.ts`** — типы, связанные с самим контекстом (ExtractValues, JsonPatch, ContextInstance).
-- **`context.ts`** — бизнес-логика: класс `Context`, функция `createContext`, импортирующие `types` и типы из `*.t.ts`.
-- **`fixture/`** — кастомные матчеры для тестов (toPlainObjectEqual).
-- Скрипты: `script/` — сборка (build.ts), генерация типов (typegen.ts), обновление версии (version.ts).
-- Тесты: `test/` — примеры, edge-cases, проверки иммутабельности и подписки.
-
-### Как добавить новый тип
-
-1. Добавьте фабрику в `types.ts` по аналогии с существующими (см. createStringType, createNumberType и т.д.).
-2. Опишите тип в `types.t.ts`.
-3. Добавьте обработку в метод initializeContext класса Context в `context.ts`.
-4. Добавьте тесты в `test/`.
-
-### Сборка и тесты
+### Установка зависимостей
 
 ```sh
-# Разработка
-bun run build:dev
-
-# Продакшн
-bun run build:prod
-
-# Тесты
-bun test
-
-# Сухая публикация
-bun run publish:dry
+bun install
 ```
 
-### Публикация
+### Команды разработки
 
 ```sh
-# Обновление версии (patch/minor/major)
-bun run script/version.ts [patch|minor|major]
-
-# Публикация в npm
-bun run publish:npm
+bun test              # Запуск тестов
+bun run build:dev     # Сборка в режиме разработки
+bun run build:prod    # Продакшн сборка (минификация + типы)
 ```
 
----
+### Архитектура проекта
 
-## Вклад
-
-1. Форкните репозиторий
-2. Создайте ветку: `git checkout -b feature/ваша-фича`
-3. Внесите изменения, добавьте тесты
-4. Оформите pull request
+```
+context/
+├── context.ts        # Основная логика
+├── context.t.ts      # Типы для контекста
+├── types.ts          # Фабрики типов
+├── types.t.ts        # Типы для фабрик
+├── test/             # Тесты
+├── script/           # Скрипты сборки
+│   ├── build.ts      # Сборка JS
+│   └── typegen.ts    # Генерация типов
+└── fixture/          # Утилиты для тестов
+```
 
 ---
 
 ## Лицензия
 
-MIT
+MIT © [zavx0z](https://github.com/zavx0z)

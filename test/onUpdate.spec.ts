@@ -5,9 +5,9 @@ import type { JsonPatch } from "../context.t"
 describe("onUpdate", () => {
   it("вызывает коллбек с патчами при обновлении", () => {
     const { update, onUpdate } = createContext({
-      name: types.string.required({ default: "Гость" }),
+      name: types.string.required("Гость"),
       age: types.number.optional(),
-      isActive: types.boolean.required({ default: true }),
+      isActive: types.boolean.required(true),
     })
 
     let received: JsonPatch[] = []
@@ -29,7 +29,7 @@ describe("onUpdate", () => {
 
   it("поддерживает отписку от обновлений", () => {
     const { update, onUpdate } = createContext({
-      name: types.string.required({ default: "Гость" }),
+      name: types.string.required("Гость"),
     })
 
     let called = 0
@@ -47,7 +47,7 @@ describe("onUpdate", () => {
 
   it("поддерживает несколько подписчиков", () => {
     const { update, onUpdate } = createContext({
-      name: types.string.required({ default: "Гость" }),
+      name: types.string.required("Гость"),
     })
 
     let a = 0,
@@ -66,7 +66,7 @@ describe("onUpdate", () => {
 
   it("генерирует корректные JSON Patch", () => {
     const { update, onUpdate } = createContext({
-      name: types.string.required({ default: "Гость" }),
+      name: types.string.required("Гость"),
       age: types.number.optional(),
     })
 
@@ -98,7 +98,7 @@ describe("onUpdate", () => {
   it("не вызывает коллбек при создании контекста", () => {
     let called = false
     const { onUpdate } = createContext({
-      name: types.string.required({ default: "Гость" }),
+      name: types.string.required("Гость"),
     })
 
     onUpdate(() => {
@@ -110,7 +110,7 @@ describe("onUpdate", () => {
 
   it("вызывает коллбек только при изменении значений", () => {
     const { update, onUpdate } = createContext({
-      name: types.string.required({ default: "Гость" }),
+      name: types.string.required("Гость"),
       age: types.number.optional(),
     })
 

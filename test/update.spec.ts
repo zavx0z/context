@@ -4,7 +4,7 @@ import { types, createContext } from "../context"
 describe("update", () => {
   it("обновляет только переданные значения", () => {
     const { context, update } = createContext({
-      name: types.string.required({ default: "Гость" }),
+      name: types.string.required("Гость"),
       nickname: types.string(),
       age: types.number.optional(),
     })
@@ -22,7 +22,7 @@ describe("update", () => {
 
   it("игнорирует undefined значения", () => {
     const { context, update } = createContext({
-      name: types.string.required({ default: "Гость" }),
+      name: types.string.required("Гость"),
       nickname: types.string(),
     })
 
@@ -53,15 +53,15 @@ describe("update", () => {
 
   it("работает со всеми типами данных", () => {
     const { context, update } = createContext({
-      title: types.string.required({ default: "Заголовок" }),
+      title: types.string.required("Заголовок"),
       description: types.string(),
-      age: types.number.required({ default: 18 }),
+      age: types.number.required(18),
       score: types.number(),
-      isActive: types.boolean.required({ default: true }),
+      isActive: types.boolean.required(true),
       isVerified: types.boolean(),
-      status: types.enum("draft", "published", "archived").required({ default: "draft" }),
+      status: types.enum("draft", "published", "archived").required("draft"),
       category: types.enum("tech", "design", "business")(),
-      tags: types.array.required({ default: [] }),
+      tags: types.array.required([]),
       permissions: types.array(),
       flags: types.array(),
     })
@@ -95,8 +95,8 @@ describe("update", () => {
 
   it("возвращает обновленный контекст", () => {
     const { context, update } = createContext({
-      name: types.string.required({ default: "Гость" }),
-      status: types.enum("start", "process", "end").required({ default: "start" }),
+      name: types.string.required("Гость"),
+      status: types.enum("start", "process", "end").required("start"),
       age: types.number.optional(),
     })
 
@@ -113,8 +113,8 @@ describe("update", () => {
 
   it("сохраняет иммутабельность после обновления", () => {
     const { context, update } = createContext({
-      name: types.string.required({ default: "Гость" }),
-      status: types.enum("start", "process", "end").required({ default: "start" }),
+      name: types.string.required("Гость"),
+      status: types.enum("start", "process", "end").required("start"),
     })
 
     update({ name: "Новое имя" })

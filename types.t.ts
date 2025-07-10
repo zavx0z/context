@@ -5,32 +5,32 @@
 export interface BaseStringDefinition {
   type: "string"
   title?: string
-  default?: string
+  default?: string | undefined
 }
 
 export interface BaseNumberDefinition {
   type: "number"
   title?: string
-  default?: number
+  default?: number | undefined
 }
 
 export interface BaseBooleanDefinition {
   type: "boolean"
   title?: string
-  default?: boolean
+  default?: boolean | undefined
 }
 
 export interface BaseArrayDefinition<T extends string | number | boolean> {
   type: "array"
   title?: string
-  default?: T[]
+  default?: T[] | undefined
 }
 
 export interface BaseEnumDefinition<T extends readonly (string | number)[]> {
   type: "enum"
   values: T
   title?: string
-  default?: T[number]
+  default?: T[number] | undefined
 }
 
 export interface RequiredStringDefinition extends BaseStringDefinition {
@@ -93,41 +93,61 @@ export type AnyDefinition =
   | EnumDefinition<any>
 
 export type ContextSchema = Record<string, AnyDefinition>
+
+// Новые типы для chainable API
 export type ContextTypes = {
   string: {
-    required: <T extends string = string>(params?: { title?: string; default?: T }) => RequiredStringDefinition
-    optional: <T extends string = string>(params?: { title?: string; default?: T }) => OptionalStringDefinition
-    <T extends string = string>(params?: { title?: string; default?: T }): OptionalStringDefinition
+    required: <T extends string = string>(
+      defaultValue?: T
+    ) => ((options?: { title?: string }) => RequiredStringDefinition) & RequiredStringDefinition
+    optional: <T extends string = string>(
+      defaultValue?: T
+    ) => ((options?: { title?: string }) => OptionalStringDefinition) & OptionalStringDefinition
+    <T extends string = string>(defaultValue?: T): ((options?: { title?: string }) => OptionalStringDefinition) &
+      OptionalStringDefinition
   }
   number: {
-    required: <T extends number = number>(params?: { title?: string; default?: T }) => RequiredNumberDefinition
-    optional: <T extends number = number>(params?: { title?: string; default?: T }) => OptionalNumberDefinition
-    <T extends number = number>(params?: { title?: string; default?: T }): OptionalNumberDefinition
+    required: <T extends number = number>(
+      defaultValue?: T
+    ) => ((options?: { title?: string }) => RequiredNumberDefinition) & RequiredNumberDefinition
+    optional: <T extends number = number>(
+      defaultValue?: T
+    ) => ((options?: { title?: string }) => OptionalNumberDefinition) & OptionalNumberDefinition
+    <T extends number = number>(defaultValue?: T): ((options?: { title?: string }) => OptionalNumberDefinition) &
+      OptionalNumberDefinition
   }
   boolean: {
-    required: <T extends boolean = boolean>(params?: { title?: string; default?: T }) => RequiredBooleanDefinition
-    optional: <T extends boolean = boolean>(params?: { title?: string; default?: T }) => OptionalBooleanDefinition
-    <T extends boolean = boolean>(params?: { title?: string; default?: T }): OptionalBooleanDefinition
+    required: <T extends boolean = boolean>(
+      defaultValue?: T
+    ) => ((options?: { title?: string }) => RequiredBooleanDefinition) & RequiredBooleanDefinition
+    optional: <T extends boolean = boolean>(
+      defaultValue?: T
+    ) => ((options?: { title?: string }) => OptionalBooleanDefinition) & OptionalBooleanDefinition
+    <T extends boolean = boolean>(defaultValue?: T): ((options?: { title?: string }) => OptionalBooleanDefinition) &
+      OptionalBooleanDefinition
   }
   array: {
-    required: <T extends string | number | boolean = string>(params?: {
+    required: <T extends string | number | boolean = string>(
+      defaultValue?: T[]
+    ) => ((options?: { title?: string }) => RequiredArrayDefinition<T>) & RequiredArrayDefinition<T>
+    optional: <T extends string | number | boolean = string>(
+      defaultValue?: T[]
+    ) => ((options?: { title?: string }) => OptionalArrayDefinition<T>) & OptionalArrayDefinition<T>
+    <T extends string | number | boolean = string>(defaultValue?: T[]): ((options?: {
       title?: string
-      default?: T[]
-    }) => RequiredArrayDefinition<T>
-    optional: <T extends string | number | boolean = string>(params?: {
-      title?: string
-      default?: T[]
-    }) => OptionalArrayDefinition<T>
-    <T extends string | number | boolean = string>(params?: {
-      title?: string
-      default?: T[]
-    }): OptionalArrayDefinition<T>
+    }) => OptionalArrayDefinition<T>) &
+      OptionalArrayDefinition<T>
   }
   enum: <const T extends readonly (string | number)[]>(
     ...values: T
   ) => {
-    required: (options?: { title?: string; default?: T[number] }) => RequiredEnumDefinition<T>
-    optional: (options?: { title?: string; default?: T[number] }) => OptionalEnumDefinition<T>
-    (options?: { title?: string; default?: T[number] }): OptionalEnumDefinition<T>
+    required: (
+      defaultValue?: T[number]
+    ) => ((options?: { title?: string }) => RequiredEnumDefinition<T>) & RequiredEnumDefinition<T>
+    optional: (
+      defaultValue?: T[number]
+    ) => ((options?: { title?: string }) => OptionalEnumDefinition<T>) & OptionalEnumDefinition<T>
+    (defaultValue?: T[number]): ((options?: { title?: string }) => OptionalEnumDefinition<T>) &
+      OptionalEnumDefinition<T>
   }
 }

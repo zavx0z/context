@@ -5,12 +5,12 @@ describe("Контекст", () => {
   describe("Создание контекста", () => {
     it("создаёт контекст с правильными значениями по умолчанию", () => {
       const { context } = createContext({
-        name: types.string.required({ default: "Гость" }),
-        role: types.enum("user", "admin", "moderator").required({ default: "user" }),
+        name: types.string.required("Гость"),
+        role: types.enum("user", "admin", "moderator").required("user"),
         nickname: types.string(),
         bio: types.string.optional(),
         priority: types.enum("low", "medium", "high")(),
-        tags: types.array.optional({ default: [] }),
+        tags: types.array.optional([]),
       })
 
       expect(context.name, 'Поле name должно быть "Гость" по умолчанию').toBe("Гость")
@@ -23,15 +23,15 @@ describe("Контекст", () => {
 
     it("корректно работает со всеми типами данных", () => {
       const { context } = createContext({
-        title: types.string.required({ default: "Заголовок" }),
+        title: types.string.required("Заголовок"),
         description: types.string(),
-        age: types.number.required({ default: 18 }),
+        age: types.number.required(18),
         score: types.number(),
-        isActive: types.boolean.required({ default: true }),
+        isActive: types.boolean.required(true),
         isVerified: types.boolean(),
-        status: types.enum("draft", "published", "archived").required({ default: "draft" }),
+        status: types.enum("draft", "published", "archived").required("draft"),
         category: types.enum("tech", "design", "business")(),
-        tags: types.array.required({ default: [] }),
+        tags: types.array.required([]),
         permissions: types.array(),
         flags: types.array(),
       })
@@ -49,6 +49,18 @@ describe("Контекст", () => {
       expect(context.flags, "Поле flags должно быть null по умолчанию").toBe(null)
     })
 
+    it("проверяет новый chainable API с title", () => {
+      const { context } = createContext({
+        name: types.string.required("Гость")({ title: "Имя пользователя" }),
+        role: types.enum("user", "admin", "moderator").required("user")({ title: "Роль" }),
+        nickname: types.string("Nic")({ title: "Псевдоним" }),
+      })
+
+      expect(context.name, 'Поле name должно быть "Гость" по умолчанию').toBe("Гость")
+      expect(context.role, 'Поле role должно быть "user" по умолчанию').toBe("user")
+      expect(context.nickname, 'Поле nickname должно быть "Nic" по умолчанию').toBe("Nic")
+    })
+
     it("проверяет типизацию enum", () => {
       const { context } = createContext({
         role: types.enum("user", "admin")(),
@@ -63,7 +75,7 @@ describe("Контекст", () => {
 
     it("проверяет типизацию array", () => {
       const { context } = createContext({
-        tags: types.array({ default: ["a", "b"] }),
+        tags: types.array(["a", "b"]),
         numbers: types.array(),
         flags: types.array(),
       })
@@ -72,15 +84,15 @@ describe("Контекст", () => {
       expect(context.flags, "Поле flags должно быть null по умолчанию").toBe(null)
 
       // @ts-ignore - array должен принимать только примитивы
-      types.array({ default: [{}] })
+      types.array([{}])
     })
   })
 
   describe("Иммутабельность", () => {
     it("запрещает прямое изменение значений", () => {
       const { context } = createContext({
-        name: types.string.required({ default: "Гость" }),
-        status: types.enum("start", "process", "end").required({ default: "start" }),
+        name: types.string.required("Гость"),
+        status: types.enum("start", "process", "end").required("start"),
       })
 
       expect(() => {
@@ -98,8 +110,8 @@ describe("Контекст", () => {
 
     it("запрещает удаление свойств", () => {
       const { context } = createContext({
-        name: types.string.required({ default: "Гость" }),
-        status: types.enum("start", "process", "end").required({ default: "start" }),
+        name: types.string.required("Гость"),
+        status: types.enum("start", "process", "end").required("start"),
       })
 
       expect(() => {
@@ -113,8 +125,8 @@ describe("Контекст", () => {
 
     it("позволяет читать значения", () => {
       const { context } = createContext({
-        name: types.string.required({ default: "Гость" }),
-        status: types.enum("start", "process", "end").required({ default: "start" }),
+        name: types.string.required("Гость"),
+        status: types.enum("start", "process", "end").required("start"),
       })
 
       expect(context.name, 'Поле name должно быть "Гость"').toBe("Гость")
@@ -126,10 +138,10 @@ describe("Контекст", () => {
 describe("Примеры использования", () => {
   it("пользовательский контекст", () => {
     const schema = {
-      name: types.string.required({ default: "Гость" }),
+      name: types.string.required("Гость"),
       age: types.number.optional(),
-      isActive: types.boolean.required({ default: true }),
-      role: types.enum("user", "admin", "moderator").required({ default: "user" }),
+      isActive: types.boolean.required(true),
+      role: types.enum("user", "admin", "moderator").required("user"),
       tags: types.array.optional(),
     }
     const { context, update } = createContext(schema)
@@ -152,11 +164,11 @@ describe("Примеры использования", () => {
   it("контекст продукта", () => {
     const schema = {
       id: types.string.required(),
-      name: types.string.required({ default: "Новый продукт" }),
-      price: types.number.required({ default: 0 }),
-      inStock: types.boolean.required({ default: false }),
+      name: types.string.required("Новый продукт"),
+      price: types.number.required(0),
+      inStock: types.boolean.required(false),
       category: types.enum("electronics", "clothing", "books").optional(),
-      images: types.array.required({ default: [] }),
+      images: types.array.required([]),
     }
     const { context, update } = createContext(schema)
 
@@ -187,10 +199,10 @@ describe("Примеры использования", () => {
 
   it("контекст статьи", () => {
     const schema = {
-      title: types.string.required({ default: "Заголовок" }),
+      title: types.string.required("Заголовок"),
       content: types.string.optional(),
-      published: types.boolean.required({ default: false }),
-      views: types.number.required({ default: 0 }),
+      published: types.boolean.required(false),
+      views: types.number.required(0),
     }
     const { context, update } = createContext(schema)
 

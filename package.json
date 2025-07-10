@@ -16,15 +16,12 @@
     "type": "git",
     "url": "https://github.com/zavx0z/context.git"
   },
-  "main": "dist/context.js",
-  "types": "dist/context.d.ts",
+  "main": "./dist/context.js",
+  "types": "./dist/context.d.ts",
   "exports": {
     ".": {
       "import": "./dist/context.js",
       "types": "./dist/context.d.ts"
-    },
-    "./types": {
-      "types": "./dist/types.d.ts"
     }
   },
   "files": [
