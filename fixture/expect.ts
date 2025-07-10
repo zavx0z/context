@@ -1,5 +1,15 @@
 import { expect } from "bun:test"
 
+/** Сравнивает Proxy-контекст с plain-объектом по схеме */
+function toPlainObject(proxy: any, schema: any): any {
+  const result: any = {}
+  const keys = Object.keys(schema)
+  for (const key of keys) {
+    result[key] = proxy[key]
+  }
+  return result
+}
+
 expect.extend({
   toPlainObjectEqual(received: unknown, schema: object, expected: object) {
     const plain = toPlainObject(received, schema)
@@ -22,12 +32,3 @@ expect.extend({
     }
   },
 })
-/** Сравнивает Proxy-контекст с plain-объектом по схеме */
-function toPlainObject(proxy: any, schema: any): any {
-  const result: any = {}
-  const keys = Object.keys(schema)
-  for (const key of keys) {
-    result[key] = proxy[key]
-  }
-  return result
-}

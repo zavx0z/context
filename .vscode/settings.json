@@ -10,11 +10,22 @@
         "**/node_modules": true,
         "**/__pycache__": true,
         ".venv": true,
-        "**/.vscode": true
+        "**/.vscode": true,
+        ".idea": true
     },
-    "hide-files.files": [],
-    "explorer.fileNesting.enabled": false,
+    "hide-files.files": [
+        ".idea"
+    ],
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.expand": false,
+    "explorer.fileNesting.patterns": {
+        "tsconfig.json": "tsconfig.*.json",
+        "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lock, bun.lockb, bunfig.toml, .npmrc",
+        "*.ts": "",
+        "*.js": "${capture}.js.map, ${capture}.min.js",
+    },
     "cSpell.words": [
+        "bunfig",
         "иммутабельности",
         "иммутабельных",
         "коммита",

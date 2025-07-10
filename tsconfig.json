@@ -29,6 +29,10 @@
     // "forceConsistentCasingInFileNames": true
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    ".cursor",
+    ".github",
+    "dist",
+    "script"
   ]
 }
