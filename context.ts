@@ -2,59 +2,13 @@
  * Модуль для создания типизированных контекстов и схем параметров
  * @packageDocumentation
  */
+import {types} from "./types"
 
-import type {
-  ContextTypes,
-  ContextSchema,
-  ExtractValues,
-  UpdateValues,
-  JsonPatch,
-  ContextInstance,
-} from "./context.t.js"
+import type {ContextSchema} from "./types.t"
+import type {ExtractValues, UpdateValues, JsonPatch, ContextInstance} from "./context.t"
 
-export * from "./context.t.js"
-
-const createStringType = {
-  required: (params = {}) => ({ type: "string" as const, required: true as const, ...params }),
-  optional: (params = {}) => ({ type: "string" as const, required: false as const, ...params }),
-}
-const createNumberType = {
-  required: (params = {}) => ({ type: "number" as const, required: true as const, ...params }),
-  optional: (params = {}) => ({ type: "number" as const, required: false as const, ...params }),
-}
-const createBooleanType = {
-  required: (params = {}) => ({ type: "boolean" as const, required: true as const, ...params }),
-  optional: (params = {}) => ({ type: "boolean" as const, required: false as const, ...params }),
-}
-const createArrayType = {
-  required: (params = {}) => ({ type: "array" as const, required: true as const, ...params }),
-  optional: (params = {}) => ({ type: "array" as const, required: false as const, ...params }),
-}
-
-/**
- * Набор фабрик для создания описаний типов параметров контекста.
- * Используется для построения схемы контекста.
- *
- * @example
- * const schema = {
- *   name: types.string.required({ default: 'Гость' }),
- *   age: types.number.optional(),
- *   role: types.enum('user', 'admin').required({ default: 'user' })
- * }
- */
-export const types: ContextTypes = {
-  string: Object.assign((params = {}) => createStringType.optional(params), createStringType),
-  number: Object.assign((params = {}) => createNumberType.optional(params), createNumberType),
-  boolean: Object.assign((params = {}) => createBooleanType.optional(params), createBooleanType),
-  array: Object.assign((params = {}) => createArrayType.optional(params), createArrayType),
-  enum: <const T extends readonly (string | number)[]>(...values: T) => {
-    const enumBase = {
-      required: (options = {}) => ({ type: "enum" as const, required: true as const, values, ...options }),
-      optional: (options = {}) => ({ type: "enum" as const, required: false as const, values, ...options }),
-    }
-    return Object.assign((options = {}) => enumBase.optional(options), enumBase)
-  },
-}
+export {types}
+export type {ContextSchema, ExtractValues, UpdateValues}
 
 /**
  * Класс для работы с типизированными контекстами.
@@ -68,7 +22,7 @@ export const types: ContextTypes = {
  * ctx.context // доступ к значениям
  * ctx.update({name: 'Новое имя'})
  */
-export class Context<T extends ContextSchema> implements ContextInstance<T> {
+class Context<T extends ContextSchema> implements ContextInstance<T> {
   /** @internal */
   private contextData: ExtractValues<T>
   /** @internal */
@@ -202,12 +156,12 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
       if (value === null) {
         // Для null — если текущее значение не null, делаем replace с value: null
         if (currentValue !== null) {
-          patches.push({ op: "replace", path: `/${key}`, value: null })
+          patches.push({op: "replace", path: `/${key}`, value: null})
         }
       } else {
         // Для обычных значений — сравниваем с текущим
         if (currentValue !== value) {
-          patches.push({ op: "replace", path: `/${key}`, value })
+          patches.push({op: "replace", path: `/${key}`, value})
         }
       }
     }
@@ -219,11 +173,12 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
       for (const cb of this.updateSubscribers) {
         try {
           cb(patches)
-        } catch {}
+        } catch {
+        }
       }
     }
 
-    return { ...this.contextData }
+    return {...this.contextData}
   }
 
   /**
@@ -232,7 +187,7 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
    */
   clone(): Context<T> {
     const newContext = new Context({} as T)
-    newContext.contextData = { ...this.contextData }
+    newContext.contextData = {...this.contextData}
     newContext.immutableContext = newContext.createImmutableContext()
     return newContext
   }
@@ -252,11 +207,9 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
  * ctx.update({name: 'Новое имя'})
  */
 export function createContext<const T extends ContextSchema>(
-  schema: ((types: ContextTypes) => T) | T
+  schema: T
 ): ContextInstance<T> {
-  const actualSchema = typeof schema === "function" ? (schema as any)(types) : (schema as T)
-  const contextInstance = new Context(actualSchema)
-
+  const contextInstance = new Context(schema)
   return {
     context: contextInstance.context,
     update: contextInstance.update.bind(contextInstance),

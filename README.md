@@ -127,8 +127,10 @@ const productSchema = {
 
 ### Архитектура
 
-- Основной модуль: `context.ts` — содержит фабрики типов, класс Context и функцию createContext.
-- Типы: `types.ts` — все интерфейсы и типы для схем, патчей, экземпляров.
+- **`types.ts`** — фабрики типов (runtime) и объект `types` для декларативного описания схемы.
+- **`types.t.ts`** — TypeScript-интерфейсы, описывающие декларативные типы схемы (RequiredStringDefinition, …​).
+- **`context.t.ts`** — типы, связанные с самим контекстом (ExtractValues, JsonPatch, ContextInstance).
+- **`context.ts`** — бизнес-логика: класс `Context`, функция `createContext`, импортирующие `types` и типы из `*.t.ts`.
 - Скрипты: `script/` — сборка (build.ts), обновление версии (version.ts).
 - Тесты: `test/` — примеры, edge-cases, проверки иммутабельности и подписки.
 
