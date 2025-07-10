@@ -143,15 +143,9 @@ describe("Примеры использования", () => {
     })
 
     const updated = update({ name: "Иван", age: 25 })
-    expect(
-      updated,
-      "После update должны обновиться только переданные поля, остальные остаться прежними"
-    ).toPlainObjectEqual(schema, {
+    expect(updated, "После update должны вернуться только обновленные поля").toEqual({
       name: "Иван",
       age: 25,
-      isActive: true,
-      role: "user",
-      tags: null,
     })
   })
 
@@ -182,16 +176,12 @@ describe("Примеры использования", () => {
       inStock: true,
       category: "electronics",
     })
-    expect(
-      updated,
-      "После update должны обновиться только переданные поля, остальные остаться прежними"
-    ).toPlainObjectEqual(schema, {
+    expect(updated, "После update должны вернуться только обновленные поля").toEqual({
       id: "prod-123",
       name: "iPhone 15",
       price: 99999,
       inStock: true,
       category: "electronics",
-      images: [],
     })
   })
 
@@ -216,14 +206,10 @@ describe("Примеры использования", () => {
       content: "Содержание статьи",
       published: true,
     })
-    expect(
-      updated,
-      "После update должны обновиться только переданные поля, остальные остаться прежними"
-    ).toPlainObjectEqual(schema, {
+    expect(updated, "После update должны вернуться только обновленные поля").toEqual({
       title: "Новый заголовок",
       content: "Содержание статьи",
       published: true,
-      views: 0,
     })
   })
 })

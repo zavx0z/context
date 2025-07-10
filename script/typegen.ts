@@ -28,6 +28,6 @@ if (import.meta.main) {
   const outDir = "../metafor/package/context"
   const entrypoint = "./context.ts"
   const destination = join(outDir, "context.d.ts")
-  
+
   await typegen(entrypoint, destination)
 }

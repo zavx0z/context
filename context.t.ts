@@ -53,7 +53,7 @@ export interface ContextInstance<T extends ContextSchema> {
   /** Текущее состояние контекста (только для чтения) */
   context: ExtractValues<T>
   /** Обновляет значения в контексте */
-  update: (values: UpdateValues<ExtractValues<T>>) => ExtractValues<T>
+  update: (values: UpdateValues<ExtractValues<T>>) => Partial<ExtractValues<T>>
   /** Подписка на обновления контекста */
   onUpdate: (cb: (patches: JsonPatch[]) => void) => () => void
 }

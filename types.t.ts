@@ -110,11 +110,22 @@ export type ContextTypes = {
     <T extends boolean = boolean>(params?: { title?: string; default?: T }): OptionalBooleanDefinition
   }
   array: {
-    required: <T extends string | number | boolean = string>(params?: { title?: string; default?: T[] }) => RequiredArrayDefinition<T>
-    optional: <T extends string | number | boolean = string>(params?: { title?: string; default?: T[] }) => OptionalArrayDefinition<T>
-    <T extends string | number | boolean = string>(params?: { title?: string; default?: T[] }): OptionalArrayDefinition<T>
+    required: <T extends string | number | boolean = string>(params?: {
+      title?: string
+      default?: T[]
+    }) => RequiredArrayDefinition<T>
+    optional: <T extends string | number | boolean = string>(params?: {
+      title?: string
+      default?: T[]
+    }) => OptionalArrayDefinition<T>
+    <T extends string | number | boolean = string>(params?: {
+      title?: string
+      default?: T[]
+    }): OptionalArrayDefinition<T>
   }
-  enum: <const T extends readonly (string | number)[]>(...values: T) => {
+  enum: <const T extends readonly (string | number)[]>(
+    ...values: T
+  ) => {
     required: (options?: { title?: string; default?: T[number] }) => RequiredEnumDefinition<T>
     optional: (options?: { title?: string; default?: T[number] }) => OptionalEnumDefinition<T>
     (options?: { title?: string; default?: T[number] }): OptionalEnumDefinition<T>

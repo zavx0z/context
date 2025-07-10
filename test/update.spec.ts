@@ -93,17 +93,22 @@ describe("update", () => {
     expect(context.flags, "Поле flags должно обновиться на [true, false, true]").toEqual([true, false, true])
   })
 
-  it.todo("возвращает обновленный контекст", () => {
+  it("возвращает обновленный контекст", () => {
     const { context, update } = createContext({
       name: types.string.required({ default: "Гость" }),
+      status: types.enum("start", "process", "end").required({ default: "start" }),
       age: types.number.optional(),
     })
 
-    const updated = update({ name: "Иван", age: 25 })
+    const updated = update({ name: "Иван", age: 25, status: "start" })
 
-    expect(updated, "update должен возвращать тот же объект контекста").toBe(context)
+    expect(updated, "update должен возвращать ключи только с обновленными параметрами").toEqual({
+      name: "Иван",
+      age: 25,
+    })
     expect(updated.name, 'Возвращенный контекст должен содержать обновленное имя "Иван"').toBe("Иван")
     expect(updated.age, "Возвращенный контекст должен содержать обновленный возраст 25").toBe(25)
+    expect(updated.status, "Поле status не должно быть в возвращаемом объекте, так как не изменилось").toBeUndefined()
   })
 
   it("сохраняет иммутабельность после обновления", () => {

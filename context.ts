@@ -2,13 +2,13 @@
  * Модуль для создания типизированных контекстов и схем параметров
  * @packageDocumentation
  */
-import {types} from "./types"
+import { types } from "./types"
 
-import type {ContextSchema, ContextTypes} from "./types.t"
-import type {ExtractValues, UpdateValues, JsonPatch, ContextInstance} from "./context.t"
+import type { ContextSchema, ContextTypes } from "./types.t"
+import type { ExtractValues, UpdateValues, JsonPatch, ContextInstance } from "./context.t"
 
-export {types}
-export type {ContextSchema, ExtractValues, UpdateValues, ContextInstance, ContextTypes}
+export { types }
+export type { ContextSchema, ExtractValues, UpdateValues, ContextInstance, ContextTypes }
 
 /**
  * Класс для работы с типизированными контекстами.
@@ -137,18 +137,20 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
    * Только переданные значения будут обновлены, остальные останутся без изменений.
    *
    * @param values - Объект с новыми значениями
-   * @returns Обновленный контекст
+   * @returns Объект только с обновленными параметрами
    *
    * @example
    * context.update({name: 'Новое имя', age: 30})
    */
-  update(values: UpdateValues<ExtractValues<T>>): ExtractValues<T> {
+  update(values: UpdateValues<ExtractValues<T>>): Partial<ExtractValues<T>> {
     const filteredValues = Object.fromEntries(
       Object.entries(values).filter(([_, value]) => value !== undefined)
     ) as Partial<ExtractValues<T>>
 
     // Формируем JSON Patch только для реально измененных значений
     const patches: JsonPatch[] = []
+    const updatedValues: Partial<ExtractValues<T>> = {}
+
     for (const [key, value] of Object.entries(filteredValues)) {
       const currentValue = (this.contextData as any)[key]
 
@@ -156,12 +158,14 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
       if (value === null) {
         // Для null — если текущее значение не null, делаем replace с value: null
         if (currentValue !== null) {
-          patches.push({op: "replace", path: `/${key}`, value: null})
+          patches.push({ op: "replace", path: `/${key}`, value: null })
+          updatedValues[key as keyof ExtractValues<T>] = value
         }
       } else {
         // Для обычных значений — сравниваем с текущим
         if (currentValue !== value) {
-          patches.push({op: "replace", path: `/${key}`, value})
+          patches.push({ op: "replace", path: `/${key}`, value })
+          updatedValues[key as keyof ExtractValues<T>] = value
         }
       }
     }
@@ -173,23 +177,11 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
       for (const cb of this.updateSubscribers) {
         try {
           cb(patches)
-        } catch {
-        }
+        } catch {}
       }
     }
 
-    return {...this.contextData}
-  }
-
-  /**
-   * Создает новый экземпляр контекста с текущими значениями (глубокое копирование).
-   * @returns Новый экземпляр Context
-   */
-  clone(): Context<T> {
-    const newContext = new Context({} as T)
-    newContext.contextData = {...this.contextData}
-    newContext.immutableContext = newContext.createImmutableContext()
-    return newContext
+    return updatedValues
   }
 }
 
