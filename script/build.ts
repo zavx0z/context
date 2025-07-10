@@ -25,8 +25,6 @@ if (import.meta.main) {
       console.log("Building in development mode")
       console.log("Building js")
       await build(true, distDir, entrypoint)
-      console.log("Building types")
-      await typegen(entrypoint, join(distDir, `${fileName}.d.ts`))
       break
     case "--prod":
       console.log("Building in production mode")
@@ -36,4 +34,6 @@ if (import.meta.main) {
       console.error("Usage: bun run build:js --dev|--prod")
       process.exit(1)
   }
+  console.log("Building types")
+  await typegen(entrypoint, join(distDir, `${fileName}.d.ts`))
 }

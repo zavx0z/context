@@ -61,9 +61,9 @@ describe("update", () => {
       isVerified: types.boolean(),
       status: types.enum("draft", "published", "archived").required({ default: "draft" }),
       category: types.enum("tech", "design", "business")(),
-      tags: types.array.required<string>({ default: [] }),
-      permissions: types.array<number>(),
-      flags: types.array<boolean>(),
+      tags: types.array.required({ default: [] }),
+      permissions: types.array(),
+      flags: types.array(),
     })
 
     update({

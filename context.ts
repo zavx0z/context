@@ -4,11 +4,11 @@
  */
 import {types} from "./types"
 
-import type {ContextSchema} from "./types.t"
+import type {ContextSchema, ContextTypes} from "./types.t"
 import type {ExtractValues, UpdateValues, JsonPatch, ContextInstance} from "./context.t"
 
 export {types}
-export type {ContextSchema, ExtractValues, UpdateValues}
+export type {ContextSchema, ExtractValues, UpdateValues, ContextInstance, ContextTypes}
 
 /**
  * Класс для работы с типизированными контекстами.
@@ -22,7 +22,7 @@ export type {ContextSchema, ExtractValues, UpdateValues}
  * ctx.context // доступ к значениям
  * ctx.update({name: 'Новое имя'})
  */
-class Context<T extends ContextSchema> implements ContextInstance<T> {
+export class Context<T extends ContextSchema> implements ContextInstance<T> {
   /** @internal */
   private contextData: ExtractValues<T>
   /** @internal */
@@ -206,9 +206,7 @@ class Context<T extends ContextSchema> implements ContextInstance<T> {
  * ctx.context // доступ к значениям
  * ctx.update({name: 'Новое имя'})
  */
-export function createContext<const T extends ContextSchema>(
-  schema: T
-): ContextInstance<T> {
+export function createContext<const T extends ContextSchema>(schema: T): ContextInstance<T> {
   const contextInstance = new Context(schema)
   return {
     context: contextInstance.context,

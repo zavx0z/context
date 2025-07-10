@@ -93,3 +93,30 @@ export type AnyDefinition =
   | EnumDefinition<any>
 
 export type ContextSchema = Record<string, AnyDefinition>
+export type ContextTypes = {
+  string: {
+    required: <T extends string = string>(params?: { title?: string; default?: T }) => RequiredStringDefinition
+    optional: <T extends string = string>(params?: { title?: string; default?: T }) => OptionalStringDefinition
+    <T extends string = string>(params?: { title?: string; default?: T }): OptionalStringDefinition
+  }
+  number: {
+    required: <T extends number = number>(params?: { title?: string; default?: T }) => RequiredNumberDefinition
+    optional: <T extends number = number>(params?: { title?: string; default?: T }) => OptionalNumberDefinition
+    <T extends number = number>(params?: { title?: string; default?: T }): OptionalNumberDefinition
+  }
+  boolean: {
+    required: <T extends boolean = boolean>(params?: { title?: string; default?: T }) => RequiredBooleanDefinition
+    optional: <T extends boolean = boolean>(params?: { title?: string; default?: T }) => OptionalBooleanDefinition
+    <T extends boolean = boolean>(params?: { title?: string; default?: T }): OptionalBooleanDefinition
+  }
+  array: {
+    required: <T extends string | number | boolean = string>(params?: { title?: string; default?: T[] }) => RequiredArrayDefinition<T>
+    optional: <T extends string | number | boolean = string>(params?: { title?: string; default?: T[] }) => OptionalArrayDefinition<T>
+    <T extends string | number | boolean = string>(params?: { title?: string; default?: T[] }): OptionalArrayDefinition<T>
+  }
+  enum: <const T extends readonly (string | number)[]>(...values: T) => {
+    required: (options?: { title?: string; default?: T[number] }) => RequiredEnumDefinition<T>
+    optional: (options?: { title?: string; default?: T[number] }) => OptionalEnumDefinition<T>
+    (options?: { title?: string; default?: T[number] }): OptionalEnumDefinition<T>
+  }
+}

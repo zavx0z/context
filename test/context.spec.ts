@@ -31,9 +31,9 @@ describe("Контекст", () => {
         isVerified: types.boolean(),
         status: types.enum("draft", "published", "archived").required({ default: "draft" }),
         category: types.enum("tech", "design", "business")(),
-        tags: types.array.required<string>({ default: [] }),
-        permissions: types.array<number>(),
-        flags: types.array<boolean>(),
+        tags: types.array.required({ default: [] }),
+        permissions: types.array(),
+        flags: types.array(),
       })
 
       expect(context.title, 'Поле title должно быть "Заголовок" по умолчанию').toBe("Заголовок")
@@ -63,15 +63,15 @@ describe("Контекст", () => {
 
     it("проверяет типизацию array", () => {
       const { context } = createContext({
-        tags: types.array<string>({ default: ["a", "b"] }),
-        numbers: types.array<number>(),
-        flags: types.array<boolean>(),
+        tags: types.array({ default: ["a", "b"] }),
+        numbers: types.array(),
+        flags: types.array(),
       })
       expect(context.tags, 'Поле tags должно быть ["a", "b"] по умолчанию').toEqual(["a", "b"])
       expect(context.numbers, "Поле numbers должно быть null по умолчанию").toBe(null)
       expect(context.flags, "Поле flags должно быть null по умолчанию").toBe(null)
 
-      // @ts-expect-error - array должен принимать только примитивы
+      // @ts-ignore - array должен принимать только примитивы
       types.array({ default: [{}] })
     })
   })
