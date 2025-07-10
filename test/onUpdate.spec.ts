@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test"
 import { types, createContext } from "../context"
-import type { JsonPatch } from "../types"
+import type { JsonPatch } from "../context.t"
 
 describe("onUpdate", () => {
   it("вызывает коллбек с патчами при обновлении", () => {

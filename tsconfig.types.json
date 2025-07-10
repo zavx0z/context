@@ -14,7 +14,7 @@
         "bun.test.d.ts",
         "context.spec.ts",
         "fixture.ts",
-        "types.ts",
+        "context.t.ts",
         "script/**/*",
         "test/**/*",
         "node_modules/**/*",

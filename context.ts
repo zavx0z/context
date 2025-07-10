@@ -3,7 +3,16 @@
  * @packageDocumentation
  */
 
-import type { ContextTypes, ContextSchema, ExtractValues, UpdateValues, JsonPatch, ContextInstance } from "./types.ts"
+import type {
+  ContextTypes,
+  ContextSchema,
+  ExtractValues,
+  UpdateValues,
+  JsonPatch,
+  ContextInstance,
+} from "./context.t.js"
+
+export * from "./context.t.js"
 
 const createStringType = {
   required: (params = {}) => ({ type: "string" as const, required: true as const, ...params }),

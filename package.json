@@ -34,13 +34,14 @@
   "type": "module",
   "private": false,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "dts-bundle-generator": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "scripts": {
-    "build:dev": "bun run build:js --dev && bun run build:types",
+    "build:dev": "bun run build:js --dev",
     "build:prod": "bun run build:js --prod && bun run build:types",
     "publish:npm": "bun run build:prod && bun publish --access public",
     "build:js": "bun run script/build.ts",
