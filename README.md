@@ -62,6 +62,38 @@ const schema = {
 }
 ```
 
+### Доступ к заголовкам через \_title
+
+Контекст предоставляет доступ к заголовкам полей через свойство `_title`:
+
+```ts
+const { context } = createContext({
+  name: types.string.required("Гость")({ title: "Имя пользователя" }),
+  age: types.number.optional()({ title: "Возраст" }),
+  isActive: types.boolean.required(true),
+})
+
+// Доступ к заголовкам
+console.log(context._title.name) // "Имя пользователя"
+console.log(context._title.age) // "Возраст"
+console.log(context._title.isActive) // "" (пустая строка, если title не указан)
+
+// _title — изменяемый объект
+context._title.name = "Полное имя"
+context._title.age = "Возраст пользователя"
+console.log(context._title.name) // "Полное имя"
+
+// Значения контекста остаются неизменными
+console.log(context.name) // "Гость" (не изменилось)
+```
+
+**Особенности:**
+
+- `_title` — изменяемый объект для управления заголовками
+- Если `title` не указан в схеме, по умолчанию используется пустая строка
+- Изменение `_title` не влияет на значения контекста
+- Можно добавлять заголовки для полей, у которых не был указан `title`
+
 ---
 
 ## Основные возможности
@@ -233,7 +265,7 @@ bun run build:prod    # Продакшн сборка (минификация + 
 
 ### Архитектура проекта
 
-```
+```text
 context/
 ├── context.ts        # Основная логика
 ├── context.t.ts      # Типы для контекста

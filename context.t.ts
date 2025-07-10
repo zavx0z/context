@@ -51,7 +51,7 @@ export type JsonPatch =
 
 export interface ContextInstance<T extends ContextSchema> {
   /** Текущее состояние контекста (только для чтения) */
-  context: ExtractValues<T>
+  context: ExtractValues<T> & { _title: Record<keyof T, string> }
   /** Обновляет значения в контексте */
   update: (values: UpdateValues<ExtractValues<T>>) => Partial<ExtractValues<T>>
   /** Подписка на обновления контекста */

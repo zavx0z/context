@@ -3,6 +3,75 @@ import { types, createContext } from "../context"
 
 describe("Контекст", () => {
   describe("Создание контекста", () => {
+    it("проверяет доступ к метаданным через _title", () => {
+      const { context } = createContext({
+        name: types.string.required("Гость")({ title: "Имя пользователя" }),
+        age: types.number.optional()({ title: "Возраст" }),
+        isActive: types.boolean.required(true)({ title: "Активен" }),
+        role: types.enum("user", "admin", "moderator").required("user")({ title: "Роль" }),
+        tags: types.array.optional()({ title: "Теги" }),
+        description: types.string.optional(), // без title
+      })
+
+      // Проверяем значения
+      expect(context.name, "Поле name должно быть 'Гость'").toBe("Гость")
+      expect(context.age, "Поле age должно быть null").toBe(null)
+      expect(context.isActive, "Поле isActive должно быть true").toBe(true)
+      expect(context.role, "Поле role должно быть 'user'").toBe("user")
+      expect(context.tags, "Поле tags должно быть null").toBe(null)
+      expect(context.description, "Поле description должно быть null").toBe(null)
+
+      // Проверяем метаданные
+      expect(context._title.name, "Метаданные name должны быть доступны").toBe("Имя пользователя")
+      expect(context._title.age, "Метаданные age должны быть доступны").toBe("Возраст")
+      expect(context._title.isActive, "Метаданные isActive должны быть доступны").toBe("Активен")
+      expect(context._title.role, "Метаданные role должны быть доступны").toBe("Роль")
+      expect(context._title.tags, "Метаданные tags должны быть доступны").toBe("Теги")
+      expect(context._title.description, "Метаданные description должны быть пустой строкой").toBe("")
+
+      // Проверяем полный объект _title
+      expect(context._title, "Полный объект _title должен содержать все метаданные").toEqual({
+        name: "Имя пользователя",
+        age: "Возраст",
+        isActive: "Активен",
+        role: "Роль",
+        tags: "Теги",
+        description: "",
+      })
+    })
+
+    it("позволяет изменять заголовки через _title", () => {
+      const { context } = createContext({
+        name: types.string.required("Гость")({ title: "Имя пользователя" }),
+        age: types.number.optional(),
+        isActive: types.boolean.required(true),
+      })
+
+      // Проверяем начальные значения
+      expect(context._title.name, "Начальный заголовок name").toBe("Имя пользователя")
+      expect(context._title.age, "Начальный заголовок age должен быть пустой строкой").toBe("")
+      expect(context._title.isActive, "Начальный заголовок isActive должен быть пустой строкой").toBe("")
+
+      // Изменяем заголовки
+      context._title.name = "Полное имя"
+      context._title.age = "Возраст пользователя"
+      context._title.isActive = "Статус активности"
+
+      // Проверяем, что заголовки изменились
+      expect(context._title.name, "Заголовок name должен измениться").toBe("Полное имя")
+      expect(context._title.age, "Заголовок age должен измениться").toBe("Возраст пользователя")
+      expect(context._title.isActive, "Заголовок isActive должен измениться").toBe("Статус активности")
+
+      // Проверяем, что значения контекста не изменились
+      expect(context.name, "Значение name не должно измениться").toBe("Гость")
+      expect(context.age, "Значение age не должно измениться").toBe(null)
+      expect(context.isActive, "Значение isActive не должно измениться").toBe(true)
+
+      // Добавляем новый заголовок для несуществующего поля
+      ;(context._title as any).newField = "Новый заголовок"
+      expect((context._title as any).newField, "Можно добавить заголовок для нового поля").toBe("Новый заголовок")
+    })
+
     it("создаёт контекст с правильными значениями по умолчанию", () => {
       const { context } = createContext({
         name: types.string.required("Гость"),
@@ -160,12 +229,14 @@ describe("Дефолтные значения", () => {
         s: types.string.optional(),
       })
       expect(context.s, "Поле s должно быть null по умолчанию").toBe(null)
+      expect(context._title.s, "Метаданные title должны быть пустой строкой когда не указаны").toBe("")
     })
     it("chainable с title", () => {
       const { context } = createContext({
         s: types.string.required("abc")({ title: "Строка" }),
       })
       expect(context.s, "Поле s должно быть 'abc'").toBe("abc")
+      expect(context._title.s, "Метаданные title должны быть доступны через _title").toBe("Строка")
     })
   })
 
@@ -302,10 +373,10 @@ describe("Дефолтные значения", () => {
 describe("Примеры использования", () => {
   it("пользовательский контекст", () => {
     const schema = {
-      name: types.string.required("Гость"),
+      name: types.string.required("Гость")({ title: "Имя пользователя" }),
       age: types.number.optional(),
       isActive: types.boolean.required(true),
-      role: types.enum("user", "admin", "moderator").required("user"),
+      role: types.enum("user", "admin", "moderator").required("user")({ title: "Роль" }),
       tags: types.array.optional(),
     }
     const { context, update } = createContext(schema)
@@ -323,6 +394,13 @@ describe("Примеры использования", () => {
       name: "Иван",
       age: 25,
     })
+
+    // Проверяем доступ к метаданным
+    expect(context._title.name, "Метаданные name должны быть доступны").toBe("Имя пользователя")
+    expect(context._title.role, "Метаданные role должны быть доступны").toBe("Роль")
+    expect(context._title.age, "Метаданные age должны быть пустой строкой").toBe("")
+    expect(context._title.isActive, "Метаданные isActive должны быть пустой строкой").toBe("")
+    expect(context._title.tags, "Метаданные tags должны быть пустой строкой").toBe("")
   })
 
   it("контекст продукта", () => {

@@ -26,7 +26,9 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
   /** @internal */
   private contextData: ExtractValues<T>
   /** @internal */
-  private immutableContext: ExtractValues<T>
+  private immutableContext: ExtractValues<T> & { _title: Record<keyof T, string> }
+  /** @internal */
+  private schema: T
   /**
    * Список подписчиков на обновления контекста.
    * Каждый подписчик получает массив JSON Patch при изменении.
@@ -39,6 +41,7 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
    * @param schema - Схема контекста
    */
   constructor(schema: T) {
+    this.schema = schema
     this.contextData = {} as ExtractValues<T>
     this.initializeContext(schema)
     this.immutableContext = this.createImmutableContext()
@@ -82,9 +85,20 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
    * Создает иммутабельный (только для чтения) прокси-объект для доступа к значениям контекста.
    * @returns Иммутабельный объект контекста
    */
-  private createImmutableContext(): ExtractValues<T> {
-    const immutableContext = new Proxy({} as ExtractValues<T>, {
+  private createImmutableContext(): ExtractValues<T> & { _title: Record<keyof T, string> } {
+    const titleData: Record<keyof T, string> = {} as Record<keyof T, string>
+
+    // Инициализируем метаданные: если title не указан — всегда пустая строка
+    for (const key in this.schema) {
+      const definition = this.schema[key]
+      titleData[key] = definition && "title" in definition && definition.title ? definition.title : ""
+    }
+
+    const immutableContext = new Proxy({} as ExtractValues<T> & { _title: Record<keyof T, string> }, {
       get: (_, prop) => {
+        if (prop === "_title") {
+          return titleData
+        }
         return (this.contextData as any)[prop]
       },
       set: (_, prop) => {
@@ -107,7 +121,7 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
    * Текущее состояние контекста (только для чтения).
    * @readonly
    */
-  get context(): ExtractValues<T> {
+  get context(): ExtractValues<T> & { _title: Record<keyof T, string> } {
     return this.immutableContext
   }
 
