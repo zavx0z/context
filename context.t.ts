@@ -50,6 +50,8 @@ export type JsonPatch =
   | { op: "remove"; path: string }
 
 export interface ContextInstance<T extends ContextSchema> {
+  /** Схема контекста (только для чтения) */
+  schema: T
   /** Текущее состояние контекста (только для чтения) */
   context: ExtractValues<T> & { _title: Record<keyof T, string> }
   /** Обновляет значения в контексте */

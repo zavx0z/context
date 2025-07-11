@@ -28,7 +28,7 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
   /** @internal */
   private immutableContext: ExtractValues<T> & { _title: Record<keyof T, string> }
   /** @internal */
-  private schema: T
+  private schemaDefinition: T
   /**
    * Список подписчиков на обновления контекста.
    * Каждый подписчик получает массив JSON Patch при изменении.
@@ -41,7 +41,7 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
    * @param schema - Схема контекста
    */
   constructor(schema: T) {
-    this.schema = schema
+    this.schemaDefinition = schema
     this.contextData = {} as ExtractValues<T>
     this.initializeContext(schema)
     this.immutableContext = this.createImmutableContext()
@@ -123,6 +123,14 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
    */
   get context(): ExtractValues<T> & { _title: Record<keyof T, string> } {
     return this.immutableContext
+  }
+
+  /**
+   * Схема контекста (только для чтения).
+   * @readonly
+   */
+  get schema(): T {
+    return this.schemaDefinition
   }
 
   /**
@@ -218,5 +226,6 @@ export function createContext<const T extends ContextSchema>(schema: T): Context
     context: contextInstance.context,
     update: contextInstance.update.bind(contextInstance),
     onUpdate: contextInstance.onUpdate.bind(contextInstance),
+    schema: contextInstance.schema,
   }
 }
