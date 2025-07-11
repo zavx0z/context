@@ -1,0 +1,39 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": [
+        "./context.ts",
+        "./types.ts"
+    ],
+    "out": "docs",
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeExternals": true,
+    "includeVersion": true,
+    "categorizeByGroup": true,
+    "categoryOrder": [
+        "Context",
+        "Types",
+        "Factories",
+        "*"
+    ],
+    "defaultCategory": "Other",
+    "readme": "README.md",
+    "name": "@zavx0z/context",
+    "theme": "default",
+    "lightHighlightTheme": "github-light",
+    "darkHighlightTheme": "github-dark",
+    "searchInComments": true,
+    "validation": {
+        "invalidLink": true,
+        "notExported": true
+    },
+    "gitRevision": "main",
+    "gitRemote": "origin",
+    "githubPages": true,
+    "cleanOutputDir": true,
+    "hideGenerator": false,
+    "sidebarLinks": {
+        "GitHub": "https://github.com/zavx0z/context",
+        "NPM": "https://www.npmjs.com/package/@zavx0z/context"
+    }
+}

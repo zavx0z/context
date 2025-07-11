@@ -33,6 +33,7 @@
     ".cursor",
     ".github",
     "dist",
-    "script"
+    "script",
+    "docs"
   ]
 }

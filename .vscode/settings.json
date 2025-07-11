@@ -22,6 +22,7 @@
         "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lock, bun.lockb, bunfig.toml, .npmrc",
         "*.ts": "${capture}.t.ts, ${capture}.spec.ts",
         "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.html",
+        "typedoc.json": "markdown.typedoc.json "
     },
     "cSpell.words": [
         "иммутабельности",
@@ -42,5 +43,12 @@
         "npmjs",
         "softprops",
         "typedoc"
+    ],
+    "cSpell.ignorePaths": [
+        "docs/**",
+        ".gitignore"
+    ],
+    "markdownlint.ignore": [
+        "docs/**"
     ]
 }
