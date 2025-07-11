@@ -10,7 +10,6 @@
         "**/node_modules": true,
         "**/__pycache__": true,
         ".venv": true,
-        "**/.vscode": true,
         ".idea": true
     },
     "hide-files.files": [
@@ -21,8 +20,8 @@
     "explorer.fileNesting.patterns": {
         "tsconfig.json": "tsconfig.*.json",
         "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lock, bun.lockb, bunfig.toml, .npmrc",
-        "*.ts": "${capture}.t.ts",
-        "*.js": "${capture}.js.map, ${capture}.min.js",
+        "*.ts": "${capture}.t.ts, ${capture}.spec.ts",
+        "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.html",
     },
     "cSpell.words": [
         "иммутабельности",

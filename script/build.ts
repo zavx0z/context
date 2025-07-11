@@ -19,6 +19,7 @@ if (import.meta.main) {
   const fileName = "context"
   const entrypoint = `./${fileName}.ts`
   const distDir = "./dist"
+  const typeDest = join(distDir, `${fileName}.d.ts`)
 
   switch (process.argv[2]) {
     case "--dev":
@@ -35,5 +36,5 @@ if (import.meta.main) {
       process.exit(1)
   }
   console.log("Building types")
-  await typegen(entrypoint, join(distDir, `${fileName}.d.ts`))
+  await typegen(entrypoint, typeDest)
 }

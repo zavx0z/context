@@ -25,9 +25,10 @@ export const typegen = async (entrypoint: string, destination: string) => {
 }
 
 if (import.meta.main) {
-  const outDir = "../metafor/package/context"
-  const entrypoint = "./context.ts"
-  const destination = join(outDir, "context.d.ts")
+  const fileName = "context"
+  const entrypoint = `./${fileName}.ts`
+  const distDir = "./dist"
+  const typeDest = join(distDir, `${fileName}.d.ts`)
 
-  await typegen(entrypoint, destination)
+  await typegen(entrypoint, typeDest)
 }

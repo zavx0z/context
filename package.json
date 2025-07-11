@@ -42,6 +42,6 @@
     "build:prod": "bun run build:js --prod",
     "publish:npm": "bun run build:prod && bun publish --access public",
     "build:js": "bun run script/build.ts",
-    "publish:dry": "bun run build && bun publish --dry-run"
+    "publish:dry": "bun run build:prod && bun publish --dry-run"
   }
 }
