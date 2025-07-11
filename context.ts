@@ -8,7 +8,7 @@ import type { ContextSchema, ContextTypes } from "./types.t"
 import type { ExtractValues, UpdateValues, JsonPatch, ContextInstance } from "./context.t"
 
 export { types }
-export type { ContextSchema, ExtractValues, UpdateValues, ContextInstance, ContextTypes }
+export type { ContextSchema, ExtractValues, UpdateValues, ContextInstance, ContextTypes, JsonPatch }
 
 /**
  * Класс для работы с типизированными контекстами.
