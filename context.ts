@@ -5,10 +5,10 @@
 import { types } from "./types"
 
 import type { ContextSchema, ContextTypes } from "./types.t"
-import type { ExtractValues, UpdateValues, JsonPatch, ContextInstance } from "./context.t"
+import type { ExtractValues, UpdateValues, JsonPatch, ContextInstance, SerializedSchema } from "./context.t"
 
 export { types }
-export type { ContextSchema, ExtractValues, UpdateValues, ContextInstance, ContextTypes, JsonPatch }
+export type { ContextSchema, SerializedSchema, ExtractValues, UpdateValues, ContextInstance, ContextTypes, JsonPatch }
 
 /**
  * Класс для работы с типизированными контекстами.
@@ -129,8 +129,33 @@ export class Context<T extends ContextSchema> implements ContextInstance<T> {
    * Схема контекста (только для чтения).
    * @readonly
    */
-  get schema(): T {
-    return this.schemaDefinition
+  get schema(): Record<keyof T, any> {
+    const result: Record<keyof T, any> = {} as Record<keyof T, any>
+
+    for (const key in this.schemaDefinition) {
+      const definition = this.schemaDefinition[key]
+      if (!definition) continue
+
+      // Извлекаем базовые свойства из определения типа
+      const baseProps = {
+        type: definition.type,
+        required: definition.required,
+        default: definition.default,
+      }
+
+      // Добавляем дополнительные свойства если они есть
+      if ("title" in definition && definition.title) {
+        ;(baseProps as any).title = definition.title
+      }
+
+      if ("values" in definition && definition.values) {
+        ;(baseProps as any).values = definition.values
+      }
+
+      result[key] = baseProps
+    }
+
+    return result
   }
 
   /**

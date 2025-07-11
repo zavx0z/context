@@ -1,6 +1,6 @@
 {
   "name": "@zavx0z/context",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Context library for creating typed, immutable contexts with schemas and change subscriptions",
   "author": "zavx0z",
   "keywords": [

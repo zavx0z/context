@@ -44,6 +44,17 @@ export type ExtractValue<T> = T extends RequiredStringDefinition
 export type ExtractValues<S extends ContextSchema> = { [K in keyof S]: ExtractValue<S[K]> }
 export type UpdateValues<T> = { [K in keyof T]?: T[K] }
 
+// Тип для сериализованной схемы
+export type SerializedSchema<T extends ContextSchema> = {
+  [K in keyof T]: {
+    type: T[K]["type"]
+    required: T[K]["required"]
+    default: T[K]["default"]
+    title?: T[K]["title"]
+    values?: T[K] extends { values: any } ? T[K]["values"] : never
+  }
+}
+
 export type JsonPatch =
   | { op: "replace"; path: string; value: any }
   | { op: "add"; path: string; value: any }
@@ -51,7 +62,7 @@ export type JsonPatch =
 
 export interface ContextInstance<T extends ContextSchema> {
   /** Схема контекста (только для чтения) */
-  schema: T
+  schema: SerializedSchema<T>
   /** Текущее состояние контекста (только для чтения) */
   context: ExtractValues<T> & { _title: Record<keyof T, string> }
   /** Обновляет значения в контексте */

@@ -5,7 +5,7 @@ describe("Схема", () => {
   it("должен возвращать оригинальную схему через геттер", () => {
     const ctx = createContext({
       name: types.string.required("Иван")({ title: "Имя пользователя" }),
-      age: types.number.optional()({ title: "Возраст" }),
+      age: types.number.optional(),
       isActive: types.boolean.required(true)({ title: "Активен" }),
       role: types.enum("user", "admin", "moderator").required("user")({ title: "Роль" }),
       tags: types.array.required([])({ title: "Теги" }),
@@ -30,7 +30,6 @@ describe("Схема", () => {
         type: "number",
         required: false,
         default: undefined,
-        title: "Возраст",
       },
       isActive: {
         type: "boolean",
@@ -71,5 +70,67 @@ describe("Схема", () => {
         title: "Метаданные",
       },
     })
+  })
+
+  it("должен сохранять типизацию схемы", () => {
+    const ctx = createContext({
+      name: types.string.required("Иван")({ title: "Имя пользователя" }),
+      age: types.number.optional(),
+      role: types.enum("user", "admin", "moderator").required("user")({ title: "Роль" }),
+      isActive: types.boolean.required(true)({ title: "Активен" }),
+      description: types.string.optional()({ title: "Описание" }),
+      priority: types.enum("low", "medium", "high").optional()({ title: "Приоритет" }),
+      tags: types.array.optional()({ title: "Теги" }),
+    })
+
+    // Проверяем типизацию - TypeScript должен знать точные типы
+    const schema = ctx.schema
+
+    // Проверяем required поля
+    expect(schema.name.type).toBe("string")
+    expect(schema.name.required).toBe(true)
+    expect(schema.name.default).toBe("Иван")
+    expect(schema.name.title).toBe("Имя пользователя")
+
+    expect(schema.role.type).toBe("enum")
+    expect(schema.role.required).toBe(true)
+    expect(schema.role.default).toBe("user")
+    expect(schema.role.title).toBe("Роль")
+    expect(schema.role.values).toEqual(["user", "admin", "moderator"])
+
+    expect(schema.isActive.type).toBe("boolean")
+    expect(schema.isActive.required).toBe(true)
+    expect(schema.isActive.default).toBe(true)
+    expect(schema.isActive.title).toBe("Активен")
+
+    // Проверяем optional поля
+    expect(schema.age.type).toBe("number")
+    expect(schema.age.required).toBe(false)
+    expect(schema.age.default).toBeUndefined()
+
+    expect(schema.description.type).toBe("string")
+    expect(schema.description.required).toBe(false)
+    expect(schema.description.default).toBeUndefined()
+    expect(schema.description.title).toBe("Описание")
+
+    expect(schema.priority.type).toBe("enum")
+    expect(schema.priority.required).toBe(false)
+    expect(schema.priority.default).toBeUndefined()
+    expect(schema.priority.title).toBe("Приоритет")
+    expect(schema.priority.values).toEqual(["low", "medium", "high"])
+
+    expect(schema.tags.type).toBe("array")
+    expect(schema.tags.required).toBe(false)
+    expect(schema.tags.default).toBeUndefined()
+    expect(schema.tags.title).toBe("Теги")
+
+    // Проверяем, что схема остается неизменной при изменении заголовков
+    ctx.context._title.name = "Новое имя"
+    ctx.context._title.role = "Новая роль"
+
+    expect(ctx.schema.name.title).toBe("Имя пользователя")
+    expect(ctx.schema.role.title).toBe("Роль")
+    expect(ctx.context._title.name).toBe("Новое имя")
+    expect(ctx.context._title.role).toBe("Новая роль")
   })
 })
