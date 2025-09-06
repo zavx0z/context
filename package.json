@@ -1,6 +1,6 @@
 {
   "name": "@zavx0z/context",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Context library for creating typed, immutable contexts with schemas and change subscriptions",
   "author": "zavx0z",
   "homepage": "https://github.com/zavx0z/context#readme",
@@ -21,12 +21,12 @@
     "url": "https://github.com/zavx0z/context/issues"
   },
   "docs": "https://zavx0z.github.io/context",
-  "main": "./dist/context.js",
-  "types": "./dist/context.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/context.js",
-      "types": "./dist/context.d.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "files": [
@@ -38,8 +38,7 @@
   "devDependencies": {
     "@types/bun": "latest",
     "dts-bundle-generator": "latest",
-    "typedoc": "latest",
-    "typedoc-plugin-markdown": "latest"
+    "typedoc": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -51,10 +50,6 @@
     "publish:npm": "bun run build:prod && bun publish --access public",
     "build:js": "bun run script/build.ts",
     "publish:dry": "bun run build:prod && bun publish --dry-run",
-    "docs": "typedoc",
-    "docs:markdown": "typedoc --options markdown.typedoc.json",
-    "docs:all": "bun run docs && bun run docs:markdown",
-    "docs:build": "bun run build:prod && bun run docs",
-    "docs:serve": "typedoc --serve"
+    "docs": "typedoc"
   }
 }

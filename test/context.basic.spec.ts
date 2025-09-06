@@ -2,6 +2,7 @@ import { test, expect } from "bun:test"
 import { Context } from "../index"
 
 test("Создание контекста с базовыми типами", () => {
+  // #region allTypes
   const { context } = new Context((types) => ({
     name: types.string.required("Гость")({ title: "Имя пользователя" }),
     age: types.number.optional()({ title: "Возраст" }),
@@ -10,7 +11,7 @@ test("Создание контекста с базовыми типами", () 
     tags: types.array.optional()({ title: "Теги" }),
     description: types.string.optional(), // без title
   }))
-
+  // #endregion allTypes
   // Проверяем значения
   expect(context.name, "Поле name должно быть 'Гость'").toBe("Гость")
   expect(context.age, "Поле age должно быть null").toBe(null)

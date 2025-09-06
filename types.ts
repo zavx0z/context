@@ -176,8 +176,7 @@ const createArrayType = {
  * }))
  * ```
  *
- * @includeExample ./context/test/context.basic.spec.ts
- * @includeExample ./context/test/context.types.spec.ts
+ * {@includeCode ./test/context.basic.spec.ts#allTypes}
  */
 export const types = {
   /**

@@ -19,6 +19,7 @@ describe("Схема", () => {
     // Проверяем что это объект схемы
     expect(typeof result).toBe("object")
     expect(result).not.toBeNull()
+    console.log(result)
     expect(result).toEqual({
       name: {
         type: "string",

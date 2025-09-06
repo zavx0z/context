@@ -7,7 +7,7 @@ async function build(dev: boolean, distDir: string, entrypoint: string) {
     outdir: distDir,
     target: "browser",
     format: "esm",
-    sourcemap: dev ? "inline" : "none",
+    // sourcemap: dev ? "inline" : "none",
     splitting: false,
     minify: !dev,
   })
@@ -16,7 +16,7 @@ async function build(dev: boolean, distDir: string, entrypoint: string) {
 }
 
 if (import.meta.main) {
-  const fileName = "context"
+  const fileName = "index"
   const entrypoint = `./${fileName}.ts`
   const distDir = "./dist"
   const typeDest = join(distDir, `${fileName}.d.ts`)

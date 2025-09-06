@@ -73,7 +73,7 @@ export type SerializedSchema<T extends ContextSchema> = {
     required: T[K]["required"]
     default: T[K]["default"]
     title?: T[K]["title"]
-    values: T[K] extends { values: any } ? T[K]["values"] : never
+    values?: T[K] extends { values: any } ? T[K]["values"] : never
   }
 }
 /**
@@ -82,8 +82,8 @@ export type SerializedSchema<T extends ContextSchema> = {
  * @param values - Значения для обновления
  * @returns Значения, которые были обновлены
  *
- * @includeExample ./context/test/context.basic.spec.ts
- * @includeExample ./context/test/context.types.spec.ts
+ * {@includeCode ./test/context.basic.spec.ts}
+ * {@includeCode ./test/context.types.spec.ts}
  */
 export type Update<C extends ContextSchema> = (values: UpdateValues<ExtractValues<C>>) => Partial<ExtractValues<C>>
 
@@ -99,8 +99,8 @@ export type OnUpdate<C extends ContextSchema> = (cb: (updated: Partial<ExtractVa
  * Интерфейс для экземпляра контекста
  * @template C - Схема контекста
  *
- * @includeExample ./context/test/context.basic.spec.ts
- * @includeExample ./context/test/context.metadata.spec.ts
+ * {@includeCode ./test/context.basic.spec.ts}
+ * {@includeCode ./test/context.metadata.spec.ts}
  */
 export interface ContextInstance<C extends ContextSchema> {
   /** Схема контекста (только для чтения) */

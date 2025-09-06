@@ -25,7 +25,7 @@ export const typegen = async (entrypoint: string, destination: string) => {
 }
 
 if (import.meta.main) {
-  const fileName = "context"
+  const fileName = "index"
   const entrypoint = `./${fileName}.ts`
   const distDir = "./dist"
   const typeDest = join(distDir, `${fileName}.d.ts`)

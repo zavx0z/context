@@ -63,7 +63,7 @@ describe("ContextClone", () => {
   })
 
   it("снимок с метаданными", () => {
-    const snapshotWithMetadata: any = {
+    const snapshotWithMetadata = {
       name: {
         type: "string" as const,
         required: true,
@@ -74,18 +74,19 @@ describe("ContextClone", () => {
         type: "number" as const,
         required: false,
         title: "Возраст",
+        default: undefined,
       },
     }
 
     const clonedContext = ContextClone.fromSnapshot(snapshotWithMetadata)
 
-    expect(clonedContext.schema.name.type, "тип должен сохраниться").toBe("string")
-    expect(clonedContext.schema.name.required, "required должен сохраниться").toBe(true)
-    expect(clonedContext.schema.name.default, "default должен сохраниться").toBe("Гость")
-    expect(clonedContext.schema.name.title, "title должен сохраниться").toBe("Имя пользователя")
-    expect(clonedContext.schema.age.type, "тип должен сохраниться").toBe("number")
-    expect(clonedContext.schema.age.required, "required должен сохраниться").toBe(false)
-    expect(clonedContext.schema.age.title, "title должен сохраниться").toBe("Возраст")
+    expect(clonedContext.schema.name!.type, "тип должен сохраниться").toBe("string")
+    expect(clonedContext.schema.name!.required, "required должен сохраниться").toBe(true)
+    expect(clonedContext.schema.name!.default, "default должен сохраниться").toBe("Гость")
+    expect(clonedContext.schema.name!.title, "title должен сохраниться").toBe("Имя пользователя")
+    expect(clonedContext.schema.age!.type, "тип должен сохраниться").toBe("number")
+    expect(clonedContext.schema.age!.required, "required должен сохраниться").toBe(false)
+    expect(clonedContext.schema.age!.title, "title должен сохраниться").toBe("Возраст")
   })
 
   it("подписка на обновления", () => {
