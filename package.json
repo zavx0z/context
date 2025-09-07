@@ -1,6 +1,6 @@
 {
   "name": "@zavx0z/context",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Context library for creating typed, immutable contexts with schemas and change subscriptions",
   "author": "zavx0z",
   "homepage": "https://github.com/zavx0z/context#readme",
@@ -44,12 +44,9 @@
     "typescript": "^5"
   },
   "scripts": {
-    "upd": "bun update --latest && bun i",
-    "build:dev": "bun run build:js --dev",
-    "build:prod": "bun run build:js --prod",
-    "publish:npm": "bun run build:prod && bun publish --access public",
-    "build:js": "bun run script/build.ts",
-    "publish:dry": "bun run build:prod && bun publish --dry-run",
-    "docs": "typedoc"
+    "build": "bun run script/build.ts --dev",
+    "docs": "typedoc",
+    "prepublishOnly": "bun run build",
+    "publish:npm": "bun publish --access public"
   }
 }
