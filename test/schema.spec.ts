@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test"
-import { Context } from "../index"
+import { Context } from "../context"
 
 describe("Схема", () => {
   it("должен возвращать оригинальную схему через геттер", () => {
@@ -19,7 +19,6 @@ describe("Схема", () => {
     // Проверяем что это объект схемы
     expect(typeof result).toBe("object")
     expect(result).not.toBeNull()
-    console.log(result)
     expect(result).toEqual({
       name: {
         type: "string",
@@ -30,7 +29,6 @@ describe("Схема", () => {
       age: {
         type: "number",
         required: false,
-        default: undefined,
       },
       isActive: {
         type: "boolean",
@@ -54,20 +52,17 @@ describe("Схема", () => {
       priority: {
         type: "enum",
         required: false,
-        default: undefined,
         values: ["low", "medium", "high"],
         title: "Приоритет",
       },
       description: {
         type: "string",
         required: false,
-        default: undefined,
         title: "Описание",
       },
       metadata: {
         type: "array",
         required: false,
-        default: undefined,
         title: "Метаданные",
       },
     })

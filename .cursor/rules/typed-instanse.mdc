@@ -19,7 +19,7 @@
 ❌ **Неправильно**
 
 ```ts
-export function createContext<T extends ContextSchema>(schema: T) {
+export function createContext<T extends Schema>(schema: T) {
   const inst = new Context(schema)
   return {
     context: inst.context,
@@ -32,7 +32,7 @@ export function createContext<T extends ContextSchema>(schema: T) {
 ✅ **Правильно**
 
 ```ts
-export function createContext<T extends ContextSchema>(schema: T): ContextInstance<T> {
+export function createContext<T extends Schema>(schema: T): ContextInstance<T> {
   return new Context(schema)
 }
 ```

@@ -40,16 +40,23 @@
  */
 
 /**
+ * Базовое определение типа
+ * @template T - Тип значения
+ * @template TypeName - Название типа ("string", "number", "boolean", "array", "enum")
+ */
+interface BaseDefinition<T, TypeName extends string> {
+  type: TypeName
+  title?: string
+  default?: T | undefined
+}
+
+/**
  * Базовое определение строкового типа
  * @property type - Тип поля ("string")
  * @property title - Опциональное название поля для документации
  * @property default - Значение по умолчанию
  */
-export interface BaseStringDefinition {
-  type: "string"
-  title?: string
-  default?: string | undefined
-}
+export interface BaseStringDefinition extends BaseDefinition<string, "string"> {}
 
 /**
  * Базовое определение числового типа
@@ -57,11 +64,7 @@ export interface BaseStringDefinition {
  * @property title - Опциональное название поля для документации
  * @property default - Значение по умолчанию
  */
-export interface BaseNumberDefinition {
-  type: "number"
-  title?: string
-  default?: number | undefined
-}
+export interface BaseNumberDefinition extends BaseDefinition<number, "number"> {}
 
 /**
  * Базовое определение булевого типа
@@ -69,11 +72,7 @@ export interface BaseNumberDefinition {
  * @property title - Опциональное название поля для документации
  * @property default - Значение по умолчанию
  */
-export interface BaseBooleanDefinition {
-  type: "boolean"
-  title?: string
-  default?: boolean | undefined
-}
+export interface BaseBooleanDefinition extends BaseDefinition<boolean, "boolean"> {}
 
 /**
  * Базовое определение типа массива
@@ -91,11 +90,7 @@ export interface BaseBooleanDefinition {
  * postIds: types.array.required([])
  * ```
  */
-export interface BaseArrayDefinition<T extends string | number | boolean> {
-  type: "array"
-  title?: string
-  default?: T[] | undefined
-}
+export interface BaseArrayDefinition<T extends string | number | boolean> extends BaseDefinition<T[], "array"> {}
 
 /**
  * Базовое определение типа перечисления
@@ -114,11 +109,24 @@ export interface BaseArrayDefinition<T extends string | number | boolean> {
  * role: types.enum.required(["user", "admin", "moderator"])
  * ```
  */
-export interface BaseEnumDefinition<T extends readonly (string | number)[]> {
-  type: "enum"
+export interface BaseEnumDefinition<T extends readonly (string | number)[]> extends BaseDefinition<T[number], "enum"> {
   values: T
-  title?: string
-  default?: T[number] | undefined
+}
+
+/**
+ * Обязательное поле
+ * @template T - Базовое определение типа
+ */
+type RequiredDefinition<T> = T & {
+  required: true
+}
+
+/**
+ * Опциональное поле
+ * @template T - Базовое определение типа
+ */
+type OptionalDefinition<T> = T & {
+  required: false
 }
 
 /**
@@ -129,9 +137,7 @@ export interface BaseEnumDefinition<T extends readonly (string | number)[]> {
  * email: types.string.required("")
  * ```
  */
-export interface RequiredStringDefinition extends BaseStringDefinition {
-  required: true
-}
+export type RequiredStringDefinition = RequiredDefinition<BaseStringDefinition>
 
 /**
  * Обязательное числовое поле
@@ -141,9 +147,7 @@ export interface RequiredStringDefinition extends BaseStringDefinition {
  * count: types.number.required(0)
  * ```
  */
-export interface RequiredNumberDefinition extends BaseNumberDefinition {
-  required: true
-}
+export type RequiredNumberDefinition = RequiredDefinition<BaseNumberDefinition>
 
 /**
  * Обязательное булево поле
@@ -153,9 +157,7 @@ export interface RequiredNumberDefinition extends BaseNumberDefinition {
  * isLoading: types.boolean.required(false)
  * ```
  */
-export interface RequiredBooleanDefinition extends BaseBooleanDefinition {
-  required: true
-}
+export type RequiredBooleanDefinition = RequiredDefinition<BaseBooleanDefinition>
 
 /**
  * Обязательное поле массива
@@ -169,9 +171,7 @@ export interface RequiredBooleanDefinition extends BaseBooleanDefinition {
  * postIds: types.array.required([])
  * ```
  */
-export interface RequiredArrayDefinition<T extends string | number | boolean> extends BaseArrayDefinition<T> {
-  required: true
-}
+export type RequiredArrayDefinition<T extends string | number | boolean> = RequiredDefinition<BaseArrayDefinition<T>>
 
 /**
  * Обязательное поле перечисления
@@ -182,9 +182,7 @@ export interface RequiredArrayDefinition<T extends string | number | boolean> ex
  * role: types.enum.required(["user", "admin"])
  * ```
  */
-export interface RequiredEnumDefinition<T extends readonly (string | number)[]> extends BaseEnumDefinition<T> {
-  required: true
-}
+export type RequiredEnumDefinition<T extends readonly (string | number)[]> = RequiredDefinition<BaseEnumDefinition<T>>
 
 /**
  * Опциональное строковое поле
@@ -194,9 +192,7 @@ export interface RequiredEnumDefinition<T extends readonly (string | number)[]> 
  * avatar: types.string.optional()
  * ```
  */
-export interface OptionalStringDefinition extends BaseStringDefinition {
-  required: false
-}
+export type OptionalStringDefinition = OptionalDefinition<BaseStringDefinition>
 
 /**
  * Опциональное числовое поле
@@ -206,9 +202,7 @@ export interface OptionalStringDefinition extends BaseStringDefinition {
  * priority: types.number.optional()
  * ```
  */
-export interface OptionalNumberDefinition extends BaseNumberDefinition {
-  required: false
-}
+export type OptionalNumberDefinition = OptionalDefinition<BaseNumberDefinition>
 
 /**
  * Опциональное булево поле
@@ -218,9 +212,7 @@ export interface OptionalNumberDefinition extends BaseNumberDefinition {
  * isPremium: types.boolean.optional()
  * ```
  */
-export interface OptionalBooleanDefinition extends BaseBooleanDefinition {
-  required: false
-}
+export type OptionalBooleanDefinition = OptionalDefinition<BaseBooleanDefinition>
 
 /**
  * Опциональное поле массива
@@ -231,9 +223,7 @@ export interface OptionalBooleanDefinition extends BaseBooleanDefinition {
  * categories: types.array.optional()
  * ```
  */
-export interface OptionalArrayDefinition<T extends string | number | boolean> extends BaseArrayDefinition<T> {
-  required: false
-}
+export type OptionalArrayDefinition<T extends string | number | boolean> = OptionalDefinition<BaseArrayDefinition<T>>
 
 /**
  * Опциональное поле перечисления
@@ -244,9 +234,7 @@ export interface OptionalArrayDefinition<T extends string | number | boolean> ex
  * language: types.enum.optional(["ru", "en"])
  * ```
  */
-export interface OptionalEnumDefinition<T extends readonly (string | number)[]> extends BaseEnumDefinition<T> {
-  required: false
-}
+export type OptionalEnumDefinition<T extends readonly (string | number)[]> = OptionalDefinition<BaseEnumDefinition<T>>
 
 /**
  * Объединенный тип для строковых определений
@@ -280,21 +268,11 @@ export type EnumDefinition<T extends readonly (string | number)[]> =
   | OptionalEnumDefinition<T>
 
 /**
- * Объединенный тип для всех возможных определений типов
- */
-export type AnyDefinition =
-  | StringDefinition
-  | NumberDefinition
-  | BooleanDefinition
-  | ArrayDefinition<string | number | boolean>
-  | EnumDefinition<any>
-
-/**
  * Схема контекста - объект, где ключи - это имена полей, а значения - определения типов
  *
  * @example
  * ```typescript
- * const schema: ContextSchema = {
+ * const schema: Schema = {
  *   name: { type: "string", required: true, default: "Anonymous" },
  *   age: { type: "number", required: true, default: 18 },
  *   isActive: { type: "boolean", required: true, default: false },
@@ -303,7 +281,117 @@ export type AnyDefinition =
  * }
  * ```
  */
-export type ContextSchema = Record<string, AnyDefinition>
+export type Schema = Record<
+  string,
+  | StringDefinition
+  | NumberDefinition
+  | BooleanDefinition
+  | ArrayDefinition<string | number | boolean>
+  | EnumDefinition<readonly (string | number)[]>
+>
+
+/**
+ * Фабрика для строкового типа
+ * @example
+ * ```typescript
+ * types.string.required('Гость')
+ * types.string.optional()
+ * types.string('По умолчанию')
+ * ```
+ */
+export type StringTypeFactory = {
+  required: <T extends string = string>(
+    defaultValue?: T
+  ) => ((options?: { title?: string }) => RequiredStringDefinition) & RequiredStringDefinition
+  optional: <T extends string = string>(
+    defaultValue?: T
+  ) => ((options?: { title?: string }) => OptionalStringDefinition) & OptionalStringDefinition
+  <T extends string = string>(defaultValue?: T): ((options?: { title?: string }) => OptionalStringDefinition) &
+    OptionalStringDefinition
+}
+
+/**
+ * Фабрика для числового типа
+ * @example
+ * ```typescript
+ * types.number.required(18)
+ * types.number.optional()
+ * types.number(0)
+ * ```
+ */
+export type NumberTypeFactory = {
+  required: <T extends number = number>(
+    defaultValue?: T
+  ) => ((options?: { title?: string }) => RequiredNumberDefinition) & RequiredNumberDefinition
+  optional: <T extends number = number>(
+    defaultValue?: T
+  ) => ((options?: { title?: string }) => OptionalNumberDefinition) & OptionalNumberDefinition
+  <T extends number = number>(defaultValue?: T): ((options?: { title?: string }) => OptionalNumberDefinition) &
+    OptionalNumberDefinition
+}
+
+/**
+ * Фабрика для булевого типа
+ * @example
+ * ```typescript
+ * types.boolean.required(false)
+ * types.boolean.optional()
+ * types.boolean(true)
+ * ```
+ */
+export type BooleanTypeFactory = {
+  required: <T extends boolean = boolean>(
+    defaultValue?: T
+  ) => ((options?: { title?: string }) => RequiredBooleanDefinition) & RequiredBooleanDefinition
+  optional: <T extends boolean = boolean>(
+    defaultValue?: T
+  ) => ((options?: { title?: string }) => OptionalBooleanDefinition) & OptionalBooleanDefinition
+  <T extends boolean = boolean>(defaultValue?: T): ((options?: { title?: string }) => OptionalBooleanDefinition) &
+    OptionalBooleanDefinition
+}
+
+/**
+ * Фабрика для типа массива
+ * @example
+ * ```typescript
+ * types.array.required([])
+ * types.array.optional()
+ * types.array(['item1', 'item2'])
+ * ```
+ */
+export type ArrayTypeFactory = {
+  required: <T extends string | number | boolean = string>(
+    defaultValue?: T[]
+  ) => ((options?: { title?: string }) => RequiredArrayDefinition<T>) & RequiredArrayDefinition<T>
+  optional: <T extends string | number | boolean = string>(
+    defaultValue?: T[]
+  ) => ((options?: { title?: string }) => OptionalArrayDefinition<T>) & OptionalArrayDefinition<T>
+  <T extends string | number | boolean = string>(defaultValue?: T[]): ((options?: {
+    title?: string
+  }) => OptionalArrayDefinition<T>) &
+    OptionalArrayDefinition<T>
+}
+
+/**
+ * Фабрика для типа перечисления
+ * @example
+ * ```typescript
+ * types.enum('user', 'admin').required('user')
+ * types.enum('pending', 'active').optional()
+ * types.enum('low', 'high')('medium')
+ * ```
+ */
+export type EnumTypeFactory = <const T extends readonly (string | number)[]>(
+  ...values: T
+) => {
+  required: (
+    defaultValue?: T[number]
+  ) => ((options?: { title?: string }) => RequiredEnumDefinition<T>) & RequiredEnumDefinition<T>
+  optional: (
+    defaultValue?: T[number]
+  ) => ((options?: { title?: string }) => OptionalEnumDefinition<T>) & OptionalEnumDefinition<T>
+  (defaultValue?: T[number]): ((options?: { title?: string }) => OptionalEnumDefinition<T>) & OptionalEnumDefinition<T>
+}
 
 /**
  * Фабрики типов для создания схем контекста
@@ -317,58 +405,9 @@ export type ContextSchema = Record<string, AnyDefinition>
  * ```
  */
 export type ContextTypes = {
-  string: {
-    required: <T extends string = string>(
-      defaultValue?: T
-    ) => ((options?: { title?: string }) => RequiredStringDefinition) & RequiredStringDefinition
-    optional: <T extends string = string>(
-      defaultValue?: T
-    ) => ((options?: { title?: string }) => OptionalStringDefinition) & OptionalStringDefinition
-    <T extends string = string>(defaultValue?: T): ((options?: { title?: string }) => OptionalStringDefinition) &
-      OptionalStringDefinition
-  }
-  number: {
-    required: <T extends number = number>(
-      defaultValue?: T
-    ) => ((options?: { title?: string }) => RequiredNumberDefinition) & RequiredNumberDefinition
-    optional: <T extends number = number>(
-      defaultValue?: T
-    ) => ((options?: { title?: string }) => OptionalNumberDefinition) & OptionalNumberDefinition
-    <T extends number = number>(defaultValue?: T): ((options?: { title?: string }) => OptionalNumberDefinition) &
-      OptionalNumberDefinition
-  }
-  boolean: {
-    required: <T extends boolean = boolean>(
-      defaultValue?: T
-    ) => ((options?: { title?: string }) => RequiredBooleanDefinition) & RequiredBooleanDefinition
-    optional: <T extends boolean = boolean>(
-      defaultValue?: T
-    ) => ((options?: { title?: string }) => OptionalBooleanDefinition) & OptionalBooleanDefinition
-    <T extends boolean = boolean>(defaultValue?: T): ((options?: { title?: string }) => OptionalBooleanDefinition) &
-      OptionalBooleanDefinition
-  }
-  array: {
-    required: <T extends string | number | boolean = string>(
-      defaultValue?: T[]
-    ) => ((options?: { title?: string }) => RequiredArrayDefinition<T>) & RequiredArrayDefinition<T>
-    optional: <T extends string | number | boolean = string>(
-      defaultValue?: T[]
-    ) => ((options?: { title?: string }) => OptionalArrayDefinition<T>) & OptionalArrayDefinition<T>
-    <T extends string | number | boolean = string>(defaultValue?: T[]): ((options?: {
-      title?: string
-    }) => OptionalArrayDefinition<T>) &
-      OptionalArrayDefinition<T>
-  }
-  enum: <const T extends readonly (string | number)[]>(
-    ...values: T
-  ) => {
-    required: (
-      defaultValue?: T[number]
-    ) => ((options?: { title?: string }) => RequiredEnumDefinition<T>) & RequiredEnumDefinition<T>
-    optional: (
-      defaultValue?: T[number]
-    ) => ((options?: { title?: string }) => OptionalEnumDefinition<T>) & OptionalEnumDefinition<T>
-    (defaultValue?: T[number]): ((options?: { title?: string }) => OptionalEnumDefinition<T>) &
-      OptionalEnumDefinition<T>
-  }
+  string: StringTypeFactory
+  number: NumberTypeFactory
+  boolean: BooleanTypeFactory
+  array: ArrayTypeFactory
+  enum: EnumTypeFactory
 }

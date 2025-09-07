@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test"
-import { Context } from "../index"
+import { Context } from "../context"
 
 test("Работа с метаданными контекста", () => {
   const { context } = new Context((types) => ({
@@ -27,4 +27,4 @@ test("Работа с метаданными контекста", () => {
   expect(context.name, "Значение name не должно измениться").toBe("Гость")
   expect(context.age, "Значение age не должно измениться").toBe(null)
   expect(context.isActive, "Значение isActive не должно измениться").toBe(true)
-}) 
+})

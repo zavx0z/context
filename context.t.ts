@@ -1,11 +1,4 @@
-/**
- * Типы для реализации контекста
- * @packageDocumentation
- * @module Context
- */
-
 import type {
-  ContextSchema,
   RequiredStringDefinition,
   OptionalStringDefinition,
   RequiredNumberDefinition,
@@ -16,6 +9,7 @@ import type {
   OptionalArrayDefinition,
   RequiredEnumDefinition,
   OptionalEnumDefinition,
+  Schema,
 } from "./types.t"
 
 export * from "./types.t"
@@ -48,15 +42,17 @@ export type ExtractValue<T> = T extends RequiredStringDefinition
   ? boolean[]
   : never
 
-export type ExtractValues<C extends ContextSchema> = { [K in keyof C]: ExtractValue<C[K]> }
-export type UpdateValues<T> = { [K in keyof T]?: T[K] }
+export type Values<C extends Schema> = {
+  [K in keyof C]: ExtractValue<C[K]>
+}
 
 /**
  * Тип для снимка контекста
  * @template C - Схема контекста
  * @returns Снимок контекста
  */
-export type ContextSnapshot<C extends ContextSchema> = {
+
+export type ContextSnapshot<C extends Schema> = {
   [K in keyof C]: {
     type: C[K]["type"]
     required: C[K]["required"]
@@ -67,11 +63,11 @@ export type ContextSnapshot<C extends ContextSchema> = {
   }
 }
 // Тип для сериализованной схемы
-export type SerializedSchema<T extends ContextSchema> = {
+export type SerializedSchema<T extends Schema> = {
   [K in keyof T]: {
     type: T[K]["type"]
     required: T[K]["required"]
-    default: T[K]["default"]
+    default?: T[K]["default"]
     title?: T[K]["title"]
     values?: T[K] extends { values: any } ? T[K]["values"] : never
   }
@@ -85,16 +81,15 @@ export type SerializedSchema<T extends ContextSchema> = {
  * {@includeCode ./test/context.basic.spec.ts}
  * {@includeCode ./test/context.types.spec.ts}
  */
-export type Update<C extends ContextSchema> = (values: UpdateValues<ExtractValues<C>>) => Partial<ExtractValues<C>>
-
+export type Update<C extends Schema> = (values: Partial<Values<C>>) => Partial<Values<C>>
 /**
  * Тип для подписки на обновления контекста
  * @template C - Схема контекста
  * @param cb - Функция, которая будет вызываться при обновлении контекста
  * @returns Функция для отписки от обновлений
  */
-export type OnUpdate<C extends ContextSchema> = (cb: (updated: Partial<ExtractValues<C>>) => void) => () => void
 
+export type OnUpdate<C extends Schema> = (cb: (updated: Partial<Values<C>>) => void) => () => void
 /**
  * Интерфейс для экземпляра контекста
  * @template C - Схема контекста
@@ -102,14 +97,15 @@ export type OnUpdate<C extends ContextSchema> = (cb: (updated: Partial<ExtractVa
  * {@includeCode ./test/context.basic.spec.ts}
  * {@includeCode ./test/context.metadata.spec.ts}
  */
-export interface ContextInstance<C extends ContextSchema> {
+
+export interface ContextInstance<C extends Schema> {
   /** Схема контекста (только для чтения) */
   schema: SerializedSchema<C>
   /** Текущее состояние контекста (только для чтения) */
-  context: ExtractValues<C> & { _title: Record<keyof C, string> }
+  context: Values<C> & { _title: Record<keyof C, string> }
   /** Обновляет значения в контексте */
   update: Update<C>
   onUpdate: OnUpdate<C>
   /** Снимок контекста (только для чтения) */
-  getSnapshot: () => ExtractValues<C>
+  getSnapshot: () => Values<C>
 }

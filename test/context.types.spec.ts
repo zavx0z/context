@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test"
-import { Context } from "../index"
+import { Context } from "../context"
 
 test("Работа со всеми типами данных", () => {
   const { context } = new Context((types) => ({

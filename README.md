@@ -105,14 +105,7 @@ clone.restoreValues(values)
 
 ```ts
 import { Context, ContextClone, types } from "@zavx0z/context"
-import type {
-  ContextSchema,
-  ContextSnapshot,
-  SerializedSchema,
-  ExtractValues,
-  UpdateValues,
-  ContextInstance,
-} from "@zavx0z/context"
+import type { Schema, ContextSnapshot, SerializedSchema, Values, ContextInstance } from "@zavx0z/context"
 ```
 
 ---

@@ -1,8 +1,7 @@
 {
     "$schema": "https://typedoc.org/schema.json",
     "entryPoints": [
-        "./index.ts",
-        "./types.ts"
+        "./index.ts"
     ],
     "out": "docs",
     "excludePrivate": true,
@@ -18,7 +17,7 @@
     ],
     "defaultCategory": "Other",
     "readme": "README.md",
-    "name": "@zavx0z/context",
+    "name": "Контекст для MetaFor",
     "theme": "default",
     "lightHighlightTheme": "github-light",
     "darkHighlightTheme": "github-dark",

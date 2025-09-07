@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test"
-import { Context, ContextClone } from "../index"
+import { Context, ContextClone } from "../context"
 
 describe("ContextClone", () => {
   it("создание из снимка", () => {
