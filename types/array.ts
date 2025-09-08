@@ -13,7 +13,7 @@ export const createArrayType = {
    * ```
    */
   required: <T extends string | number | boolean = string>(defaultValue?: T[]) => {
-    const base = { type: "array" as const, required: true as const, default: defaultValue }
+    const base = { type: "array" as const, required: true as const, ...(defaultValue && { default: defaultValue }) }
     const configurator = (options: { title?: string } = {}) => ({ ...base, ...options })
     return Object.assign(configurator, base)
   },
@@ -28,7 +28,7 @@ export const createArrayType = {
    * ```
    */
   optional: <T extends (string | number | boolean)[]>(defaultValue?: T) => {
-    const base = { type: "array" as const, required: false as const, default: defaultValue }
+    const base = { type: "array" as const, required: false as const, ...(defaultValue && { default: defaultValue }) }
     const configurator = (options: { title?: string } = {}) => ({ ...base, ...options })
     return Object.assign(configurator, base)
   },

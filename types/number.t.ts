@@ -9,7 +9,6 @@ import type { BaseDefinition, OptionalDefinition, RequiredDefinition } from "./i
  * types.number(0)
  * ```
  */
-
 export type NumberTypeFactory = {
   required: <T extends number = number>(
     defaultValue?: T
@@ -19,10 +18,10 @@ export type NumberTypeFactory = {
     defaultValue?: T
   ) => OptionalNumberDefinition & ((options?: { title?: string }) => OptionalNumberDefinition)
 
-  <T extends number = number>(defaultValue?: T):
-    | (OptionalNumberDefinition & ((options?: { title?: string }) => OptionalNumberDefinition))
-    | OptionalNumberDefinition
+  <T extends number = number>(defaultValue?: T): OptionalNumberDefinition &
+    ((options?: { title?: string }) => OptionalNumberDefinition)
 }
+
 /**
  * Опциональное числовое поле
  * @example
@@ -31,8 +30,8 @@ export type NumberTypeFactory = {
  * priority: types.number.optional()
  * ```
  */
+export type OptionalNumberDefinition = OptionalDefinition<BaseDefinition<number, "number">>
 
-export type OptionalNumberDefinition = OptionalDefinition<BaseNumberDefinition>
 /**
  * Обязательное числовое поле
  * @example
@@ -41,13 +40,4 @@ export type OptionalNumberDefinition = OptionalDefinition<BaseNumberDefinition>
  * count: types.number.required(0)
  * ```
  */
-
-export type RequiredNumberDefinition = RequiredDefinition<BaseNumberDefinition>
-/**
- * Базовое определение числового типа
- * @property type - Тип поля ("number")
- * @property title - Опциональное название поля для документации
- * @property default - Значение по умолчанию
- */
-
-export interface BaseNumberDefinition extends BaseDefinition<number, "number"> {}
+export type RequiredNumberDefinition = RequiredDefinition<BaseDefinition<number, "number">>

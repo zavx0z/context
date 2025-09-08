@@ -11,7 +11,7 @@ import type { BaseDefinition } from "./index.t"
 export interface OptionalStringDefinition {
   type: "string"
   required: false
-  default: string | undefined
+  default?: string
   title?: string
 }
 
@@ -26,7 +26,7 @@ export interface OptionalStringDefinition {
 export interface RequiredStringDefinition {
   type: "string"
   required: true
-  default: string | undefined
+  default?: string
   title?: string
 }
 

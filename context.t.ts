@@ -1,4 +1,4 @@
-import type { SchemaDefinition as ContextDefinition } from "./types/index.t"
+import type { TypesDefinition as ContextDefinition } from "./types/index.t"
 import type { RequiredStringDefinition } from "./types/string.t"
 import type { RequiredNumberDefinition } from "./types/number.t"
 import type { RequiredBooleanDefinition } from "./types/boolean.t"

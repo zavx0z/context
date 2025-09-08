@@ -1,9 +1,9 @@
 import type { ContextInstance, Values, Snapshot, Schema } from "./context.t"
 import { types } from "./types"
-import type { SchemaDefinition, ContextTypes } from "./types/index.t"
+import type { TypesDefinition, ContextTypes } from "./types/index.t"
 
 /** Базовый класс контекста */
-export abstract class ContextBase<C extends SchemaDefinition> implements ContextInstance<C> {
+export abstract class ContextBase<C extends TypesDefinition> implements ContextInstance<C> {
   /** @internal */
   protected contextData!: Values<C>
   /** @internal */
@@ -202,7 +202,7 @@ export abstract class ContextBase<C extends SchemaDefinition> implements Context
  * ctx.context // доступ к значениям
  * ctx.update({name: 'Новое имя'})
  */
-export class Context<C extends SchemaDefinition> extends ContextBase<C> {
+export class Context<C extends TypesDefinition> extends ContextBase<C> {
   constructor(schemaDefinition: (types: ContextTypes) => C) {
     super()
     const schema = schemaDefinition(types)
@@ -250,7 +250,7 @@ export class Context<C extends SchemaDefinition> extends ContextBase<C> {
  *
  * @typeParam C - Схема контекста (Schema)
  */
-export class ContextClone<C extends SchemaDefinition> extends ContextBase<C> {
+export class ContextClone<C extends TypesDefinition> extends ContextBase<C> {
   constructor() {
     super()
   }
@@ -260,7 +260,7 @@ export class ContextClone<C extends SchemaDefinition> extends ContextBase<C> {
    * @param snapshot - Сериализованный снимок контекста
    * @returns Экземпляр ContextClone
    */
-  static fromSnapshot<C extends SchemaDefinition>(snapshot: C): ContextClone<C> {
+  static fromSnapshot<C extends TypesDefinition>(snapshot: C): ContextClone<C> {
     const contextClone = new ContextClone<C>()
 
     // Восстанавливаем схему из снимка

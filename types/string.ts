@@ -13,7 +13,7 @@ export const createStringType = {
    * ```
    */
   required: (defaultValue?: string) => {
-    const base = { type: "string" as const, required: true as const, default: defaultValue }
+    const base = { type: "string" as const, required: true as const, ...(defaultValue && { default: defaultValue }) }
     const configurator = (options: { title?: string } = {}) => ({ ...base, ...options })
     return Object.assign(configurator, base)
   },
@@ -28,7 +28,7 @@ export const createStringType = {
    * ```
    */
   optional: (defaultValue?: string) => {
-    const base = { type: "string" as const, required: false as const, default: defaultValue }
+    const base = { type: "string" as const, required: false as const, ...(defaultValue && { default: defaultValue }) }
     const configurator = (options: { title?: string } = {}) => ({ ...base, ...options })
     return Object.assign(configurator, base)
   },

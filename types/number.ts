@@ -13,7 +13,7 @@ export const createNumberType = {
    * ```
    */
   required: (defaultValue?: number) => {
-    const base = { type: "number" as const, required: true as const, default: defaultValue }
+    const base = { type: "number" as const, required: true as const, ...(defaultValue && { default: defaultValue }) }
     const configurator = (options: { title?: string } = {}) => ({ ...base, ...options })
     return Object.assign(configurator, base)
   },
@@ -28,7 +28,7 @@ export const createNumberType = {
    * ```
    */
   optional: (defaultValue?: number) => {
-    const base = { type: "number" as const, required: false as const, default: defaultValue }
+    const base = { type: "number" as const, required: false as const, ...(defaultValue && { default: defaultValue }) }
     const configurator = (options: { title?: string } = {}) => ({ ...base, ...options })
     return Object.assign(configurator, base)
   },

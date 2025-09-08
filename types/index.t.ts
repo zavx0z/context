@@ -42,7 +42,7 @@ export type OptionalDefinition<T> = T & { required: false }
  * }
  * ```
  */
-export type SchemaDefinition = Record<
+export type TypesDefinition = Record<
   string,
   | RequiredStringDefinition
   | OptionalStringDefinition

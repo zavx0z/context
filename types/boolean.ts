@@ -13,7 +13,7 @@ export const createBooleanType = {
    * ```
    */
   required: (defaultValue?: boolean) => {
-    const base = { type: "boolean" as const, required: true as const, default: defaultValue }
+    const base = { type: "boolean" as const, required: true as const, ...(defaultValue && {default: defaultValue}) }
     const configurator = (options: { title?: string } = {}) => ({ ...base, ...options })
     return Object.assign(configurator, base)
   },
@@ -28,7 +28,7 @@ export const createBooleanType = {
    * ```
    */
   optional: (defaultValue?: boolean) => {
-    const base = { type: "boolean" as const, required: false as const, default: defaultValue }
+    const base = { type: "boolean" as const, required: false as const, ...(defaultValue && {default: defaultValue}) }
     const configurator = (options: { title?: string } = {}) => ({ ...base, ...options })
     return Object.assign(configurator, base)
   },
