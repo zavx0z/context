@@ -1,6 +1,5 @@
 import type { SchemaDefinition } from "./types/index.t"
 
-/* ---------------------- Вспомогательные типы/утилиты ---------------------- */
 export type Primitive = string | number | boolean | null | undefined | symbol | bigint
 
 export type DeepReadonly<T> = T extends Array<infer U> ? ReadonlyArray<DeepReadonly<U>> : T | Primitive
@@ -32,14 +31,14 @@ export type ExtractValue<T> = T extends { type: "string"; required: true }
   : never
 
 /**
- * Значения контекста
+ * Значения
  */
 export type Values<C extends SchemaDefinition> = {
   [K in keyof C]: ExtractValue<C[K]>
 }
 
 /**
- * Снимок контекста
+ * Снимок
  */
 export type Snapshot<C extends SchemaDefinition> = {
   [K in keyof C]: {
@@ -52,7 +51,7 @@ export type Snapshot<C extends SchemaDefinition> = {
   }
 }
 /**
- * Сериализованная схема контекста
+ * Схема
  */
 export type Schema<C extends SchemaDefinition> = {
   [K in keyof C]: {

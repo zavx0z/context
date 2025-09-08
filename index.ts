@@ -1,6 +1,6 @@
 export { Context } from "./context"
 export type { Values, Schema, Snapshot, ExtractValue } from "./context.t"
-export type { SchemaDefinition, Types, BaseTypeSchema } from "./types/index.t"
+export type { SchemaDefinition, Types, BaseTypeSchema, TypeShort } from "./types/index.t"
 export type { ArrayType, ArraySchema } from "./types/array.t"
 export type { EnumType, EnumSchema } from "./types/enum.t"
 export type { StringType, StringSchema } from "./types/string.t"

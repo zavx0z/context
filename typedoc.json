@@ -15,6 +15,10 @@
         "Factories",
         "*"
     ],
+    "navigation": {
+        "includeCategories": true,
+        "includeGroups": true
+    },
     "defaultCategory": "Other",
     "readme": "README.md",
     "name": "Контекст для MetaFor",
