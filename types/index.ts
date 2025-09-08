@@ -113,7 +113,10 @@ export const types = {
    * items: types.array(["default"])
    * ```
    */
-  array: Object.assign((defaultValue?: any[]) => createArrayType.optional(defaultValue), createArrayType),
+  array: Object.assign(
+    <const T extends (string | number | boolean)[]>(defaultValue?: T) => createArrayType.optional(defaultValue),
+    createArrayType
+  ),
 
   /**
    * Создает тип перечисления

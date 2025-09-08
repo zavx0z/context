@@ -1,4 +1,34 @@
-import type { BaseDefinition, OptionalDefinition, RequiredDefinition } from "./index.t"
+import type { BaseDefinition } from "./index.t"
+
+/**
+ * Опциональное строковое поле
+ * @example
+ * ```typescript
+ * description: types.string.optional()
+ * avatar: types.string.optional()
+ * ```
+ */
+export interface OptionalStringDefinition {
+  type: "string"
+  required: false
+  default: string | undefined
+  title?: string
+}
+
+/**
+ * Обязательное строковое поле
+ * @example
+ * ```typescript
+ * name: types.string.required("Anonymous")
+ * email: types.string.required("")
+ * ```
+ */
+export interface RequiredStringDefinition {
+  type: "string"
+  required: true
+  default: string | undefined
+  title?: string
+}
 
 /**
  * Фабрика для строкового типа
@@ -12,39 +42,11 @@ import type { BaseDefinition, OptionalDefinition, RequiredDefinition } from "./i
 export type StringTypeFactory = {
   required: <T extends string = string>(
     defaultValue?: T
-  ) => RequiredStringDefinition & ((options?: { title?: string }) => RequiredStringDefinition)
+  ) => ((options?: { title?: string }) => RequiredStringDefinition) & RequiredStringDefinition
 
   optional: <T extends string = string>(
     defaultValue?: T
-  ) => OptionalStringDefinition & ((options?: { title?: string }) => OptionalStringDefinition)
+  ) => ((options?: { title?: string }) => OptionalStringDefinition) & OptionalStringDefinition
 
   <T extends string = string>(defaultValue?: T): OptionalStringDefinition
 }
-/**
- * Опциональное строковое поле
- * @example
- * ```typescript
- * description: types.string.optional()
- * avatar: types.string.optional()
- * ```
- */
-
-export type OptionalStringDefinition = OptionalDefinition<BaseStringDefinition>
-/**
- * Обязательное строковое поле
- * @example
- * ```typescript
- * name: types.string.required("Anonymous")
- * email: types.string.required("")
- * ```
- */
-
-export type RequiredStringDefinition = RequiredDefinition<BaseStringDefinition>
-/**
- * Базовое определение строкового типа
- * @property type - Тип поля ("string")
- * @property title - Опциональное название поля для документации
- * @property default - Значение по умолчанию
- */
-
-export interface BaseStringDefinition extends BaseDefinition<string, "string"> {}

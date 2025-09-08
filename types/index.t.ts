@@ -27,6 +27,7 @@ export type RequiredDefinition<T> = T & { required: true }
  */
 
 export type OptionalDefinition<T> = T & { required: false }
+
 /**
  * Схема контекста - объект, где ключи - это имена полей, а значения - определения типов
  *
@@ -41,8 +42,7 @@ export type OptionalDefinition<T> = T & { required: false }
  * }
  * ```
  */
-
-export type Schema = Record<
+export type SchemaDefinition = Record<
   string,
   | RequiredStringDefinition
   | OptionalStringDefinition

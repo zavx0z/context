@@ -1,9 +1,9 @@
-import type { ContextInstance, Values, ContextSnapshot } from "./context.t"
+import type { ContextInstance, Values, Snapshot, Schema } from "./context.t"
 import { types } from "./types"
-import type { Schema, ContextTypes } from "./types/index.t"
+import type { SchemaDefinition, ContextTypes } from "./types/index.t"
 
 /** Базовый класс контекста */
-export abstract class ContextBase<C extends Schema> implements ContextInstance<C> {
+export abstract class ContextBase<C extends SchemaDefinition> implements ContextInstance<C> {
   /** @internal */
   protected contextData!: Values<C>
   /** @internal */
@@ -86,8 +86,8 @@ export abstract class ContextBase<C extends Schema> implements ContextInstance<C
    * Геттер для доступа к схеме контекста.
    * @returns Схема контекста
    */
-  get schema(): C {
-    const serializedSchema = {} as C
+  get schema(): Schema<C> {
+    const serializedSchema = {} as Schema<C>
 
     for (const [key, definition] of Object.entries(this.schemaDefinition)) {
       const serializedDefinition: any = {
@@ -110,7 +110,7 @@ export abstract class ContextBase<C extends Schema> implements ContextInstance<C
       ;(serializedSchema as any)[key] = serializedDefinition
     }
 
-    return serializedSchema
+    return serializedSchema as Schema<C>
   }
 
   /**
@@ -174,7 +174,7 @@ export abstract class ContextBase<C extends Schema> implements ContextInstance<C
    * @returns Сериализованный снимок контекста
    */
   get snapshot() {
-    const context: ContextSnapshot<C> = {} as ContextSnapshot<C>
+    const context: Snapshot<C> = {} as Snapshot<C>
     const contextCurrentValues = this.getSnapshot()
     for (const [key, value] of Object.entries(this.schema)) {
       context[key as keyof C] = {
@@ -202,7 +202,7 @@ export abstract class ContextBase<C extends Schema> implements ContextInstance<C
  * ctx.context // доступ к значениям
  * ctx.update({name: 'Новое имя'})
  */
-export class Context<C extends Schema> extends ContextBase<C> {
+export class Context<C extends SchemaDefinition> extends ContextBase<C> {
   constructor(schemaDefinition: (types: ContextTypes) => C) {
     super()
     const schema = schemaDefinition(types)
@@ -250,7 +250,7 @@ export class Context<C extends Schema> extends ContextBase<C> {
  *
  * @typeParam C - Схема контекста (Schema)
  */
-export class ContextClone<C extends Schema> extends ContextBase<C> {
+export class ContextClone<C extends SchemaDefinition> extends ContextBase<C> {
   constructor() {
     super()
   }
@@ -260,7 +260,7 @@ export class ContextClone<C extends Schema> extends ContextBase<C> {
    * @param snapshot - Сериализованный снимок контекста
    * @returns Экземпляр ContextClone
    */
-  static fromSnapshot<C extends Schema>(snapshot: C): ContextClone<C> {
+  static fromSnapshot<C extends SchemaDefinition>(snapshot: C): ContextClone<C> {
     const contextClone = new ContextClone<C>()
 
     // Восстанавливаем схему из снимка

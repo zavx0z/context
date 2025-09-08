@@ -27,7 +27,7 @@ export const createArrayType = {
    * tags: types.array.optional()
    * ```
    */
-  optional: <T extends string | number | boolean = string>(defaultValue?: T[]) => {
+  optional: <T extends (string | number | boolean)[]>(defaultValue?: T) => {
     const base = { type: "array" as const, required: false as const, default: defaultValue }
     const configurator = (options: { title?: string } = {}) => ({ ...base, ...options })
     return Object.assign(configurator, base)

@@ -34,10 +34,11 @@ describe("update", () => {
 
   it("позволяет устанавливать null для optional полей", () => {
     const { context, update } = new Context((types) => ({
+      name: types.string.required("Гость"),
       nickname: types.string(),
       age: types.number.optional(),
     }))
-
+    
     update({ nickname: "test" })
     expect(context.nickname, 'Поле nickname должно обновиться на "test"').toBe("test")
 
