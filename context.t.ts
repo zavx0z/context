@@ -1,4 +1,4 @@
-import type { TypesDefinition as ContextDefinition } from "./types/index.t"
+import type { TypesDefinition } from "./types/index.t"
 import type { RequiredStringDefinition } from "./types/string.t"
 import type { RequiredNumberDefinition } from "./types/number.t"
 import type { RequiredBooleanDefinition } from "./types/boolean.t"
@@ -43,16 +43,17 @@ export type ExtractValue<T> = T extends RequiredStringDefinition
   ? boolean[]
   : never
 
-export type Values<C extends ContextDefinition> = {
+/**
+ * Значения контекста
+ */
+export type Values<C extends TypesDefinition> = {
   [K in keyof C]: ExtractValue<C[K]>
 }
 
 /**
- * Тип для снимка контекста
- * @template C - Схема контекста
- * @returns Снимок контекста
+ * Снимок контекста
  */
-export type Snapshot<C extends ContextDefinition> = {
+export type Snapshot<C extends TypesDefinition> = {
   [K in keyof C]: {
     type: C[K]["type"]
     required: C[K]["required"]
@@ -62,8 +63,10 @@ export type Snapshot<C extends ContextDefinition> = {
     value: ExtractValue<C[K]>
   }
 }
-// Тип для сериализованной схемы
-export type Schema<C extends ContextDefinition> = {
+/**
+ * Сериализованная схема контекста
+ */
+export type Schema<C extends TypesDefinition> = {
   [K in keyof C]: {
     type: C[K]["type"]
     required: C[K]["required"]
@@ -71,39 +74,4 @@ export type Schema<C extends ContextDefinition> = {
     title?: C[K]["title"]
     values?: C[K] extends { values: any } ? C[K]["values"] : never
   }
-}
-/**
- * Тип для обновления значений в контексте
- * @template C - Схема контекста
- * @param values - Значения для обновления
- * @returns Значения, которые были обновлены
- *
- * {@includeCode ./test/context.basic.spec.ts}
- * {@includeCode ./test/context.types.spec.ts}
- */
-export type Update<C extends ContextDefinition> = (values: Partial<Values<C>>) => Partial<Values<C>>
-
-/**
- * Тип для подписки на обновления контекста
- * @template C - Схема контекста
- * @param cb - Функция, которая будет вызываться при обновлении контекста
- * @returns Функция для отписки от обновлений
- */
-export type OnUpdate<C extends ContextDefinition> = (cb: (updated: Partial<Values<C>>) => void) => () => void
-
-/**
- * Интерфейс для экземпляра контекста
- * @template C - Схема контекста
- *
- * {@includeCode ./test/context.basic.spec.ts}
- * {@includeCode ./test/context.metadata.spec.ts}
- */
-export interface ContextInstance<C extends ContextDefinition> {
-  /** Схема контекста (только для чтения) */
-  schema: Schema<C>
-  /** Текущее состояние контекста (только для чтения) */
-  context: Values<C>
-  /** Обновляет значения в контексте */
-  update: Update<C>
-  onUpdate: OnUpdate<C>
 }

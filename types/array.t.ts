@@ -1,4 +1,4 @@
-import type { BaseDefinition, OptionalDefinition, RequiredDefinition } from "./index.t"
+import type { OptionalDefinition, RequiredDefinition } from "./index.t"
 
 /**
  * Фабрика для типа массива
@@ -31,7 +31,8 @@ export type ArrayTypeFactory = {
  * ```
  */
 
-export type OptionalArrayDefinition<T extends string | number | boolean> = OptionalDefinition<BaseArrayDefinition<T>>
+export interface OptionalArrayDefinition<T extends string | number | boolean>
+  extends OptionalDefinition<T[], "array"> {}
 /**
  * Обязательное поле массива
  * @template T - Тип элементов массива
@@ -45,22 +46,5 @@ export type OptionalArrayDefinition<T extends string | number | boolean> = Optio
  * ```
  */
 
-export type RequiredArrayDefinition<T extends string | number | boolean> = RequiredDefinition<BaseArrayDefinition<T>>
-/**
- * Базовое определение типа массива
- * @template T - Тип элементов массива (string, number, boolean)
- * @property type - Тип поля ("array")
- * @property title - Опциональное название поля для документации
- * @property default - Значение по умолчанию (массив)
- *
- * @example
- * ```typescript
- * // Массив строк (ID пользователей)
- * userIds: types.array.required([])
- *
- * // Массив чисел (ID постов)
- * postIds: types.array.required([])
- * ```
- */
-
-export interface BaseArrayDefinition<T extends string | number | boolean> extends BaseDefinition<T[], "array"> {}
+export interface RequiredArrayDefinition<T extends string | number | boolean>
+  extends RequiredDefinition<T[], "array"> {}

@@ -1,4 +1,4 @@
-import type { BaseDefinition, OptionalDefinition, RequiredDefinition } from "./index.t"
+import type { OptionalDefinition, RequiredDefinition } from "./index.t"
 
 /**
  * Фабрика для типа перечисления
@@ -23,6 +23,7 @@ export type EnumTypeFactory = <const T extends readonly (string | number)[]>(
 
   (defaultValue?: T[number]): OptionalEnumDefinition<T>
 }
+
 /**
  * Опциональное поле перечисления
  * @template T - Массив допустимых значений
@@ -32,8 +33,9 @@ export type EnumTypeFactory = <const T extends readonly (string | number)[]>(
  * language: types.enum.optional(["ru", "en"])
  * ```
  */
+export interface OptionalEnumDefinition<T extends readonly (string | number)[]>
+  extends OptionalDefinition<T[number], "enum"> {}
 
-export type OptionalEnumDefinition<T extends readonly (string | number)[]> = OptionalDefinition<BaseEnumDefinition<T>>
 /**
  * Обязательное поле перечисления
  * @template T - Массив допустимых значений
@@ -43,26 +45,5 @@ export type OptionalEnumDefinition<T extends readonly (string | number)[]> = Opt
  * role: types.enum.required(["user", "admin"])
  * ```
  */
-
-export type RequiredEnumDefinition<T extends readonly (string | number)[]> = RequiredDefinition<BaseEnumDefinition<T>>
-/**
- * Базовое определение типа перечисления
- * @template T - Массив допустимых значений
- * @property type - Тип поля ("enum")
- * @property values - Массив допустимых значений
- * @property title - Опциональное название поля для документации
- * @property default - Значение по умолчанию
- *
- * @example
- * ```typescript
- * // Перечисление статусов
- * status: types.enum.required(["pending", "active", "blocked"])
- *
- * // Перечисление ролей
- * role: types.enum.required(["user", "admin", "moderator"])
- * ```
- */
-
-export interface BaseEnumDefinition<T extends readonly (string | number)[]> extends BaseDefinition<T[number], "enum"> {
-  values: T
-}
+export interface RequiredEnumDefinition<T extends readonly (string | number)[]>
+  extends RequiredDefinition<T[number], "enum"> {}

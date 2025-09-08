@@ -1,4 +1,4 @@
-import type { BaseDefinition, OptionalDefinition, RequiredDefinition } from "./index.t"
+import type { OptionalDefinition, RequiredDefinition } from "./index.t"
 
 /**
  * Фабрика для числового типа
@@ -30,7 +30,7 @@ export type NumberTypeFactory = {
  * priority: types.number.optional()
  * ```
  */
-export type OptionalNumberDefinition = OptionalDefinition<BaseDefinition<number, "number">>
+export interface OptionalNumberDefinition extends OptionalDefinition<number, "number"> {}
 
 /**
  * Обязательное числовое поле
@@ -40,4 +40,4 @@ export type OptionalNumberDefinition = OptionalDefinition<BaseDefinition<number,
  * count: types.number.required(0)
  * ```
  */
-export type RequiredNumberDefinition = RequiredDefinition<BaseDefinition<number, "number">>
+export interface RequiredNumberDefinition extends RequiredDefinition<number, "number"> {}

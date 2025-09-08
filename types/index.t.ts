@@ -22,7 +22,9 @@ export interface BaseDefinition<T, TypeName extends string> {
  *
  * @template T - Базовое определение типа
  */
-export type RequiredDefinition<T> = T & { required: true }
+export interface RequiredDefinition<T, TypeName extends string> extends BaseDefinition<T, TypeName> {
+  required: true
+}
 
 /**
  * Опциональное поле
@@ -31,7 +33,9 @@ export type RequiredDefinition<T> = T & { required: true }
  *
  * @template T - Базовое определение типа
  */
-export type OptionalDefinition<T> = T & { required: false }
+export interface OptionalDefinition<T, TypeName extends string> extends BaseDefinition<T, TypeName> {
+  required: false
+}
 
 /**
  * Схема контекста - объект, где ключи - это имена полей, а значения - определения типов

@@ -1,4 +1,4 @@
-import type { ContextInstance, DeepReadonly, Schema, Snapshot, Values } from "./context.t"
+import type { DeepReadonly, Schema, Snapshot, Values } from "./context.t"
 import { types } from "./types"
 import type { TypesDefinition, Types } from "./types/index.t"
 
@@ -21,7 +21,11 @@ const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.s
 
 /* ------------------------------- Базовый класс ---------------------------- */
 
-export abstract class ContextBase<C extends TypesDefinition> implements ContextInstance<C> {
+/**
+ * Базовый класс для контекста
+ * @template C - Схема контекста
+ */
+export abstract class ContextBase<C extends TypesDefinition> {
   protected contextData!: Values<C>
   protected schemaDefinition!: C
   protected updateSubscribers = new Set<(updated: Partial<Values<C>>) => void>()
@@ -88,10 +92,12 @@ export abstract class ContextBase<C extends TypesDefinition> implements ContextI
     return Object.freeze(view)
   }
 
+  /** {@inheritDoc Values} */
   get context(): Values<C> {
     return this.contextView as Values<C>
   }
 
+  /** {@inheritDoc Schema} */
   get schema(): Schema<C> {
     const serializedSchema = {} as Schema<C>
     for (const [key, definition] of Object.entries(this.schemaDefinition)) {
@@ -109,14 +115,11 @@ export abstract class ContextBase<C extends TypesDefinition> implements ContextI
 
   /**
    * Обновляет значения в контексте
-   * @template C - Схема контекста
    * @param values - Значения для обновления
    * @returns Значения, которые были обновлены
-   * 
+   *
    * Обновляет только существующие ключи. Игнорирует undefined.
-   * 
-   * {@includeCode ./test/context.basic.spec.ts}
-   * {@includeCode ./test/context.types.spec.ts}
+   *
    */
   update = (values: Partial<Values<C>>): Partial<Values<C>> => {
     const entries = Object.entries(values).filter(([, v]) => v !== undefined) as [string, any][]
@@ -163,12 +166,18 @@ export abstract class ContextBase<C extends TypesDefinition> implements ContextI
     }
     return updated
   }
-
+  /**
+   * Подписка на обновления контекста
+   * @template C - Схема контекста
+   * @param cb - Функция, которая будет вызываться при обновлении контекста
+   * @returns Функция для отписки от обновлений
+   */
   onUpdate(callback: (updated: Partial<Values<C>>) => void): () => void {
     this.updateSubscribers.add(callback)
     return () => this.updateSubscribers.delete(callback)
   }
 
+  /** {@inheritDoc Snapshot} */
   get snapshot() {
     const context: Snapshot<C> = {} as Snapshot<C>
     for (const [key, value] of Object.entries(this.schema)) {

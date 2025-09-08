@@ -1,4 +1,4 @@
-import type { BaseDefinition, OptionalDefinition, RequiredDefinition } from "./index.t"
+import type { OptionalDefinition, RequiredDefinition } from "./index.t"
 
 /**
  * Фабрика для булевого типа
@@ -30,7 +30,7 @@ export type BooleanTypeFactory = {
  * ```
  */
 
-export type OptionalBooleanDefinition = OptionalDefinition<BaseBooleanDefinition>
+export interface OptionalBooleanDefinition extends OptionalDefinition<boolean, "boolean"> {}
 /**
  * Обязательное булево поле
  * @example
@@ -40,12 +40,4 @@ export type OptionalBooleanDefinition = OptionalDefinition<BaseBooleanDefinition
  * ```
  */
 
-export type RequiredBooleanDefinition = RequiredDefinition<BaseBooleanDefinition>
-/**
- * Базовое определение булевого типа
- * @property type - Тип поля ("boolean")
- * @property title - Опциональное название поля для документации
- * @property default - Значение по умолчанию
- */
-
-export interface BaseBooleanDefinition extends BaseDefinition<boolean, "boolean"> {}
+export interface RequiredBooleanDefinition extends RequiredDefinition<boolean, "boolean"> {}

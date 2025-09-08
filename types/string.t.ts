@@ -1,4 +1,4 @@
-import type { BaseDefinition } from "./index.t"
+import type { OptionalDefinition, RequiredDefinition } from "./index.t"
 
 /**
  * Опциональное строковое поле
@@ -8,12 +8,7 @@ import type { BaseDefinition } from "./index.t"
  * avatar: types.string.optional()
  * ```
  */
-export interface OptionalStringDefinition {
-  type: "string"
-  required: false
-  default?: string
-  title?: string
-}
+export interface OptionalStringDefinition extends OptionalDefinition<string, "string"> {}
 
 /**
  * Обязательное строковое поле
@@ -23,12 +18,7 @@ export interface OptionalStringDefinition {
  * email: types.string.required("")
  * ```
  */
-export interface RequiredStringDefinition {
-  type: "string"
-  required: true
-  default?: string
-  title?: string
-}
+export interface RequiredStringDefinition extends RequiredDefinition<string, "string"> {}
 
 /**
  * Фабрика для строкового типа
