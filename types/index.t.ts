@@ -9,23 +9,28 @@ import type { RequiredStringDefinition, OptionalStringDefinition, StringTypeFact
  * @template T - Тип значения
  * @template TypeName - Название типа ("string", "number", "boolean", "array", "enum")
  */
-
 export interface BaseDefinition<T, TypeName extends string> {
   type: TypeName
   title?: string
   default?: T | undefined
 }
+
 /**
  * Обязательное поле
+ *
+ * {@includeCode ./index.spec.ts#required}
+ *
  * @template T - Базовое определение типа
  */
-
 export type RequiredDefinition<T> = T & { required: true }
+
 /**
  * Опциональное поле
+ *
+ * {@includeCode ./index.spec.ts#optional}
+ *
  * @template T - Базовое определение типа
  */
-
 export type OptionalDefinition<T> = T & { required: false }
 
 /**

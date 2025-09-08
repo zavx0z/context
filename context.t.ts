@@ -13,17 +13,7 @@ import type { OptionalEnumDefinition } from "./types/enum.t"
 /* ---------------------- Вспомогательные типы/утилиты ---------------------- */
 export type Primitive = string | number | boolean | null | undefined | symbol | bigint
 
-export type DeepReadonly<T> = T extends Primitive | Function
-  ? T
-  : T extends Array<infer U>
-  ? ReadonlyArray<DeepReadonly<U>>
-  : T extends object
-  ? {
-      readonly [K in keyof T]: DeepReadonly<T[K]>
-    }
-  : T
-
-export * from "./types/index.t"
+export type DeepReadonly<T> = T extends Array<infer U> ? ReadonlyArray<DeepReadonly<U>> : T | Primitive
 
 export type ExtractValue<T> = T extends RequiredStringDefinition
   ? string
@@ -92,14 +82,15 @@ export type Schema<C extends ContextDefinition> = {
  * {@includeCode ./test/context.types.spec.ts}
  */
 export type Update<C extends ContextDefinition> = (values: Partial<Values<C>>) => Partial<Values<C>>
+
 /**
  * Тип для подписки на обновления контекста
  * @template C - Схема контекста
  * @param cb - Функция, которая будет вызываться при обновлении контекста
  * @returns Функция для отписки от обновлений
  */
-
 export type OnUpdate<C extends ContextDefinition> = (cb: (updated: Partial<Values<C>>) => void) => () => void
+
 /**
  * Интерфейс для экземпляра контекста
  * @template C - Схема контекста
@@ -107,7 +98,6 @@ export type OnUpdate<C extends ContextDefinition> = (cb: (updated: Partial<Value
  * {@includeCode ./test/context.basic.spec.ts}
  * {@includeCode ./test/context.metadata.spec.ts}
  */
-
 export interface ContextInstance<C extends ContextDefinition> {
   /** Схема контекста (только для чтения) */
   schema: Schema<C>

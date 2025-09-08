@@ -118,13 +118,22 @@ export abstract class ContextBase<C extends TypesDefinition> implements ContextI
       const def: any = (this.schemaDefinition as any)[key]
       let next = nextRaw
 
+      // Проверяем null для required полей
+      if (nextRaw === null && def?.required) {
+        throw new TypeError(`Поле ${key} не может быть null`)
+      }
+
       if (def?.type === "array") {
-        if (!isFlatPrimitiveArray(nextRaw)) {
+        if (nextRaw === null) {
+          // null разрешен для optional массивов
+          next = nextRaw
+        } else if (!isFlatPrimitiveArray(nextRaw)) {
           throw new TypeError(
             `[Context.update] "${key}": ожидается плоский массив примитивов (string | number | boolean | null).`
           )
+        } else {
+          next = freezeArray(nextRaw)
         }
-        next = freezeArray(nextRaw)
       } else {
         assertNonObject(
           nextRaw,
