@@ -1,6 +1,6 @@
 import type { ContextInstance, Values, Snapshot, Schema } from "./context.t"
 import { types } from "./types"
-import type { TypesDefinition, ContextTypes } from "./types/index.t"
+import type { TypesDefinition, Types as Types } from "./types/index.t"
 
 /** Базовый класс контекста */
 export abstract class ContextBase<C extends TypesDefinition> implements ContextInstance<C> {
@@ -203,10 +203,9 @@ export abstract class ContextBase<C extends TypesDefinition> implements ContextI
  * ctx.update({name: 'Новое имя'})
  */
 export class Context<C extends TypesDefinition> extends ContextBase<C> {
-  constructor(schemaDefinition: (types: ContextTypes) => C) {
+  constructor(schema: (types: Types) => C) {
     super()
-    const schema = schemaDefinition(types)
-    this.schemaDefinition = schema
+    this.schemaDefinition = schema(types)
     this.contextData = {} as Values<C>
     this.initializeContext(this.schemaDefinition)
     this.immutableContext = this.createImmutableContext()

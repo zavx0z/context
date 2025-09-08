@@ -40,13 +40,14 @@ export interface RequiredStringDefinition {
  * ```
  */
 export type StringTypeFactory = {
-  required: <T extends string = string>(
-    defaultValue?: T
-  ) => ((options?: { title?: string }) => RequiredStringDefinition) & RequiredStringDefinition
+  <T extends string = string>(defaultValue?: T): ((options?: { title?: string }) => OptionalStringDefinition) &
+    OptionalStringDefinition
 
   optional: <T extends string = string>(
     defaultValue?: T
   ) => ((options?: { title?: string }) => OptionalStringDefinition) & OptionalStringDefinition
 
-  <T extends string = string>(defaultValue?: T): OptionalStringDefinition
+  required: <T extends string = string>(
+    defaultValue?: T
+  ) => ((options?: { title?: string }) => RequiredStringDefinition) & RequiredStringDefinition
 }
