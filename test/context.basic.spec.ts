@@ -3,7 +3,7 @@ import { Context } from "../context"
 
 test("Создание контекста с базовыми типами", () => {
   // #region allTypes
-  const { context } = new Context((types) => ({
+  const { context, schema } = new Context((types) => ({
     name: types.string.required("Гость")({ title: "Имя пользователя" }),
     age: types.number.optional()({ title: "Возраст" }),
     isActive: types.boolean.required(true)({ title: "Активен" }),
@@ -21,10 +21,10 @@ test("Создание контекста с базовыми типами", () 
   expect(context.description, "Поле description должно быть null").toBe(null)
 
   // Проверяем метаданные
-  expect(context._title.name, "Метаданные name должны быть доступны").toBe("Имя пользователя")
-  expect(context._title.age, "Метаданные age должны быть доступны").toBe("Возраст")
-  expect(context._title.isActive, "Метаданные isActive должны быть доступны").toBe("Активен")
-  expect(context._title.role, "Метаданные role должны быть доступны").toBe("Роль")
-  expect(context._title.tags, "Метаданные tags должны быть доступны").toBe("Теги")
-  expect(context._title.description, "Метаданные description должны быть пустой строкой").toBe("")
+  expect(schema.name.title, "Метаданные name должны быть доступны").toBe("Имя пользователя")
+  expect(schema.age.title, "Метаданные age должны быть доступны").toBe("Возраст")
+  expect(schema.isActive.title, "Метаданные isActive должны быть доступны").toBe("Активен")
+  expect(schema.role.title, "Метаданные role должны быть доступны").toBe("Роль")
+  expect(schema.tags.title, "Метаданные tags должны быть доступны").toBe("Теги")
+  expect(schema.description.title, "Метаданные description должны быть пустой строкой").toBeUndefined()
 })

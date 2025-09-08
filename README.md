@@ -33,7 +33,7 @@ const ctx = new Context((t) => ({
 
 // чтение — только через иммутабельный снимок
 console.log(ctx.context.name) // "Гость"
-console.log(ctx.context._title.name) // "Имя"
+console.log(ctx.schema.name.title) // "Имя"
 
 // обновление — возвращает только реально изменённые поля
 ctx.update({ name: "Иван", age: 25 }) // { name: "Иван", age: 25 }
@@ -104,8 +104,8 @@ clone.restoreValues(values)
 ## Экспорты
 
 ```ts
-import { Context, ContextClone, types } from "@zavx0z/context"
-import type { Schema, ContextSnapshot, SerializedSchema, Values, ContextInstance } from "@zavx0z/context"
+import { Context, ContextClone } from "@zavx0z/context"
+import type { Schema, Values, Snapshot } from "@zavx0z/context"
 ```
 
 ---

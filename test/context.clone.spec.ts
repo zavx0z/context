@@ -15,8 +15,8 @@ describe("ContextClone", () => {
     originalContext.update({ name: "Иван", age: 25 })
 
     // Создаем снимок
-    const snapshot = originalContext.toSnapshot()
-    const valuesSnapshot = originalContext.getSnapshot()
+    const snapshot = originalContext.schema
+    const valuesSnapshot = originalContext.context
 
     // Создаем клон из снимка
     const clonedContext = ContextClone.fromSnapshot(snapshot)
@@ -41,9 +41,10 @@ describe("ContextClone", () => {
       age: types.number.optional(),
     }))
 
-    const snapshot = originalContext.toSnapshot()
+    const snapshot = originalContext.schema
+    const valuesSnapshot = originalContext.context
     const clonedContext = ContextClone.fromSnapshot(snapshot)
-    clonedContext.restoreValues(originalContext.getSnapshot())
+    clonedContext.restoreValues(valuesSnapshot)
 
     // Обновляем клонированный контекст
     const updated = clonedContext.update({ name: "Новое имя", age: 30 })
@@ -63,7 +64,7 @@ describe("ContextClone", () => {
   })
 
   it("снимок с метаданными", () => {
-    const snapshotWithMetadata = {
+    const schema = {
       name: {
         type: "string" as const,
         required: true,
@@ -74,11 +75,10 @@ describe("ContextClone", () => {
         type: "number" as const,
         required: false,
         title: "Возраст",
-        default: undefined,
       },
     }
 
-    const clonedContext = ContextClone.fromSnapshot(snapshotWithMetadata)
+    const clonedContext = ContextClone.fromSnapshot(schema)
 
     expect(clonedContext.schema.name!.type, "тип должен сохраниться").toBe("string")
     expect(clonedContext.schema.name!.required, "required должен сохраниться").toBe(true)
@@ -94,9 +94,10 @@ describe("ContextClone", () => {
       name: types.string.required("Гость"),
     }))
 
-    const snapshot = originalContext.toSnapshot()
+    const snapshot = originalContext.schema
+    const valuesSnapshot = originalContext.context
     const clonedContext = ContextClone.fromSnapshot(snapshot)
-    clonedContext.restoreValues(originalContext.getSnapshot())
+    clonedContext.restoreValues(valuesSnapshot)
 
     let updateCount = 0
     let lastUpdate: any = null

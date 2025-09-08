@@ -1,284 +1,209 @@
-import type { ContextInstance, Values, Snapshot, Schema } from "./context.t"
+import type { ContextInstance, DeepReadonly, Schema, Snapshot, Values } from "./context.t"
 import { types } from "./types"
-import type { TypesDefinition, Types as Types } from "./types/index.t"
+import type { TypesDefinition, Types } from "./types/index.t"
 
-/** Базовый класс контекста */
-export abstract class ContextBase<C extends TypesDefinition> implements ContextInstance<C> {
-  /** @internal */
-  protected contextData!: Values<C>
-  /** @internal */
-  protected immutableContext!: Values<C> & { _title: Record<keyof C, string> }
-  /** @internal */
-  protected schemaDefinition!: C
-  protected updateSubscribers: Array<(updated: Partial<Values<C>>) => void> = []
+/* ------------------------------- утилиты ---------------------------------- */
 
-  /**
-   * Создает иммутабельный (только для чтения) прокси-объект для доступа к значениям контекста.
-   * @returns Иммутабельный объект контекста
-   */
-  protected createImmutableContext(): Values<C> & { _title: Record<keyof C, string> } {
-    const titleData: Record<keyof C, string> = {} as Record<keyof C, string>
+const isPrimitiveOrNull = (v: unknown): v is string | number | boolean | null =>
+  v === null || (typeof v !== "object" && typeof v !== "function")
 
-    // Инициализируем метаданные: если title не указан — всегда пустая строка
-    for (const key in this.schema) {
-      const definition = this.schema[key]
-      titleData[key] = definition && "title" in definition && definition.title ? definition.title : ""
-    }
-
-    const immutableContext = new Proxy({} as Values<C> & { _title: Record<keyof C, string> }, {
-      get: (_, prop) => {
-        if (prop === "_title") {
-          return titleData
-        }
-        return (this.contextData as any)[prop]
-      },
-      set: (_, prop) => {
-        throw new Error("Прямое изменение контекста запрещено")
-      },
-    })
-
-    return immutableContext
+const assertNonObject = (value: unknown, msg: string) => {
+  if (!isPrimitiveOrNull(value)) {
+    throw new TypeError(msg)
   }
+}
 
-  /**
-   * Инициализирует значения контекста по умолчанию согласно схеме.
-   * @param schema - Схема контекста
-   */
+const isFlatPrimitiveArray = (v: unknown): v is Array<string | number | boolean | null> =>
+  Array.isArray(v) && v.every(isPrimitiveOrNull)
+
+/** Копия массива с заморозкой (элементы — примитивы, так что глубокая не нужна) */
+const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.slice()) as T
+
+/* ------------------------------- Базовый класс ---------------------------- */
+
+export abstract class ContextBase<C extends TypesDefinition> implements ContextInstance<C> {
+  protected contextData!: Values<C>
+  protected schemaDefinition!: C
+  protected updateSubscribers = new Set<(updated: Partial<Values<C>>) => void>()
+  private contextView!: DeepReadonly<Values<C>>
+
   protected initializeContext(schema: C): void {
     for (const key in schema) {
-      const definition = schema[key]
-      if (!definition) continue
+      const def = schema[key]
+      if (!def) continue
 
-      if ("default" in definition && definition.default !== undefined) {
-        ;(this.contextData as any)[key] = definition.default
+      let val: any
+
+      if ("default" in def && def.default !== undefined) {
+        if (def.type === "array") {
+          if (!isFlatPrimitiveArray(def.default)) {
+            throw new TypeError(`[Context] "${key}": default для типа array должен быть плоским массивом примитивов.`)
+          }
+          val = freezeArray(def.default as any)
+        } else {
+          assertNonObject(
+            def.default,
+            `[Context] "${key}": default должен быть примитивом или null (объекты запрещены).`
+          )
+          val = def.default
+        }
       } else {
-        switch (definition.type) {
+        switch (def.type) {
           case "string":
-            ;(this.contextData as any)[key] = definition.required ? "" : null
+            val = def.required ? "" : null
             break
           case "number":
-            ;(this.contextData as any)[key] = definition.required ? 0 : null
+            val = def.required ? 0 : null
             break
           case "boolean":
-            ;(this.contextData as any)[key] = definition.required ? false : null
-            break
-          case "array":
-            ;(this.contextData as any)[key] = definition.required ? [] : null
+            val = def.required ? false : null
             break
           case "enum":
-            const enumDef = definition as any
-            ;(this.contextData as any)[key] = definition.required ? enumDef.values[0] : null
+            val = def.required ? (def as any).values[0] : null
             break
+          case "array":
+            val = def.required ? freezeArray<any>([]) : null
+            break
+          default:
+            val = null
         }
       }
+
+      this.contextData[key as keyof Values<C>] = val
     }
+
+    Object.seal(this.contextData)
+    this.contextView = this.#createReadOnlyView()
   }
 
-  /**
-   * Геттер для доступа к иммутабельному контексту.
-   * @returns Иммутабельный объект контекста
-   */
-  get context(): Values<C> & { _title: Record<keyof C, string> } {
-    return this.immutableContext
+  #createReadOnlyView(): DeepReadonly<Values<C>> {
+    const view: any = {}
+    for (const key of Object.keys(this.schemaDefinition)) {
+      Object.defineProperty(view, key, {
+        enumerable: true,
+        configurable: false,
+        get: () => this.contextData[key as keyof Values<C>],
+      })
+    }
+    return Object.freeze(view)
   }
 
-  /**
-   * Геттер для доступа к схеме контекста.
-   * @returns Схема контекста
-   */
+  get context(): Values<C> {
+    return this.contextView as Values<C>
+  }
+
   get schema(): Schema<C> {
     const serializedSchema = {} as Schema<C>
-
     for (const [key, definition] of Object.entries(this.schemaDefinition)) {
-      const serializedDefinition: any = {
+      const out: any = {
         type: definition.type,
         required: definition.required,
       }
-
-      if ("default" in definition && definition.default) {
-        serializedDefinition.default = definition.default
-      }
-
-      if ("title" in definition && definition.title) {
-        serializedDefinition.title = definition.title
-      }
-
-      if ("values" in definition) {
-        serializedDefinition.values = definition.values
-      }
-
-      ;(serializedSchema as any)[key] = serializedDefinition
+      if ("default" in definition && definition.default !== undefined) out.default = definition.default
+      if ("title" in definition && definition.title) out.title = definition.title
+      if ("values" in definition && definition.values) out.values = definition.values
+      ;(serializedSchema as any)[key] = out
     }
-
-    return serializedSchema as Schema<C>
+    return serializedSchema
   }
 
-  /**
-   * Обновляет значения контекста.
-   * Игнорирует undefined значения и возвращает только обновленные поля.
-   *
-   * @param values - Объект с новыми значениями
-   * @returns Объект с обновленными полями
-   *
-   * @example
-   * context.update({name: 'Новое имя', age: 30})
-   */
+  /** Обновляет только существующие ключи. Игнорирует undefined. */
   update = (values: Partial<Values<C>>): Partial<Values<C>> => {
-    const filteredValues = Object.fromEntries(
-      Object.entries(values).filter(([_, value]) => value !== undefined)
-    ) as Partial<Values<C>>
-
+    const entries = Object.entries(values).filter(([, v]) => v !== undefined) as [string, any][]
     const updated: Partial<Values<C>> = {}
 
-    for (const [key, value] of Object.entries(filteredValues)) {
-      if (key in this.contextData) {
-        // Проверяем, изменилось ли значение
-        if (this.contextData[key as keyof Values<C>] !== value) {
-          ;(this.contextData as any)[key] = value
-          ;(updated as any)[key] = value
+    for (const [key, nextRaw] of entries) {
+      if (!(key in this.contextData)) continue
+
+      const def: any = (this.schemaDefinition as any)[key]
+      let next = nextRaw
+
+      if (def?.type === "array") {
+        if (!isFlatPrimitiveArray(nextRaw)) {
+          throw new TypeError(
+            `[Context.update] "${key}": ожидается плоский массив примитивов (string | number | boolean | null).`
+          )
         }
+        next = freezeArray(nextRaw)
+      } else {
+        assertNonObject(
+          nextRaw,
+          `[Context.update] "${key}": объекты и функции запрещены (используйте core или сериализуйте).`
+        )
+      }
+
+      const prev = (this.contextData as any)[key]
+      if (prev !== next) {
+        ;(this.contextData as any)[key] = next
+        ;(updated as any)[key] = next
       }
     }
 
-    // Уведомляем подписчиков об изменениях
-    this.updateSubscribers.forEach((callback) => callback(updated))
-
+    if (Object.keys(updated).length > 0) {
+      for (const cb of this.updateSubscribers) cb(updated)
+    }
     return updated
   }
 
-  /**
-   * Подписывается на обновления контекста.
-   * @param callback - Функция обратного вызова
-   * @returns Функция для отписки
-   */
   onUpdate(callback: (updated: Partial<Values<C>>) => void): () => void {
-    this.updateSubscribers.push(callback)
-    return () => {
-      const index = this.updateSubscribers.indexOf(callback)
-      if (index > -1) {
-        this.updateSubscribers.splice(index, 1)
-      }
-    }
+    this.updateSubscribers.add(callback)
+    return () => this.updateSubscribers.delete(callback)
   }
 
-  /**
-   * Возвращает все значения текущего состояния контекста.
-   * @returns Снимок контекста
-   */
-  getSnapshot(): Values<C> {
-    return Object.freeze({ ...this.contextData })
-  }
-
-  /**
-   * Возвращает сериализованный снимок текущего состояния контекста.
-   * @returns Сериализованный снимок контекста
-   */
   get snapshot() {
     const context: Snapshot<C> = {} as Snapshot<C>
-    const contextCurrentValues = this.getSnapshot()
     for (const [key, value] of Object.entries(this.schema)) {
       context[key as keyof C] = {
         type: value.type,
         required: value.required,
         default: value.default,
         ...(value.title ? { title: value.title } : {}),
-        //@ts-ignore
         ...(value.values ? { values: value.values } : {}),
-        value: contextCurrentValues[key as keyof C],
+        value: this.context[key as keyof C],
       }
     }
     return context
   }
 }
 
-/**
- * Класс для работы с типизированными контекстами.
- * Позволяет создавать, читать, обновлять и клонировать контекст на основе схемы.
- *
- * @typeParam T - Схема контекста (Schema)
- *
- * @example
- * const ctx = new Context(types => ({name: types.string.required()}))
- * ctx.context // доступ к значениям
- * ctx.update({name: 'Новое имя'})
- */
+/* -------------------------------- Реализации -------------------------------- */
+
 export class Context<C extends TypesDefinition> extends ContextBase<C> {
   constructor(schema: (types: Types) => C) {
     super()
     this.schemaDefinition = schema(types)
     this.contextData = {} as Values<C>
     this.initializeContext(this.schemaDefinition)
-    this.immutableContext = this.createImmutableContext()
-  }
-
-  /**
-   * Создает снимок контекста для сериализации.
-   * @returns Сериализованный снимок контекста
-   */
-  toSnapshot(): C {
-    const serializedSchema = {} as C
-
-    for (const [key, definition] of Object.entries(this.schemaDefinition)) {
-      const serializedDefinition: any = {
-        type: definition.type,
-        required: definition.required,
-      }
-
-      if ("default" in definition && definition.default !== undefined) {
-        serializedDefinition.default = definition.default
-      }
-
-      if ("title" in definition && definition.title) {
-        serializedDefinition.title = definition.title
-      }
-
-      if ("values" in definition && definition.values) {
-        serializedDefinition.values = definition.values
-      }
-
-      ;(serializedSchema as any)[key] = serializedDefinition
-    }
-
-    return serializedSchema
   }
 }
 
-/**
- * Клонированный контекст, созданный из снимка.
- * Позволяет восстанавливать контекст из сериализованного состояния.
- *
- * @typeParam C - Схема контекста (Schema)
- */
 export class ContextClone<C extends TypesDefinition> extends ContextBase<C> {
-  constructor() {
-    super()
+  static fromSnapshot<C extends TypesDefinition>(snapshot: Schema<C>): ContextClone<C> {
+    const ctx = new ContextClone<C>()
+    ctx.schemaDefinition = snapshot as unknown as C
+    ctx.contextData = {} as Values<C>
+    ctx.initializeContext(ctx.schemaDefinition)
+    return ctx
   }
 
-  /**
-   * Создает контекст из снимка.
-   * @param snapshot - Сериализованный снимок контекста
-   * @returns Экземпляр ContextClone
-   */
-  static fromSnapshot<C extends TypesDefinition>(snapshot: C): ContextClone<C> {
-    const contextClone = new ContextClone<C>()
-
-    // Восстанавливаем схему из снимка
-    contextClone.schemaDefinition = snapshot as C
-
-    // Инициализируем пустые данные
-    contextClone.contextData = {} as Values<C>
-    contextClone.initializeContext(contextClone.schemaDefinition)
-    contextClone.immutableContext = contextClone.createImmutableContext()
-
-    return contextClone
-  }
-
-  /**
-   * Восстанавливает данные контекста из снимка значений.
-   * @param values - Снимок значений контекста
-   */
+  /** Восстановление значений с валидацией и заморозкой массивов */
   restoreValues(values: Values<C>): void {
-    this.contextData = { ...values }
-    this.immutableContext = this.createImmutableContext()
+    for (const key of Object.keys(this.schemaDefinition)) {
+      const def: any = (this.schemaDefinition as any)[key]
+      const v = (values as any)[key]
+
+      if (def?.type === "array") {
+        if (v == null) {
+          ;(this.contextData as any)[key] = v
+        } else if (isFlatPrimitiveArray(v)) {
+          ;(this.contextData as any)[key] = freezeArray(v)
+        } else {
+          throw new TypeError(`[Context.restoreValues] "${key}": ожидается плоский массив примитивов.`)
+        }
+      } else {
+        assertNonObject(v, `[Context.restoreValues] "${key}": объекты запрещены.`)
+        ;(this.contextData as any)[key] = v
+      }
+    }
   }
 }

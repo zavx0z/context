@@ -10,6 +10,19 @@ import type { OptionalBooleanDefinition } from "./types/boolean.t"
 import type { OptionalArrayDefinition } from "./types/array.t"
 import type { OptionalEnumDefinition } from "./types/enum.t"
 
+/* ---------------------- Вспомогательные типы/утилиты ---------------------- */
+export type Primitive = string | number | boolean | null | undefined | symbol | bigint
+
+export type DeepReadonly<T> = T extends Primitive | Function
+  ? T
+  : T extends Array<infer U>
+  ? ReadonlyArray<DeepReadonly<U>>
+  : T extends object
+  ? {
+      readonly [K in keyof T]: DeepReadonly<T[K]>
+    }
+  : T
+
 export * from "./types/index.t"
 
 export type ExtractValue<T> = T extends RequiredStringDefinition
@@ -99,10 +112,8 @@ export interface ContextInstance<C extends ContextDefinition> {
   /** Схема контекста (только для чтения) */
   schema: Schema<C>
   /** Текущее состояние контекста (только для чтения) */
-  context: Values<C> & { _title: Record<keyof C, string> }
+  context: Values<C>
   /** Обновляет значения в контексте */
   update: Update<C>
   onUpdate: OnUpdate<C>
-  /** Снимок контекста (только для чтения) */
-  getSnapshot: () => Values<C>
 }

@@ -69,7 +69,7 @@ describe("Схема", () => {
   })
 
   it("должен сохранять типизацию схемы", () => {
-    const ctx = new Context((types) => ({
+    const { schema } = new Context((types) => ({
       name: types.string.required("Иван")({ title: "Имя пользователя" }),
       age: types.number.optional(),
       role: types.enum("user", "admin", "moderator").required("user")({ title: "Роль" }),
@@ -78,9 +78,6 @@ describe("Схема", () => {
       priority: types.enum("low", "medium", "high").optional()({ title: "Приоритет" }),
       tags: types.array.optional()({ title: "Теги" }),
     }))
-
-    // Проверяем типизацию - TypeScript должен знать точные типы
-    const schema = ctx.schema
 
     // Проверяем required поля
     expect(schema.name.type).toBe("string")
@@ -119,14 +116,5 @@ describe("Схема", () => {
     expect(schema.tags.required).toBe(false)
     expect(schema.tags.default).toBeUndefined()
     expect(schema.tags.title).toBe("Теги")
-
-    // Проверяем, что схема остается неизменной при изменении заголовков
-    ctx.context._title.name = "Новое имя"
-    ctx.context._title.role = "Новая роль"
-
-    expect(ctx.schema.name.title).toBe("Имя пользователя")
-    expect(ctx.schema.role.title).toBe("Роль")
-    expect(ctx.context._title.name).toBe("Новое имя")
-    expect(ctx.context._title.role).toBe("Новая роль")
   })
 })
