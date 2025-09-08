@@ -1,6 +1,6 @@
-import type { BaseType } from "./index.t"
+import type { BaseTypeSchema } from "./index.t"
 
-export type NumberType = BaseType<number, "number", true> | BaseType<number, "number", false>
+export type NumberSchema = BaseTypeSchema<number, "number", true> | BaseTypeSchema<number, "number", false>
 /**
  * Фабрика для числового типа
  * @example
@@ -10,15 +10,17 @@ export type NumberType = BaseType<number, "number", true> | BaseType<number, "nu
  * types.number(0)
  * ```
  */
-export type NumberTypeFactory = {
+export type NumberType = {
   required: <T extends number = number>(
     defaultValue?: T
-  ) => BaseType<number, "number", true> & ((options?: { title?: string }) => BaseType<number, "number", true>)
+  ) => BaseTypeSchema<number, "number", true> &
+    ((options?: { title?: string }) => BaseTypeSchema<number, "number", true>)
 
   optional: <T extends number = number>(
     defaultValue?: T
-  ) => BaseType<number, "number", false> & ((options?: { title?: string }) => BaseType<number, "number", false>)
+  ) => BaseTypeSchema<number, "number", false> &
+    ((options?: { title?: string }) => BaseTypeSchema<number, "number", false>)
 
-  <T extends number = number>(defaultValue?: T): BaseType<number, "number"> &
-    ((options?: { title?: string }) => BaseType<number, "number">)
+  <T extends number = number>(defaultValue?: T): BaseTypeSchema<number, "number"> &
+    ((options?: { title?: string }) => BaseTypeSchema<number, "number">)
 }

@@ -1,6 +1,6 @@
-import type { BaseType } from "./index.t"
+import type { BaseTypeSchema } from "./index.t"
 
-export type BooleanType = BaseType<boolean, "boolean", true> | BaseType<boolean, "boolean", false>
+export type BooleanSchema = BaseTypeSchema<boolean, "boolean", true> | BaseTypeSchema<boolean, "boolean", false>
 
 /**
  * Фабрика для булевого типа
@@ -11,15 +11,17 @@ export type BooleanType = BaseType<boolean, "boolean", true> | BaseType<boolean,
  * types.boolean(true)
  * ```
  */
-export type BooleanTypeFactory = {
+export type BooleanType = {
   required: <T extends boolean = boolean>(
     defaultValue?: T
-  ) => BaseType<boolean, "boolean", true> & ((options?: { title?: string }) => BaseType<boolean, "boolean", true>)
+  ) => BaseTypeSchema<boolean, "boolean", true> &
+    ((options?: { title?: string }) => BaseTypeSchema<boolean, "boolean", true>)
 
   optional: <T extends boolean = boolean>(
     defaultValue?: T
-  ) => BaseType<boolean, "boolean", false> & ((options?: { title?: string }) => BaseType<boolean, "boolean", false>)
+  ) => BaseTypeSchema<boolean, "boolean", false> &
+    ((options?: { title?: string }) => BaseTypeSchema<boolean, "boolean", false>)
 
-  <T extends boolean = boolean>(defaultValue?: T): BaseType<boolean, "boolean"> &
-    ((options?: { title?: string }) => BaseType<boolean, "boolean">)
+  <T extends boolean = boolean>(defaultValue?: T): BaseTypeSchema<boolean, "boolean"> &
+    ((options?: { title?: string }) => BaseTypeSchema<boolean, "boolean">)
 }

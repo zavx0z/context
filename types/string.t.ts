@@ -1,6 +1,6 @@
-import type { BaseType } from "./index.t"
+import type { BaseTypeSchema } from "./index.t"
 
-export type StringType = BaseType<string, "string", true> | BaseType<string, "string", false>
+export type StringSchema = BaseTypeSchema<string, "string", true> | BaseTypeSchema<string, "string", false>
 /**
  * Фабрика для строкового типа
  * @example
@@ -10,15 +10,16 @@ export type StringType = BaseType<string, "string", true> | BaseType<string, "st
  * types.string('По умолчанию')
  * ```
  */
-export type StringTypeFactory = {
-  <T extends string = string>(defaultValue?: T): ((options?: { title?: string }) => BaseType<string, "string">) &
-    BaseType<string, "string">
+export type StringType = {
+  <T extends string = string>(defaultValue?: T): ((options?: { title?: string }) => BaseTypeSchema<string, "string">) &
+    BaseTypeSchema<string, "string">
 
   optional: <T extends string = string>(
     defaultValue?: T
-  ) => ((options?: { title?: string }) => BaseType<string, "string">) & BaseType<string, "string">
+  ) => ((options?: { title?: string }) => BaseTypeSchema<string, "string">) & BaseTypeSchema<string, "string">
 
   required: <T extends string = string>(
     defaultValue?: T
-  ) => ((options?: { title?: string }) => BaseType<string, "string", true>) & BaseType<string, "string", true>
+  ) => ((options?: { title?: string }) => BaseTypeSchema<string, "string", true>) &
+    BaseTypeSchema<string, "string", true>
 }

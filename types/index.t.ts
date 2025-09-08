@@ -1,14 +1,18 @@
-import type { ArrayType, ArrayTypeFactory } from "./array.t"
-import type { BooleanTypeFactory, BooleanType } from "./boolean.t"
-import type { EnumTypeFactory, EnumType } from "./enum.t"
-import type { NumberTypeFactory, NumberType } from "./number.t"
-import type { StringTypeFactory, StringType } from "./string.t"
+import type { ArraySchema, ArrayType } from "./array.t"
+import type { BooleanType, BooleanSchema } from "./boolean.t"
+import type { EnumType, EnumSchema } from "./enum.t"
+import type { NumberType, NumberSchema } from "./number.t"
+import type { StringType, StringSchema } from "./string.t"
 /**
- * Базовое определение типа
+ * Базовое определение схемы типа
  * @template T - Тип значения
  * @template TypeName - Название типа ("string", "number", "boolean", "array", "enum")
  */
-export interface BaseType<T, TypeName extends string, Required extends boolean = false> {
+export interface BaseTypeSchema<
+  T,
+  TypeName extends "string" | "number" | "boolean" | "array" | "enum",
+  Required extends boolean = false
+> {
   type: TypeName
   required: Required
   title?: string
@@ -29,10 +33,7 @@ export interface BaseType<T, TypeName extends string, Required extends boolean =
  * }
  * ```
  */
-export type TypesDefinition = Record<
-  string,
-  StringType | NumberType | BooleanType | ArrayType | EnumType
->
+export type SchemaDefinition = Record<string, StringSchema | NumberSchema | BooleanSchema | ArraySchema | EnumSchema>
 
 /**
  * Фабрика типов для создания схемы контекста
@@ -65,8 +66,6 @@ export type TypesDefinition = Record<
  *   status: types.enum.required(["pending", "active", "blocked"]),
  * }))
  * ```
- *
- * {@includeCode ./test/context.basic.spec.ts#allTypes}
  */
 export type Types = {
   /**
@@ -86,7 +85,7 @@ export type Types = {
    * title: types.string("Default Title")
    * ```
    */
-  string: StringTypeFactory
+  string: StringType
   /**
    * Создает числовой тип
    * @param defaultValue - Значение по умолчанию (создает optional тип)
@@ -104,7 +103,7 @@ export type Types = {
    * count: types.number(0)
    * ```
    */
-  number: NumberTypeFactory
+  number: NumberType
   /**
    * Создает булевый тип
    * @param defaultValue - Значение по умолчанию (создает optional тип)
@@ -122,7 +121,7 @@ export type Types = {
    * enabled: types.boolean(true)
    * ```
    */
-  boolean: BooleanTypeFactory
+  boolean: BooleanType
   /**
    * Создает тип массива
    * @param defaultValue - Значение по умолчанию (создает optional тип)
@@ -140,7 +139,7 @@ export type Types = {
    * items: types.array(["default"])
    * ```
    */
-  array: ArrayTypeFactory
+  array: ArrayType
   /**
    * Создает тип перечисления
    * @param values - Массив допустимых значений
@@ -158,5 +157,5 @@ export type Types = {
    * role: types.enum("user", "admin")("user")
    * ```
    */
-  enum: EnumTypeFactory
+  enum: EnumType
 }

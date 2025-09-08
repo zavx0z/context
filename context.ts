@@ -1,6 +1,6 @@
 import type { DeepReadonly, Schema, Snapshot, Values } from "./context.t"
 import { types } from "./types"
-import type { TypesDefinition, Types } from "./types/index.t"
+import type { SchemaDefinition, Types } from "./types/index.t"
 
 /* ------------------------------- утилиты ---------------------------------- */
 
@@ -25,7 +25,7 @@ const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.s
  * Базовый класс для контекста
  * @template C - Схема контекста
  */
-export abstract class ContextBase<C extends TypesDefinition> {
+export abstract class ContextBase<C extends SchemaDefinition> {
   protected contextData!: Values<C>
   protected schemaDefinition!: C
   protected updateSubscribers = new Set<(updated: Partial<Values<C>>) => void>()
@@ -190,7 +190,7 @@ export abstract class ContextBase<C extends TypesDefinition> {
   /**
    * Подписка на обновления контекста
    * @template C - Схема контекста
-   * @param cb - Функция, которая будет вызываться при обновлении контекста
+   * @param callback - Функция, которая будет вызываться при обновлении контекста
    * @returns Функция для отписки от обновлений
    */
   onUpdate(callback: (updated: Partial<Values<C>>) => void): () => void {
@@ -217,7 +217,7 @@ export abstract class ContextBase<C extends TypesDefinition> {
 
 /* -------------------------------- Реализации -------------------------------- */
 
-export class Context<C extends TypesDefinition> extends ContextBase<C> {
+export class Context<C extends SchemaDefinition> extends ContextBase<C> {
   constructor(schema: (types: Types) => C) {
     super()
     this.schemaDefinition = schema(types)
@@ -226,8 +226,8 @@ export class Context<C extends TypesDefinition> extends ContextBase<C> {
   }
 }
 
-export class ContextClone<C extends TypesDefinition> extends ContextBase<C> {
-  static fromSnapshot<C extends TypesDefinition>(snapshot: Schema<C>): ContextClone<C> {
+export class ContextClone<C extends SchemaDefinition> extends ContextBase<C> {
+  static fromSnapshot<C extends SchemaDefinition>(snapshot: Schema<C>): ContextClone<C> {
     const ctx = new ContextClone<C>()
     ctx.schemaDefinition = snapshot as unknown as C
     ctx.contextData = {} as Values<C>

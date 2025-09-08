@@ -1,8 +1,8 @@
-import type { BaseType } from "./index.t"
+import type { BaseTypeSchema } from "./index.t"
 
-export type EnumType<T extends readonly (string | number)[] = readonly (string | number)[]> =
-  | (BaseType<string | number, "enum", true> & { values: T })
-  | (BaseType<string | number, "enum", false> & { values: T })
+export type EnumSchema<T extends readonly (string | number)[] = readonly (string | number)[]> =
+  | (BaseTypeSchema<string | number, "enum", true> & { values: T })
+  | (BaseTypeSchema<string | number, "enum", false> & { values: T })
 
 /**
  * Фабрика для типа перечисления
@@ -14,22 +14,22 @@ export type EnumType<T extends readonly (string | number)[] = readonly (string |
  * ```
  */
 
-export type EnumTypeFactory = <const T extends readonly (string | number)[]>(
+export type EnumType = <const T extends readonly (string | number)[]>(
   ...values: T
 ) => {
   required: (
     defaultValue?: T[number]
-  ) => BaseType<string | number, "enum", true> & { values: T } & ((options?: {
+  ) => BaseTypeSchema<string | number, "enum", true> & { values: T } & ((options?: {
       title?: string
-    }) => BaseType<string | number, "enum", true> & { values: T })
+    }) => BaseTypeSchema<string | number, "enum", true> & { values: T })
 
   optional: (
     defaultValue?: T[number]
-  ) => BaseType<string | number, "enum"> & { values: T } & ((options?: {
+  ) => BaseTypeSchema<string | number, "enum"> & { values: T } & ((options?: {
       title?: string
-    }) => BaseType<string | number, "enum"> & { values: T })
+    }) => BaseTypeSchema<string | number, "enum"> & { values: T })
 
-  (defaultValue?: T[number]): BaseType<string | number, "enum"> & { values: T } & ((options?: {
+  (defaultValue?: T[number]): BaseTypeSchema<string | number, "enum"> & { values: T } & ((options?: {
       title?: string
-    }) => BaseType<string | number, "enum"> & { values: T })
+    }) => BaseTypeSchema<string | number, "enum"> & { values: T })
 }

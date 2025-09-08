@@ -1,4 +1,4 @@
-import type { TypesDefinition } from "./types/index.t"
+import type { SchemaDefinition } from "./types/index.t"
 
 /* ---------------------- Вспомогательные типы/утилиты ---------------------- */
 export type Primitive = string | number | boolean | null | undefined | symbol | bigint
@@ -34,14 +34,14 @@ export type ExtractValue<T> = T extends { type: "string"; required: true }
 /**
  * Значения контекста
  */
-export type Values<C extends TypesDefinition> = {
+export type Values<C extends SchemaDefinition> = {
   [K in keyof C]: ExtractValue<C[K]>
 }
 
 /**
  * Снимок контекста
  */
-export type Snapshot<C extends TypesDefinition> = {
+export type Snapshot<C extends SchemaDefinition> = {
   [K in keyof C]: {
     type: C[K]["type"]
     required: C[K]["required"]
@@ -54,7 +54,7 @@ export type Snapshot<C extends TypesDefinition> = {
 /**
  * Сериализованная схема контекста
  */
-export type Schema<C extends TypesDefinition> = {
+export type Schema<C extends SchemaDefinition> = {
   [K in keyof C]: {
     type: C[K]["type"]
     required: C[K]["required"]
