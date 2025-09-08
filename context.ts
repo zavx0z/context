@@ -107,7 +107,17 @@ export abstract class ContextBase<C extends TypesDefinition> implements ContextI
     return serializedSchema
   }
 
-  /** Обновляет только существующие ключи. Игнорирует undefined. */
+  /**
+   * Обновляет значения в контексте
+   * @template C - Схема контекста
+   * @param values - Значения для обновления
+   * @returns Значения, которые были обновлены
+   * 
+   * Обновляет только существующие ключи. Игнорирует undefined.
+   * 
+   * {@includeCode ./test/context.basic.spec.ts}
+   * {@includeCode ./test/context.types.spec.ts}
+   */
   update = (values: Partial<Values<C>>): Partial<Values<C>> => {
     const entries = Object.entries(values).filter(([, v]) => v !== undefined) as [string, any][]
     const updated: Partial<Values<C>> = {}
