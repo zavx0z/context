@@ -1,6 +1,6 @@
-import type { ContextInstance, Values, SerializedSchema, ContextSnapshot, ExtractValue } from "./context.t"
+import type { ContextInstance, Values, ContextSnapshot } from "./context.t"
 import { types } from "./types"
-import type { Schema, ContextTypes } from "./types.t"
+import type { Schema, ContextTypes } from "./types/index.t"
 
 /** Базовый класс контекста */
 export abstract class ContextBase<C extends Schema> implements ContextInstance<C> {
@@ -86,8 +86,8 @@ export abstract class ContextBase<C extends Schema> implements ContextInstance<C
    * Геттер для доступа к схеме контекста.
    * @returns Схема контекста
    */
-  get schema(): SerializedSchema<C> {
-    const serializedSchema: Record<keyof C, any> = {} as Record<keyof C, any>
+  get schema(): C {
+    const serializedSchema = {} as C
 
     for (const [key, definition] of Object.entries(this.schemaDefinition)) {
       const serializedDefinition: any = {
@@ -182,6 +182,7 @@ export abstract class ContextBase<C extends Schema> implements ContextInstance<C
         required: value.required,
         default: value.default,
         ...(value.title ? { title: value.title } : {}),
+        //@ts-ignore
         ...(value.values ? { values: value.values } : {}),
         value: contextCurrentValues[key as keyof C],
       }
@@ -215,8 +216,8 @@ export class Context<C extends Schema> extends ContextBase<C> {
    * Создает снимок контекста для сериализации.
    * @returns Сериализованный снимок контекста
    */
-  toSnapshot(): SerializedSchema<C> {
-    const serializedSchema: SerializedSchema<C> = {} as SerializedSchema<C>
+  toSnapshot(): C {
+    const serializedSchema = {} as C
 
     for (const [key, definition] of Object.entries(this.schemaDefinition)) {
       const serializedDefinition: any = {
@@ -259,7 +260,7 @@ export class ContextClone<C extends Schema> extends ContextBase<C> {
    * @param snapshot - Сериализованный снимок контекста
    * @returns Экземпляр ContextClone
    */
-  static fromSnapshot<C extends Schema>(snapshot: SerializedSchema<C>): ContextClone<C> {
+  static fromSnapshot<C extends Schema>(snapshot: C): ContextClone<C> {
     const contextClone = new ContextClone<C>()
 
     // Восстанавливаем схему из снимка

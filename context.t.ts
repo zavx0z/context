@@ -1,16 +1,14 @@
-import type {
-  RequiredStringDefinition,
-  OptionalStringDefinition,
-  RequiredNumberDefinition,
-  OptionalNumberDefinition,
-  RequiredBooleanDefinition,
-  OptionalBooleanDefinition,
-  RequiredArrayDefinition,
-  OptionalArrayDefinition,
-  RequiredEnumDefinition,
-  OptionalEnumDefinition,
-  Schema,
-} from "./types.t"
+import type { Schema } from "./types/index.t"
+import type { RequiredStringDefinition } from "./types/string.t"
+import type { RequiredNumberDefinition } from "./types/number.t"
+import type { RequiredBooleanDefinition } from "./types/boolean.t"
+import type { RequiredArrayDefinition } from "./types/array.t"
+import type { RequiredEnumDefinition } from "./types/enum.t"
+import type { OptionalStringDefinition } from "./types/string.t"
+import type { OptionalNumberDefinition } from "./types/number.t"
+import type { OptionalBooleanDefinition } from "./types/boolean.t"
+import type { OptionalArrayDefinition } from "./types/array.t"
+import type { OptionalEnumDefinition } from "./types/enum.t"
 
 export * from "./types.t"
 
@@ -62,16 +60,7 @@ export type ContextSnapshot<C extends Schema> = {
     value: ExtractValue<C[K]>
   }
 }
-// Тип для сериализованной схемы
-export type SerializedSchema<T extends Schema> = {
-  [K in keyof T]: {
-    type: T[K]["type"]
-    required: T[K]["required"]
-    default?: T[K]["default"]
-    title?: T[K]["title"]
-    values?: T[K] extends { values: any } ? T[K]["values"] : never
-  }
-}
+
 /**
  * Тип для обновления значений в контексте
  * @template C - Схема контекста
@@ -100,7 +89,7 @@ export type OnUpdate<C extends Schema> = (cb: (updated: Partial<Values<C>>) => v
 
 export interface ContextInstance<C extends Schema> {
   /** Схема контекста (только для чтения) */
-  schema: SerializedSchema<C>
+  schema: C
   /** Текущее состояние контекста (только для чтения) */
   context: Values<C> & { _title: Record<keyof C, string> }
   /** Обновляет значения в контексте */
