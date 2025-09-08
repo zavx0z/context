@@ -9,7 +9,6 @@ import type { OptionalDefinition, RequiredDefinition } from "./index.t"
  * types.boolean(true)
  * ```
  */
-
 export type BooleanTypeFactory = {
   required: <T extends boolean = boolean>(
     defaultValue?: T

@@ -147,6 +147,16 @@ export abstract class ContextBase<C extends TypesDefinition> {
         } else {
           next = freezeArray(nextRaw)
         }
+      } else if (def?.type === "enum") {
+        const allowed = (def as any).values as ReadonlyArray<string | number>
+        if (nextRaw === null) {
+          next = nextRaw
+        } else if (!allowed?.includes(nextRaw as any)) {
+          const variants = Array.isArray(allowed) ? allowed.map(String).join("' или '") : String(allowed)
+          throw new TypeError(`Поле ${key} должно быть '${variants}', получено '${String(nextRaw)}'`)
+        } else {
+          next = nextRaw
+        }
       } else {
         assertNonObject(
           nextRaw,

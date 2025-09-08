@@ -34,7 +34,9 @@ export type EnumTypeFactory = <const T extends readonly (string | number)[]>(
  * ```
  */
 export interface OptionalEnumDefinition<T extends readonly (string | number)[]>
-  extends OptionalDefinition<T[number], "enum"> {}
+  extends OptionalDefinition<T[number], "enum"> {
+  values: T
+}
 
 /**
  * Обязательное поле перечисления
@@ -46,4 +48,6 @@ export interface OptionalEnumDefinition<T extends readonly (string | number)[]>
  * ```
  */
 export interface RequiredEnumDefinition<T extends readonly (string | number)[]>
-  extends RequiredDefinition<T[number], "enum"> {}
+  extends RequiredDefinition<T[number], "enum"> {
+  values: T
+}
