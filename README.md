@@ -28,7 +28,7 @@ const ctx = new Context((t) => ({
   age: t.number.optional()({ title: "Возраст" }),
   isActive: t.boolean.required(true),
   role: t.enum("user", "admin", "moderator").required("user"),
-  tags: t.array.optional(),
+  tags: t.array.required([])({ title: "Теги" }),
 }))
 
 // чтение — только через иммутабельный снимок
@@ -39,6 +39,7 @@ console.log(ctx.schema.name.title) // "Имя"
 ctx.update({ name: "Иван", age: 25 }) // { name: "Иван", age: 25 }
 ctx.update({ age: 25 }) // {} (ничего не поменялось)
 ctx.update({ age: 30 }) // { age: 30 }
+ctx.update({ tags: ["важно", "срочно"] }) // { tags: ["важно", "срочно"] }
 
 // подписка на обновления
 const off = ctx.onUpdate((updated) => {
@@ -54,28 +55,26 @@ off()
 - **Типизированные схемы** (`string`, `number`, `boolean`, `array`, `enum`).
 - **Chainable-опции** для полей (например, `{ title: "Имя" }`).
 - **Иммутабельный доступ** к значениям: прямое присваивание запрещено.
+- **Поддержка плоских массивов** примитивов с автоматической заморозкой.
 - `update(values)` **игнорирует** `undefined` и **возвращает только изменённые** ключи.
 - `onUpdate(cb)` — подписка передаёт `updated: Partial<Values>`.
-- Заголовки полей доступны через `context._title` (изменяемый объект, не влияет на значения).
+- Заголовки полей доступны через `schema`.
 
 ---
 
 ## Снимки и клонирование
 
 ```ts
-// Текущее «плоское» состояние (только значения)
-const values = ctx.getSnapshot()
-
 // Снимок с метаданными и текущими value
 const full = ctx.snapshot
 
 // Сериализуемая схема (без текущих value)
-const schemaSnap = ctx.toSnapshot()
+const schemaSnap = ctx.schema
 
 // Восстановление/клонирование
 import { ContextClone } from "@zavx0z/context"
-const clone = ContextClone.fromSnapshot(schemaSnap)
-clone.restoreValues(values)
+const clone = ContextClone.fromSnapshot(ctx.schema)
+clone.restoreValues(ctx.context)
 ```
 
 ---
@@ -89,13 +88,11 @@ clone.restoreValues(values)
 
 ### Свойства и методы
 
-- `context` — иммутабельный доступ к значениям + `_title`.
+- `context` — иммутабельный доступ к значениям (только для чтения).
 - `schema` — сериализованная схема (типы, required, default, title, values?).
 - `update(values)` → `Partial<Values>` — только реально изменённые поля.
 - `onUpdate(cb)` → `() => void` — отписка.
-- `getSnapshot()` → `Values`.
 - `snapshot` (геттер) → `{ [key]: { type, required, default?, title?, values?, value } }`.
-- `toSnapshot()` → сериализуемая схема.
 - `ContextClone.fromSnapshot(schema)` → `ContextClone`.
 - `clone.restoreValues(values)`.
 
