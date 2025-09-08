@@ -1,25 +1,6 @@
-import type { OptionalDefinition, RequiredDefinition } from "./index.t"
+import type { BaseType } from "./index.t"
 
-/**
- * Опциональное строковое поле
- * @example
- * ```typescript
- * description: types.string.optional()
- * avatar: types.string.optional()
- * ```
- */
-export interface OptionalStringDefinition extends OptionalDefinition<string, "string"> {}
-
-/**
- * Обязательное строковое поле
- * @example
- * ```typescript
- * name: types.string.required("Anonymous")
- * email: types.string.required("")
- * ```
- */
-export interface RequiredStringDefinition extends RequiredDefinition<string, "string"> {}
-
+export type StringType = BaseType<string, "string", true> | BaseType<string, "string", false>
 /**
  * Фабрика для строкового типа
  * @example
@@ -30,14 +11,14 @@ export interface RequiredStringDefinition extends RequiredDefinition<string, "st
  * ```
  */
 export type StringTypeFactory = {
-  <T extends string = string>(defaultValue?: T): ((options?: { title?: string }) => OptionalStringDefinition) &
-    OptionalStringDefinition
+  <T extends string = string>(defaultValue?: T): ((options?: { title?: string }) => BaseType<string, "string">) &
+    BaseType<string, "string">
 
   optional: <T extends string = string>(
     defaultValue?: T
-  ) => ((options?: { title?: string }) => OptionalStringDefinition) & OptionalStringDefinition
+  ) => ((options?: { title?: string }) => BaseType<string, "string">) & BaseType<string, "string">
 
   required: <T extends string = string>(
     defaultValue?: T
-  ) => ((options?: { title?: string }) => RequiredStringDefinition) & RequiredStringDefinition
+  ) => ((options?: { title?: string }) => BaseType<string, "string", true>) & BaseType<string, "string", true>
 }

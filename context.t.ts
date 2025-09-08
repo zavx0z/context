@@ -18,9 +18,13 @@ export type ExtractValue<T> = T extends { type: "string"; required: true }
   : T extends { type: "boolean"; required: false }
   ? boolean | null
   : T extends { type: "array"; required: true; default?: infer U }
-  ? U[]
+  ? U
   : T extends { type: "array"; required: false; default?: infer U }
-  ? U[] | null
+  ? U | null
+  : T extends { type: "array"; required: true }
+  ? (string | number | boolean)[]
+  : T extends { type: "array"; required: false }
+  ? (string | number | boolean)[] | null
   : T extends { type: "enum"; required: true; values: infer V extends readonly (string | number)[] }
   ? V[number]
   : T extends { type: "enum"; required: false; values: infer V extends readonly (string | number)[] }

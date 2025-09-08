@@ -1,4 +1,6 @@
-import type { OptionalDefinition, RequiredDefinition } from "./index.t"
+import type { BaseType } from "./index.t"
+
+export type BooleanType = BaseType<boolean, "boolean", true> | BaseType<boolean, "boolean", false>
 
 /**
  * Фабрика для булевого типа
@@ -12,31 +14,12 @@ import type { OptionalDefinition, RequiredDefinition } from "./index.t"
 export type BooleanTypeFactory = {
   required: <T extends boolean = boolean>(
     defaultValue?: T
-  ) => RequiredBooleanDefinition & ((options?: { title?: string }) => RequiredBooleanDefinition)
+  ) => BaseType<boolean, "boolean", true> & ((options?: { title?: string }) => BaseType<boolean, "boolean", true>)
 
   optional: <T extends boolean = boolean>(
     defaultValue?: T
-  ) => OptionalBooleanDefinition & ((options?: { title?: string }) => OptionalBooleanDefinition)
+  ) => BaseType<boolean, "boolean", false> & ((options?: { title?: string }) => BaseType<boolean, "boolean", false>)
 
-  <T extends boolean = boolean>(defaultValue?: T): OptionalBooleanDefinition
+  <T extends boolean = boolean>(defaultValue?: T): BaseType<boolean, "boolean"> &
+    ((options?: { title?: string }) => BaseType<boolean, "boolean">)
 }
-/**
- * Опциональное булево поле
- * @example
- * ```typescript
- * isVerified: types.boolean.optional()
- * isPremium: types.boolean.optional()
- * ```
- */
-
-export interface OptionalBooleanDefinition extends OptionalDefinition<boolean, "boolean"> {}
-/**
- * Обязательное булево поле
- * @example
- * ```typescript
- * isActive: types.boolean.required(false)
- * isLoading: types.boolean.required(false)
- * ```
- */
-
-export interface RequiredBooleanDefinition extends RequiredDefinition<boolean, "boolean"> {}

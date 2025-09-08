@@ -1,40 +1,18 @@
-import type { RequiredArrayDefinition, OptionalArrayDefinition, ArrayTypeFactory } from "./array.t"
-import type { RequiredBooleanDefinition, OptionalBooleanDefinition, BooleanTypeFactory } from "./boolean.t"
-import type { RequiredEnumDefinition, OptionalEnumDefinition, EnumTypeFactory } from "./enum.t"
-import type { RequiredNumberDefinition, OptionalNumberDefinition, NumberTypeFactory } from "./number.t"
-import type { RequiredStringDefinition, OptionalStringDefinition, StringTypeFactory } from "./string.t"
-
+import type { ArrayType, ArrayTypeFactory } from "./array.t"
+import type { BooleanTypeFactory, BooleanType } from "./boolean.t"
+import type { EnumTypeFactory, EnumType } from "./enum.t"
+import type { NumberTypeFactory, NumberType } from "./number.t"
+import type { StringTypeFactory, StringType } from "./string.t"
 /**
  * Базовое определение типа
  * @template T - Тип значения
  * @template TypeName - Название типа ("string", "number", "boolean", "array", "enum")
  */
-export interface BaseDefinition<T, TypeName extends string> {
+export interface BaseType<T, TypeName extends string, Required extends boolean = false> {
   type: TypeName
+  required: Required
   title?: string
   default?: T | undefined
-}
-
-/**
- * Обязательное поле
- *
- * {@includeCode ./index.spec.ts#required}
- *
- * @template T - Базовое определение типа
- */
-export interface RequiredDefinition<T, TypeName extends string> extends BaseDefinition<T, TypeName> {
-  required: true
-}
-
-/**
- * Опциональное поле
- *
- * {@includeCode ./index.spec.ts#optional}
- *
- * @template T - Базовое определение типа
- */
-export interface OptionalDefinition<T, TypeName extends string> extends BaseDefinition<T, TypeName> {
-  required: false
 }
 
 /**
@@ -53,16 +31,7 @@ export interface OptionalDefinition<T, TypeName extends string> extends BaseDefi
  */
 export type TypesDefinition = Record<
   string,
-  | RequiredStringDefinition
-  | OptionalStringDefinition
-  | RequiredNumberDefinition
-  | OptionalNumberDefinition
-  | RequiredBooleanDefinition
-  | OptionalBooleanDefinition
-  | RequiredArrayDefinition<string | number | boolean>
-  | OptionalArrayDefinition<string | number | boolean>
-  | RequiredEnumDefinition<readonly (string | number)[]>
-  | OptionalEnumDefinition<readonly (string | number)[]>
+  StringType | NumberType | BooleanType | ArrayType | EnumType
 >
 
 /**

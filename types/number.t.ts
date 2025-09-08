@@ -1,5 +1,6 @@
-import type { OptionalDefinition, RequiredDefinition } from "./index.t"
+import type { BaseType } from "./index.t"
 
+export type NumberType = BaseType<number, "number", true> | BaseType<number, "number", false>
 /**
  * Фабрика для числового типа
  * @example
@@ -12,32 +13,12 @@ import type { OptionalDefinition, RequiredDefinition } from "./index.t"
 export type NumberTypeFactory = {
   required: <T extends number = number>(
     defaultValue?: T
-  ) => RequiredNumberDefinition & ((options?: { title?: string }) => RequiredNumberDefinition)
+  ) => BaseType<number, "number", true> & ((options?: { title?: string }) => BaseType<number, "number", true>)
 
   optional: <T extends number = number>(
     defaultValue?: T
-  ) => OptionalNumberDefinition & ((options?: { title?: string }) => OptionalNumberDefinition)
+  ) => BaseType<number, "number", false> & ((options?: { title?: string }) => BaseType<number, "number", false>)
 
-  <T extends number = number>(defaultValue?: T): OptionalNumberDefinition &
-    ((options?: { title?: string }) => OptionalNumberDefinition)
+  <T extends number = number>(defaultValue?: T): BaseType<number, "number"> &
+    ((options?: { title?: string }) => BaseType<number, "number">)
 }
-
-/**
- * Опциональное числовое поле
- * @example
- * ```typescript
- * rating: types.number.optional()
- * priority: types.number.optional()
- * ```
- */
-export interface OptionalNumberDefinition extends OptionalDefinition<number, "number"> {}
-
-/**
- * Обязательное числовое поле
- * @example
- * ```typescript
- * age: types.number.required(18)
- * count: types.number.required(0)
- * ```
- */
-export interface RequiredNumberDefinition extends RequiredDefinition<number, "number"> {}

@@ -1,5 +1,8 @@
-import type { OptionalDefinition, RequiredDefinition } from "./index.t"
+import type { BaseType } from "./index.t"
 
+export type ArrayType =
+  | BaseType<(string | number | boolean)[], "array", true>
+  | BaseType<(string | number | boolean)[], "array", false>
 /**
  * Фабрика для типа массива
  * @example
@@ -13,38 +16,12 @@ import type { OptionalDefinition, RequiredDefinition } from "./index.t"
 export type ArrayTypeFactory = {
   required: <T extends string | number | boolean = string>(
     defaultValue?: T[]
-  ) => RequiredArrayDefinition<T> & ((options?: { title?: string }) => RequiredArrayDefinition<T>)
+  ) => BaseType<T[], "array", true> & ((options?: { title?: string }) => BaseType<T[], "array", true>)
 
   optional: <T extends string | number | boolean = string>(
     defaultValue?: T[]
-  ) => OptionalArrayDefinition<T> & ((options?: { title?: string }) => OptionalArrayDefinition<T>)
+  ) => BaseType<T[], "array", false> & ((options?: { title?: string }) => BaseType<T[], "array", false>)
 
-  <T extends string | number | boolean = string>(defaultValue?: T[]): OptionalArrayDefinition<T>
+  <T extends string | number | boolean = string>(defaultValue?: T[]): BaseType<T[], "array"> &
+    ((options?: { title?: string }) => BaseType<T[], "array">)
 }
-/**
- * Опциональное поле массива
- * @template T - Тип элементов массива
- * @example
- * ```typescript
- * tags: types.array.optional()
- * categories: types.array.optional()
- * ```
- */
-
-export interface OptionalArrayDefinition<T extends string | number | boolean>
-  extends OptionalDefinition<T[], "array"> {}
-/**
- * Обязательное поле массива
- * @template T - Тип элементов массива
- * @example
- * ```typescript
- * // Массив ID пользователей
- * userIds: types.array.required([])
- *
- * // Массив ID постов
- * postIds: types.array.required([])
- * ```
- */
-
-export interface RequiredArrayDefinition<T extends string | number | boolean>
-  extends RequiredDefinition<T[], "array"> {}

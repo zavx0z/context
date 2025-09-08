@@ -145,6 +145,17 @@ export abstract class ContextBase<C extends TypesDefinition> {
             `[Context.update] "${key}": ожидается плоский массив примитивов (string | number | boolean | null).`
           )
         } else {
+          // Проверяем соответствие типов элементов массива
+          const defaultArray = (def as any).default
+          if (defaultArray && Array.isArray(defaultArray) && defaultArray.length > 0) {
+            const expectedType = typeof defaultArray[0]
+            const hasTypeMismatch = nextRaw.some((item) => typeof item !== expectedType)
+            if (hasTypeMismatch) {
+              throw new TypeError(
+                `[Context.update] "${key}": ожидается массив элементов типа '${expectedType}', получен массив с элементами разных типов.`
+              )
+            }
+          }
           next = freezeArray(nextRaw)
         }
       } else if (def?.type === "enum") {

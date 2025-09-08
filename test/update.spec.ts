@@ -38,7 +38,7 @@ describe("update", () => {
       nickname: types.string(),
       age: types.number.optional(),
     }))
-
+    
     update({ nickname: "test" })
     expect(context.nickname, 'Поле nickname должно обновиться на "test"').toBe("test")
 
@@ -122,9 +122,7 @@ describe("update", () => {
 
     expect(() => {
       ;(context as any).name = "Другое имя"
-    }, "Должна быть ошибка при прямом изменении поля name после update").toThrow(
-      "Attempted to assign to readonly property."
-    )
+    }, "Должна быть ошибка при прямом изменении поля name после update").toThrow("Attempted to assign to readonly property.")
 
     expect(() => {
       ;(context as any).status = "end"

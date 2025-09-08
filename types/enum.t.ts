@@ -1,4 +1,8 @@
-import type { OptionalDefinition, RequiredDefinition } from "./index.t"
+import type { BaseType } from "./index.t"
+
+export type EnumType<T extends readonly (string | number)[] = readonly (string | number)[]> =
+  | (BaseType<string | number, "enum", true> & { values: T })
+  | (BaseType<string | number, "enum", false> & { values: T })
 
 /**
  * Фабрика для типа перечисления
@@ -15,39 +19,17 @@ export type EnumTypeFactory = <const T extends readonly (string | number)[]>(
 ) => {
   required: (
     defaultValue?: T[number]
-  ) => RequiredEnumDefinition<T> & ((options?: { title?: string }) => RequiredEnumDefinition<T>)
+  ) => BaseType<string | number, "enum", true> & { values: T } & ((options?: {
+      title?: string
+    }) => BaseType<string | number, "enum", true> & { values: T })
 
   optional: (
     defaultValue?: T[number]
-  ) => OptionalEnumDefinition<T> & ((options?: { title?: string }) => OptionalEnumDefinition<T>)
+  ) => BaseType<string | number, "enum"> & { values: T } & ((options?: {
+      title?: string
+    }) => BaseType<string | number, "enum"> & { values: T })
 
-  (defaultValue?: T[number]): OptionalEnumDefinition<T>
-}
-
-/**
- * Опциональное поле перечисления
- * @template T - Массив допустимых значений
- * @example
- * ```typescript
- * theme: types.enum.optional(["light", "dark"])
- * language: types.enum.optional(["ru", "en"])
- * ```
- */
-export interface OptionalEnumDefinition<T extends readonly (string | number)[]>
-  extends OptionalDefinition<T[number], "enum"> {
-  values: T
-}
-
-/**
- * Обязательное поле перечисления
- * @template T - Массив допустимых значений
- * @example
- * ```typescript-
- * status: types.enum.required(["pending", "active", "blocked"])
- * role: types.enum.required(["user", "admin"])
- * ```
- */
-export interface RequiredEnumDefinition<T extends readonly (string | number)[]>
-  extends RequiredDefinition<T[number], "enum"> {
-  values: T
+  (defaultValue?: T[number]): BaseType<string | number, "enum"> & { values: T } & ((options?: {
+      title?: string
+    }) => BaseType<string | number, "enum"> & { values: T })
 }
