@@ -1,4 +1,4 @@
-import type { TypePrimitive } from "./types.t"
+import type { TypeArray, TypeEnum, TypePrimitive } from "./types.t"
 
 /**
  * Набор конструкторов типов для описания контекста.
@@ -61,36 +61,7 @@ export type Types = {
    * const titled = flags({ title: "Feature flags" });
    * ```
    */
-  array: {
-    /**
-     * Короткая запись: **необязательный** массив по умолчанию.
-     *
-     * @param defaultValue Значение по умолчанию (массив примитивов)
-     * @returns `BaseTypeSchema<T[], "array", false, T[]>` + функция для задания опций (`title`)
-     */
-    <T extends string | number | boolean>(defaultValue?: T[]): BaseTypeSchema<T[], "array"> &
-      ((options?: { title?: string }) => BaseTypeSchema<T[], "array">)
-
-    /**
-     * Явно **необязательный** массив.
-     *
-     * @param defaultValue Значение по умолчанию
-     * @returns `BaseTypeSchema<T[], "array", false>` + функция для задания опций (`title`)
-     */
-    optional: <T extends string | number | boolean>(
-      defaultValue?: T[]
-    ) => BaseTypeSchema<T[], "array", false> & ((options?: { title?: string }) => BaseTypeSchema<T[], "array", false>)
-
-    /**
-     * **Обязательный** массив.
-     *
-     * @param defaultValue Значение по умолчанию
-     * @returns `BaseTypeSchema<T[], "array", true>` + функция для задания опций (`title`)
-     */
-    required: <T extends string | number | boolean>(
-      defaultValue?: T[]
-    ) => BaseTypeSchema<T[], "array", true> & ((options?: { title?: string }) => BaseTypeSchema<T[], "array", true>)
-  }
+  array: TypeArray
 
   /**
    * Перечисляемый тип из кортежа литералов (`string | number`).
@@ -111,40 +82,7 @@ export type Types = {
    *
    *
    */
-  enum: <const T extends readonly (string | number)[]>(
-    ...values: T
-  ) => {
-    /**
-     * Короткая запись: **необязательный** enum по умолчанию.
-     *
-     * @param defaultValue Значение по умолчанию (одно из `values`)
-     * @returns `BaseTypeSchema<..., "enum", false, T>` + функция опций (`title`)
-     */
-    (defaultValue?: T[number]): BaseTypeSchema<string | number, "enum", false, T> &
-      ((options?: { title?: string }) => BaseTypeSchema<string | number, "enum", false, T>)
-
-    /**
-     * Явно **необязательный** enum.
-     *
-     * @param defaultValue Значение по умолчанию
-     * @returns `BaseTypeSchema<..., "enum", false, T>` + функция опций (`title`)
-     */
-    optional: (
-      defaultValue?: T[number]
-    ) => BaseTypeSchema<string | number, "enum", false, T> &
-      ((options?: { title?: string }) => BaseTypeSchema<string | number, "enum", false, T>)
-
-    /**
-     * **Обязательный** enum.
-     *
-     * @param defaultValue Значение по умолчанию
-     * @returns `BaseTypeSchema<..., "enum", true> & { values: T }` + функция опций (`title`)
-     */
-    required: (
-      defaultValue?: T[number]
-    ) => BaseTypeSchema<string | number, "enum", true, T> &
-      ((options?: { title?: string }) => BaseTypeSchema<string | number, "enum", true, T>)
-  }
+  enum: TypeEnum
 }
 export interface BaseTypeSchema<
   T,
