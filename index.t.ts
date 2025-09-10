@@ -159,16 +159,4 @@ export interface BaseTypeSchema<
   values?: V
 }
 
-export type SchemaDefinition = Record<
-  string,
-  | BaseTypeSchema<string, "string", true>
-  | BaseTypeSchema<string, "string", false>
-  | BaseTypeSchema<boolean, "boolean", true>
-  | BaseTypeSchema<boolean, "boolean", false>
-  | BaseTypeSchema<number, "number", true>
-  | BaseTypeSchema<number, "number", false>
-  | BaseTypeSchema<(string | number | boolean)[], "array", true>
-  | BaseTypeSchema<(string | number | boolean)[], "array", false>
-  | BaseTypeSchema<string | number, "enum", true, readonly (string | number)[]>
-  | BaseTypeSchema<string | number, "enum", false, readonly (string | number)[]>
->
+export type SchemaDefinition = Record<string, BaseTypeSchema<any, any, any, any>>

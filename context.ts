@@ -1,4 +1,5 @@
-import type { DeepReadonly, Schema, Snapshot, Values, NormalizeSchema } from "./context.t"
+import type { DeepReadonly, Snapshot, Values, NormalizeSchema } from "./context.t"
+import { normalizeSchema } from "./context.t"
 import { types } from "./types"
 import type { SchemaDefinition } from "./index.t"
 import type { Types } from "./index.t"
@@ -20,24 +21,7 @@ const isFlatPrimitiveArray = (v: unknown): v is Array<string | number | boolean 
 /** Копия массива с заморозкой (элементы — примитивы, так что глубокая не нужна) */
 const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.slice()) as T
 
-/**
- * Нормализатор на рантайме (обрезает поля до ядра)
- * Преобразует "сырую" схему с билдерами в "чистую" схему
- */
-function normalizeSchema<S>(raw: S): NormalizeSchema<S> {
-  const out: any = {}
-  for (const [k, def] of Object.entries(raw as Record<string, any>)) {
-    if (!def) continue
-    const core: any = { type: def.type, required: def.required }
-    if ("default" in def && def.default !== undefined) core.default = def.default
-    if ("title" in def && def.title !== undefined) core.title = def.title
-    if ("values" in def && def.values !== undefined) core.values = def.values
-    out[k] = core
-  }
-  return out
-}
-
-/* ------------------------------- Базовый класс ---------------------------- */
+/* ----------------------------`--- Базов`ый класс ---------------------------- */
 
 /**
  * Базовый класс для контекста
@@ -45,7 +29,7 @@ function normalizeSchema<S>(raw: S): NormalizeSchema<S> {
  */
 export abstract class ContextBase<C extends SchemaDefinition> {
   protected contextData!: Values<C>
-  protected schemaDefinition!: C
+  schema!: C
   protected updateSubscribers = new Set<(updated: Partial<Values<C>>) => void>()
   private contextView!: DeepReadonly<Values<C>>
 
@@ -71,27 +55,12 @@ export abstract class ContextBase<C extends SchemaDefinition> {
           val = def.default
         }
       } else {
-        switch (def.type) {
-          case "string":
-            val = def.required ? "" : null
-            break
-          case "number":
-            val = def.required ? 0 : null
-            break
-          case "boolean":
-            val = def.required ? false : null
-            break
-          case "enum":
-            val = def.required ? def.values?.[0] : null
-            break
-          case "array":
-            val = def.required ? freezeArray<any>([]) : null
-            break
-          default:
-            val = null
-        }
+        def.type === "string" && (val = def.required ? "" : null)
+        def.type === "number" && (val = def.required ? 0 : null)
+        def.type === "boolean" && (val = def.required ? false : null)
+        def.type === "enum" && (val = def.required ? def.values?.[0] : null)
+        def.type === "array" && (val = def.required ? freezeArray<any>([]) : null)
       }
-
       ;(this.contextData as any)[key] = val
     }
 
@@ -101,7 +70,7 @@ export abstract class ContextBase<C extends SchemaDefinition> {
 
   #createReadOnlyView(): DeepReadonly<Values<C>> {
     const view: any = {}
-    for (const key of Object.keys(this.schemaDefinition)) {
+    for (const key of Object.keys(this.schema)) {
       Object.defineProperty(view, key, {
         enumerable: true,
         configurable: false,
@@ -114,11 +83,6 @@ export abstract class ContextBase<C extends SchemaDefinition> {
   /** {@inheritDoc Values} */
   get context(): Values<C> {
     return this.contextView as Values<C>
-  }
-
-  /** возвращаем уже чистую схему C */
-  get schema(): C {
-    return this.schemaDefinition
   }
 
   /**
@@ -136,7 +100,7 @@ export abstract class ContextBase<C extends SchemaDefinition> {
     for (const [key, nextRaw] of entries) {
       if (!(key in this.contextData)) continue
 
-      const def: any = (this.schemaDefinition as any)[key]
+      const def: any = (this.schema as any)[key]
       let next = nextRaw
 
       // Проверяем null для required полей
@@ -226,31 +190,31 @@ export abstract class ContextBase<C extends SchemaDefinition> {
 /* -------------------------------- Реализации -------------------------------- */
 
 export class Context<S, C extends SchemaDefinition = NormalizeSchema<S>> extends ContextBase<C> {
-  constructor(schemaOrFactory: S | ((types: Types) => S)) {
+  constructor(schema: S | ((types: Types) => S)) {
     super()
-    const raw = typeof schemaOrFactory === "function" ? (schemaOrFactory as (t: Types) => S)(types) : schemaOrFactory
+    const raw = typeof schema === "function" ? (schema as (t: Types) => S)(types) : schema
 
     const clean = normalizeSchema(raw) as unknown as C
 
-    this.schemaDefinition = clean
+    this.schema = clean
     this.contextData = {} as Values<C>
-    this.initializeContext(this.schemaDefinition)
+    this.initializeContext(this.schema)
   }
 }
 
 export class ContextClone<S, C extends SchemaDefinition = NormalizeSchema<S>> extends ContextBase<C> {
   static fromSnapshot<S, C extends SchemaDefinition = NormalizeSchema<S>>(snapshot: C): ContextClone<S, C> {
     const ctx = new ContextClone<S, C>()
-    ctx.schemaDefinition = snapshot
+    ctx.schema = snapshot
     ctx.contextData = {} as Values<C>
-    ctx.initializeContext(ctx.schemaDefinition)
+    ctx.initializeContext(ctx.schema)
     return ctx
   }
 
   /** Восстановление значений с валидацией и заморозкой массивов */
   restoreValues(values: Values<C>): void {
-    for (const key of Object.keys(this.schemaDefinition)) {
-      const def: any = (this.schemaDefinition as any)[key]
+    for (const key of Object.keys(this.schema)) {
+      const def: any = (this.schema as any)[key]
       const v = (values as any)[key]
 
       if (def?.type === "array") {
