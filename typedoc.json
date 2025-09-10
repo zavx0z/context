@@ -16,8 +16,8 @@
         "*"
     ],
     "navigation": {
-        "includeCategories": true,
-        "includeGroups": true
+        "includeCategories": false,
+        "includeGroups": false
     },
     "defaultCategory": "Other",
     "readme": "README.md",

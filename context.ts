@@ -1,6 +1,7 @@
-import type { DeepReadonly, Schema, Snapshot, Values } from "./context.t"
+import type { DeepReadonly, Schema, Snapshot, Values, NormalizeSchema } from "./context.t"
 import { types } from "./types"
-import type { SchemaDefinition, Types } from "./types/index.t"
+import type { SchemaDefinition } from "./index.t"
+import type { Types } from "./index.t"
 
 /* ------------------------------- утилиты ---------------------------------- */
 
@@ -19,11 +20,28 @@ const isFlatPrimitiveArray = (v: unknown): v is Array<string | number | boolean 
 /** Копия массива с заморозкой (элементы — примитивы, так что глубокая не нужна) */
 const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.slice()) as T
 
+/**
+ * Нормализатор на рантайме (обрезает поля до ядра)
+ * Преобразует "сырую" схему с билдерами в "чистую" схему
+ */
+function normalizeSchema<S>(raw: S): NormalizeSchema<S> {
+  const out: any = {}
+  for (const [k, def] of Object.entries(raw as Record<string, any>)) {
+    if (!def) continue
+    const core: any = { type: def.type, required: def.required }
+    if ("default" in def && def.default !== undefined) core.default = def.default
+    if ("title" in def && def.title !== undefined) core.title = def.title
+    if ("values" in def && def.values !== undefined) core.values = def.values
+    out[k] = core
+  }
+  return out
+}
+
 /* ------------------------------- Базовый класс ---------------------------- */
 
 /**
  * Базовый класс для контекста
- * @template C - Схема контекста
+ * @template C - Чистая схема (нормализованная)
  */
 export abstract class ContextBase<C extends SchemaDefinition> {
   protected contextData!: Values<C>
@@ -33,21 +51,22 @@ export abstract class ContextBase<C extends SchemaDefinition> {
 
   protected initializeContext(schema: C): void {
     for (const key in schema) {
-      const def = schema[key]
+      const def = schema[key as keyof C] as any
       if (!def) continue
 
       let val: any
-
       if ("default" in def && def.default !== undefined) {
         if (def.type === "array") {
           if (!isFlatPrimitiveArray(def.default)) {
-            throw new TypeError(`[Context] "${key}": default для типа array должен быть плоским массивом примитивов.`)
+            throw new TypeError(
+              `[Context] "${String(key)}": default для типа array должен быть плоским массивом примитивов.`
+            )
           }
           val = freezeArray(def.default as any)
         } else {
           assertNonObject(
             def.default,
-            `[Context] "${key}": default должен быть примитивом или null (объекты запрещены).`
+            `[Context] "${String(key)}": default должен быть примитивом или null (объекты запрещены).`
           )
           val = def.default
         }
@@ -63,7 +82,7 @@ export abstract class ContextBase<C extends SchemaDefinition> {
             val = def.required ? false : null
             break
           case "enum":
-            val = def.required ? (def as any).values[0] : null
+            val = def.required ? def.values?.[0] : null
             break
           case "array":
             val = def.required ? freezeArray<any>([]) : null
@@ -73,7 +92,7 @@ export abstract class ContextBase<C extends SchemaDefinition> {
         }
       }
 
-      this.contextData[key as keyof Values<C>] = val
+      ;(this.contextData as any)[key] = val
     }
 
     Object.seal(this.contextData)
@@ -97,20 +116,9 @@ export abstract class ContextBase<C extends SchemaDefinition> {
     return this.contextView as Values<C>
   }
 
-  /** {@inheritDoc Schema} */
-  get schema(): Schema<C> {
-    const serializedSchema = {} as Schema<C>
-    for (const [key, definition] of Object.entries(this.schemaDefinition)) {
-      const out: any = {
-        type: definition.type,
-        required: definition.required,
-      }
-      if ("default" in definition && definition.default !== undefined) out.default = definition.default
-      if ("title" in definition && definition.title) out.title = definition.title
-      if ("values" in definition && definition.values) out.values = definition.values
-      ;(serializedSchema as any)[key] = out
-    }
-    return serializedSchema
+  /** возвращаем уже чистую схему C */
+  get schema(): C {
+    return this.schemaDefinition
   }
 
   /**
@@ -217,19 +225,23 @@ export abstract class ContextBase<C extends SchemaDefinition> {
 
 /* -------------------------------- Реализации -------------------------------- */
 
-export class Context<C extends SchemaDefinition> extends ContextBase<C> {
-  constructor(schema: (types: Types) => C) {
+export class Context<S, C extends SchemaDefinition = NormalizeSchema<S>> extends ContextBase<C> {
+  constructor(schemaOrFactory: S | ((types: Types) => S)) {
     super()
-    this.schemaDefinition = schema(types)
+    const raw = typeof schemaOrFactory === "function" ? (schemaOrFactory as (t: Types) => S)(types) : schemaOrFactory
+
+    const clean = normalizeSchema(raw) as unknown as C
+
+    this.schemaDefinition = clean
     this.contextData = {} as Values<C>
     this.initializeContext(this.schemaDefinition)
   }
 }
 
-export class ContextClone<C extends SchemaDefinition> extends ContextBase<C> {
-  static fromSnapshot<C extends SchemaDefinition>(snapshot: Schema<C>): ContextClone<C> {
-    const ctx = new ContextClone<C>()
-    ctx.schemaDefinition = snapshot as unknown as C
+export class ContextClone<S, C extends SchemaDefinition = NormalizeSchema<S>> extends ContextBase<C> {
+  static fromSnapshot<S, C extends SchemaDefinition = NormalizeSchema<S>>(snapshot: C): ContextClone<S, C> {
+    const ctx = new ContextClone<S, C>()
+    ctx.schemaDefinition = snapshot
     ctx.contextData = {} as Values<C>
     ctx.initializeContext(ctx.schemaDefinition)
     return ctx
