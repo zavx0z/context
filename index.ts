@@ -1,3 +1,3 @@
 export { Context } from "./context"
-export type { Values, Schema, Snapshot } from "./context.t"
-export type { Types, SchemaDefinition } from "./index.t"
+export type { Values, Snapshot } from "./context.t"
+export type { Types, Schema, BaseTypeSchema } from "./index.t"

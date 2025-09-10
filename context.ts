@@ -1,7 +1,7 @@
 import type { DeepReadonly, Snapshot, Values, NormalizeSchema } from "./context.t"
 import { normalizeSchema } from "./context.t"
 import { types } from "./types"
-import type { SchemaDefinition } from "./index.t"
+import type { Schema } from "./index.t"
 import type { Types } from "./index.t"
 
 /* ------------------------------- утилиты ---------------------------------- */
@@ -27,7 +27,7 @@ const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.s
  * Базовый класс для контекста
  * @template C - Чистая схема (нормализованная)
  */
-export abstract class ContextBase<C extends SchemaDefinition> {
+export abstract class ContextBase<C extends Schema> {
   protected contextData!: Values<C>
   schema!: C
   protected updateSubscribers = new Set<(updated: Partial<Values<C>>) => void>()
@@ -189,7 +189,7 @@ export abstract class ContextBase<C extends SchemaDefinition> {
 
 /* -------------------------------- Реализации -------------------------------- */
 
-export class Context<S, C extends SchemaDefinition = NormalizeSchema<S>> extends ContextBase<C> {
+export class Context<S, C extends Schema = NormalizeSchema<S>> extends ContextBase<C> {
   constructor(schema: S | ((types: Types) => S)) {
     super()
     const raw = typeof schema === "function" ? (schema as (t: Types) => S)(types) : schema
@@ -202,8 +202,8 @@ export class Context<S, C extends SchemaDefinition = NormalizeSchema<S>> extends
   }
 }
 
-export class ContextClone<S, C extends SchemaDefinition = NormalizeSchema<S>> extends ContextBase<C> {
-  static fromSnapshot<S, C extends SchemaDefinition = NormalizeSchema<S>>(snapshot: C): ContextClone<S, C> {
+export class ContextClone<S, C extends Schema = NormalizeSchema<S>> extends ContextBase<C> {
+  static fromSnapshot<S, C extends Schema = NormalizeSchema<S>>(snapshot: C): ContextClone<S, C> {
     const ctx = new ContextClone<S, C>()
     ctx.schema = snapshot
     ctx.contextData = {} as Values<C>

@@ -1,41 +1,67 @@
-import type { BaseTypeSchema } from "./index.t"
+import type { BaseTypeSchema, Schema } from "./index.t"
 
 export type Primitive = string | number | boolean | null | undefined | symbol | bigint
 
-type TypeName = "string" | "number" | "boolean" | "array" | "enum"
-
-type WidenPrimitive<T> = T extends number ? number : T extends string ? string : T extends boolean ? boolean : T
-
 /**
- * Если пришёл результат билдера (пересечение с функцией), аккуратно
- * извлекаем дженерики. Для массива дополнительно расширяем литералы.
+ * Нормализуем всю схему, приводя каждый ключ к строгому BaseTypeSchema
+ * Если пришёл результат билдера (пересечение с функцией), аккуратно извлекаем дженерики
  */
-type PreferBase<T> = T extends BaseTypeSchema<infer A, infer N, infer R, infer V>
-  ? N extends "array"
-    ? A extends readonly (infer E)[]
-      ? BaseTypeSchema<Array<WidenPrimitive<E>>, "array", R>
-      : BaseTypeSchema<any[], "array", R>
-    : N extends "enum"
-    ? BaseTypeSchema<V extends readonly (string | number)[] ? V[number] : string | number, "enum", R, V>
-    : BaseTypeSchema<A, N, R, V>
-  : T extends { type: infer N extends TypeName; required: infer R extends boolean }
-  ? N extends "string"
-    ? BaseTypeSchema<string, "string", R>
-    : N extends "number"
-    ? BaseTypeSchema<number, "number", R>
-    : N extends "boolean"
-    ? BaseTypeSchema<boolean, "boolean", R>
-    : N extends "array"
-    ? BaseTypeSchema<(string | number | boolean)[], "array", R>
-    : N extends "enum"
-    ? T extends { values: infer V extends readonly (string | number)[] }
-      ? BaseTypeSchema<V[number], "enum", R, V>
-      : BaseTypeSchema<string | number, "enum", R, readonly (string | number)[]>
+export type NormalizeSchema<S> = {
+  [K in keyof S]: S[K] extends BaseTypeSchema<infer A, infer N, infer R, infer V>
+    ? N extends "string"
+      ? BaseTypeSchema<string, "string", R>
+      : N extends "number"
+      ? BaseTypeSchema<number, "number", R>
+      : N extends "boolean"
+      ? BaseTypeSchema<boolean, "boolean", R>
+      : N extends "array"
+      ? A extends readonly (infer E)[]
+        ? BaseTypeSchema<
+            Array<E extends number ? number : E extends string ? string : E extends boolean ? boolean : E>,
+            "array",
+            R
+          >
+        : BaseTypeSchema<(string | number | boolean)[], "array", R>
+      : N extends "enum"
+      ? BaseTypeSchema<V extends readonly (string | number)[] ? V[number] : string | number, "enum", R, V>
+      : never
+    : S[K] extends {
+        type: infer N extends "string" | "number" | "boolean" | "array" | "enum"
+        required: infer R extends boolean
+      }
+    ? N extends "string"
+      ? BaseTypeSchema<string, "string", R>
+      : N extends "number"
+      ? BaseTypeSchema<number, "number", R>
+      : N extends "boolean"
+      ? BaseTypeSchema<boolean, "boolean", R>
+      : N extends "array"
+      ? BaseTypeSchema<(string | number | boolean)[], "array", R>
+      : N extends "enum"
+      ? S[K] extends { values: infer V extends readonly (string | number)[] }
+        ? BaseTypeSchema<V[number], "enum", R, V>
+        : BaseTypeSchema<string | number, "enum", R, readonly (string | number)[]>
+      : never
+    : never
+} extends infer T
+  ? T extends Record<string, BaseTypeSchema<any, any, any, any>>
+    ? {
+        [K in keyof T]: T[K] extends BaseTypeSchema<infer A, infer N, infer R, infer V>
+          ? N extends "string"
+            ? BaseTypeSchema<string, "string", R>
+            : N extends "number"
+            ? BaseTypeSchema<number, "number", R>
+            : N extends "boolean"
+            ? BaseTypeSchema<boolean, "boolean", R>
+            : N extends "array"
+            ? BaseTypeSchema<A, "array", R>
+            : N extends "enum"
+            ? BaseTypeSchema<V extends readonly (string | number)[] ? V[number] : string | number, "enum", R, V>
+            : never
+          : never
+      }
     : never
   : never
-
-/** Нормализуем всю схему, приводя каждый ключ к строгому BaseTypeSchema */
-export type NormalizeSchema<S> = { [K in keyof S]: PreferBase<S[K]> }
 
 // рантайм-очистка (оставляем только поля схемы)
 export function normalizeSchema<S>(raw: S): NormalizeSchema<S> {
@@ -82,7 +108,7 @@ export type ExtractValue<T> = T extends { type: "string"; required: true }
 /**
  * Значения
  */
-export type Values<C extends Record<string, BaseTypeSchema<any, any, any, any>>> = {
+export type Values<C extends Schema> = {
   [K in keyof C]: C[K] extends BaseTypeSchema<infer T, infer N, infer R, infer V>
     ? N extends "enum"
       ? // для enum берём ЛИТЕРАЛЫ из V[number], а не общий T
@@ -106,7 +132,7 @@ export type Values<C extends Record<string, BaseTypeSchema<any, any, any, any>>>
 /**
  * Снимок
  */
-export type Snapshot<C extends Record<string, BaseTypeSchema<any, any, any, any>>> = {
+export type Snapshot<C extends Schema> = {
   [K in keyof C]: {
     type: C[K]["type"]
     required: C[K]["required"]
@@ -114,17 +140,5 @@ export type Snapshot<C extends Record<string, BaseTypeSchema<any, any, any, any>
     title?: C[K]["title"]
     values?: C[K]["values"]
     value: Values<C>[K]
-  }
-}
-/**
- * Схема
- */
-export type Schema<C extends Record<string, BaseTypeSchema<any, any, any, any>>> = {
-  [K in keyof C]: {
-    type: C[K]["type"]
-    required: C[K]["required"]
-    default?: C[K]["default"]
-    title?: C[K]["title"]
-    values?: C[K]["values"]
   }
 }

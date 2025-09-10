@@ -5,7 +5,7 @@ describe("контекст", () => {
   describe("nullable", () => {
     // #region optional
     describe("позволяет устанавливать null для optional полей", () => {
-      const { context, update } = new Context((types) => ({
+      const { context } = new Context((types) => ({
         stringShort: types.string(),
         stringShortDefault: types.string("value short"),
         stringOptional: types.string.optional(),
