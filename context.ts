@@ -100,8 +100,17 @@ export abstract class ContextBase<C extends Schema> {
    * Для optional полей поддерживается установка null
    * {@includeCode ./test/update.spec.ts#optionalNull}
    *
-   * Не позволяет устанавливать null для required полей
+   * @throws {TypeError} `[Context.update] "{field}": поле не может быть null` - при попытке установить null для required поля
    * {@includeCode ./test/update.spec.ts#requiredNull}
+   *
+   * @throws {TypeError} `[Context.update] "{field}": ожидается плоский массив примитивов` - при попытке установить nested массив или массив с объектами
+   * {@includeCode ./test/update.spec.ts#arrayErrors}
+   *
+   * @throws {TypeError} `[Context.update] "{field}": объекты и функции запрещены` - при попытке установить объект или функцию в примитивное поле
+   * {@includeCode ./test/update.spec.ts#primitiveErrors}
+   *
+   * @throws {TypeError} `[Context.update] "{field}": должно быть '{values}', получено '{value}'` - при попытке установить недопустимое значение для enum поля
+   * {@includeCode ./test/update.spec.ts#enumErrors}
    *
    * @param values - Значения для обновления
    * @returns Значения, которые были обновлены

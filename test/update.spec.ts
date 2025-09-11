@@ -65,6 +65,79 @@ describe("update", () => {
     })
   })
   // #endregion requiredNull
+  // #region arrayErrors
+  describe("валидация массивов", () => {
+    const { context, update } = new Context((types) => ({
+      tags: types.array.required([]),
+      items: types.array.optional([]),
+    }))
+    it("nested массив", () => {
+      // @ts-expect-error - TypeScript запрещает nested массив
+      expect(() => update({ tags: [["nested"]] })).toThrow(
+        '[Context.update] "tags": ожидается плоский массив примитивов'
+      )
+      expect(context.tags, "Поле tags осталось []").toEqual([])
+    })
+    it("массив с объектами", () => {
+      // @ts-expect-error - TypeScript запрещает массив с объектами
+      expect(() => update({ tags: [{ x: 1 }] })).toThrow('[Context.update] "tags": ожидается плоский массив примитивов')
+      expect(context.tags, "Поле tags осталось []").toEqual([])
+    })
+    it("массив с функциями", () => {
+      // @ts-expect-error - TypeScript запрещает массив с функциями
+      expect(() => update({ tags: [function () {}] })).toThrow(
+        '[Context.update] "tags": ожидается плоский массив примитивов'
+      )
+      expect(context.tags, "Поле tags осталось []").toEqual([])
+    })
+  })
+  // #endregion arrayErrors
+  // #region primitiveErrors
+  describe("валидация примитивных полей", () => {
+    const { context, update } = new Context((types) => ({
+      name: types.string.required("test"),
+      age: types.number.required(18),
+      active: types.boolean.required(true),
+    }))
+    it("объект в string поле", () => {
+      // @ts-expect-error - TypeScript запрещает объект в string поле
+      expect(() => update({ name: { x: 1 } })).toThrow('[Context.update] "name": объекты и функции запрещены')
+      expect(context.name, "Поле name осталось 'test'").toBe("test")
+    })
+    it("функция в number поле", () => {
+      // @ts-expect-error - TypeScript запрещает функции в number поле
+      expect(() => update({ age: function () {} })).toThrow('[Context.update] "age": объекты и функции запрещены')
+      expect(context.age, "Поле age осталось 18").toBe(18)
+    })
+    it("массив в boolean поле", () => {
+      // @ts-expect-error - TypeScript запрещает массив в boolean поле
+      expect(() => update({ active: [true] })).toThrow('[Context.update] "active": объекты и функции запрещены')
+      expect(context.active, "Поле active осталось true").toBe(true)
+    })
+  })
+  // #endregion primitiveErrors
+  // #region enumErrors
+  describe("валидация enum полей", () => {
+    const { context, update } = new Context((types) => ({
+      role: types.enum("user", "admin").required("user"),
+      status: types.enum("active", "inactive").optional("active"),
+    }))
+    it("недопустимое значение в required enum", () => {
+      // @ts-expect-error - TypeScript запрещает значения, не входящие в enum
+      expect(() => update({ role: "guest" })).toThrow(
+        "[Context.update] \"role\": должно быть 'user' или 'admin', получено 'guest'"
+      )
+      expect(context.role, "Поле role осталось 'user'").toBe("user")
+    })
+    it("недопустимое значение в optional enum", () => {
+      // @ts-expect-error - TypeScript запрещает значения, не входящие в enum
+      expect(() => update({ status: "pending" })).toThrow(
+        "[Context.update] \"status\": должно быть 'active' или 'inactive', получено 'pending'"
+      )
+      expect(context.status, "Поле status осталось 'active'").toBe("active")
+    })
+  })
+  // #endregion enumErrors
   // #region optionalNull
   it("позволяет устанавливать null для optional полей", () => {
     const { context, update } = new Context((types) => ({
@@ -157,7 +230,6 @@ describe("update", () => {
       name: types.string.required("Гость"),
       status: types.enum("start", "process", "end").required("start"),
     }))
-
     update({ name: "Новое имя" })
 
     expect(() => {
