@@ -20,6 +20,7 @@ export type ExtractValue<E> = E extends SchemaType<infer T, infer N, infer R, in
   : never
 
 /**
+ * @readonly
  * Значения контекста
  *
  * @remarks содержит только актуальные значения каждого поля
@@ -30,7 +31,7 @@ export type Values<C extends Schema> = { [K in keyof C]: ExtractValue<C[K]> }
  * @readonly
  * Снимок
  *
- * @remarks содержит данные схемы + актуальные значения для каждого поля
+ * @remarks содержит данные {@link Schema | схемы} + актуальные значения для каждого поля
  */
 export type Snapshot<C extends Schema> = {
   [K in keyof C]: {

@@ -37,8 +37,8 @@ export interface SchemaType<
    *
    * Используется только для `enum` контекстного типа
    *
-   * > Значения могут отсутствовать для enum
-   * {@includeCode ./schema.spec.ts#emptyEnumSnapshot}
+   * Значения могут отсутствовать для enum ({@link Types.enum | декларация})
+   * {@includeCode ./test/enum.spec.ts#emptySchema}
    */
   values?: V
 }

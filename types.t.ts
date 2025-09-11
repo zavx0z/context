@@ -83,6 +83,10 @@ export type Types = {
    *
    * Перечисления однородные.
    *
+   * Значения для enum могут отсутствовать. ({@link SchemaType.values | схема})
+   * {@includeCode ./test/enum.spec.ts#emptyType}
+   *
+   * Варианты декларации.
    * {@includeCode ./test/enum.spec.ts#enumDefinition}
    */
   enum: TypeEnum

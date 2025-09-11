@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test"
+import { describe, it, expect, beforeAll, afterAll } from "bun:test"
 import { Context } from "../index"
 
 describe("update", () => {
@@ -19,38 +19,78 @@ describe("update", () => {
     expect(context.nickname, 'Поле nickname должно обновиться на "nick"').toBe("nick")
     expect(context.age, "Поле age должно обновиться на 25").toBe(25)
   })
-
+  // #region undefined
   it("игнорирует undefined значения", () => {
     const { context, update } = new Context((types) => ({
       name: types.string.required("Гость"),
-      nickname: types.string(),
     }))
-
-    // @ts-expect-error - TypeScript должен запрещать undefined
+    // @ts-expect-error - TypeScript запрещает undefined
     update({ name: undefined })
-
-    expect(context.name, 'Поле name должно остаться "Гость"').toBe("Гость")
+    expect(context.name, 'Поле name осталось "Гость"').toBe("Гость")
   })
-
-  it("позволяет устанавливать null для optional полей", () => {
+  // #endregion undefined
+  // #region requiredNull
+  describe("не позволяет устанавливать null для required полей", () => {
     const { context, update } = new Context((types) => ({
       name: types.string.required("Гость"),
-      nickname: types.string(),
-      age: types.number.optional(),
+      age: types.number.required(18),
+      isActive: types.boolean.required(true),
+      tags: types.array.required([]),
+      role: types.enum("user", "admin").required("user"),
     }))
-    
-    update({ nickname: "test" })
-    expect(context.nickname, 'Поле nickname должно обновиться на "test"').toBe("test")
+    it("null для required string", () => {
+      // @ts-expect-error - TypeScript запрещает null
+      expect(() => update({ name: null })).toThrow('[Context.update] "name": поле не может быть null')
+      expect(context.name, "Поле name осталось 'Гость'").toBe("Гость")
+    })
+    it("null для required number", () => {
+      // @ts-expect-error - TypeScript запрещает null
+      expect(() => update({ age: null })).toThrow('[Context.update] "age": поле не может быть null')
+      expect(context.age, "Поле age осталось 18").toBe(18)
+    })
+    it("null для required boolean", () => {
+      // @ts-expect-error - TypeScript запрещает null
+      expect(() => update({ isActive: null })).toThrow('[Context.update] "isActive": поле не может быть null')
+      expect(context.isActive, "Поле isActive осталось true").toBe(true)
+    })
+    it("null для required array", () => {
+      // @ts-expect-error - TypeScript запрещает null
+      expect(() => update({ tags: null })).toThrow('[Context.update] "tags": поле не может быть null')
+      expect(context.tags, "Поле tags осталось []").toEqual([])
+    })
+    it("null для required enum", () => {
+      // @ts-expect-error - TypeScript запрещает null
+      expect(() => update({ role: null })).toThrow('[Context.update] "role": поле не может быть null')
+      expect(context.role, "Поле role осталось 'user'").toBe("user")
+    })
+  })
+  // #endregion requiredNull
+  // #region optionalNull
+  it("позволяет устанавливать null для optional полей", () => {
+    const { context, update } = new Context((types) => ({
+      nickname: types.string(""),
+      age: types.number.optional(4),
+      isActive: types.boolean.optional(false),
+      tags: types.array.optional([]),
+      role: types.enum("user", "admin").optional("user"),
+    }))
 
     update({ nickname: null })
     expect(context.nickname, "Поле nickname должно обновиться на null").toBe(null)
 
-    update({ age: 25 })
-    expect(context.age, "Поле age должно обновиться на 25").toBe(25)
-
     update({ age: null })
     expect(context.age, "Поле age должно обновиться на null").toBe(null)
+
+    update({ isActive: null })
+    expect(context.isActive, "Поле isActive должно обновиться на null").toBe(null)
+
+    update({ tags: null })
+    expect(context.tags, "Поле tags должно обновиться на null").toBe(null)
+
+    update({ role: null })
+    expect(context.role, "Поле role должно обновиться на null").toBe(null)
   })
+  // #endregion optionalNull
 
   it("работает со всеми типами данных", () => {
     const { context, update } = new Context((types) => ({
@@ -122,7 +162,9 @@ describe("update", () => {
 
     expect(() => {
       ;(context as any).name = "Другое имя"
-    }, "Должна быть ошибка при прямом изменении поля name после update").toThrow("Attempted to assign to readonly property.")
+    }, "Должна быть ошибка при прямом изменении поля name после update").toThrow(
+      "Attempted to assign to readonly property."
+    )
 
     expect(() => {
       ;(context as any).status = "end"

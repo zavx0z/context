@@ -11,9 +11,7 @@ const isPrimitiveOrNull = (v: unknown): v is string | number | boolean | null =>
   v === null || (typeof v !== "object" && typeof v !== "function")
 
 const assertNonObject = (value: unknown, msg: string) => {
-  if (!isPrimitiveOrNull(value)) {
-    throw new TypeError(msg)
-  }
+  if (!isPrimitiveOrNull(value)) throw new TypeError(msg)
 }
 
 const isFlatPrimitiveArray = (v: unknown): v is Array<string | number | boolean | null> =>
@@ -30,6 +28,11 @@ const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.s
  */
 export abstract class ContextBase<C extends Schema> {
   protected data!: Values<C>
+  /**
+   * @readonly
+   *
+   * {@link Schema | Схема контекста}
+   */
   schema!: C
   protected updateSubscribers = new Set<(updated: Partial<Values<C>>) => void>()
   /**
@@ -90,11 +93,18 @@ export abstract class ContextBase<C extends Schema> {
 
   /**
    * Обновляет значения в контексте
-   * @param values - Значения для обновления
-   * @returns Значения, которые были обновлены
    *
    * Обновляет только существующие ключи. Игнорирует undefined.
+   * {@includeCode ./test/update.spec.ts#undefined}
    *
+   * Для optional полей поддерживается установка null
+   * {@includeCode ./test/update.spec.ts#optionalNull}
+   *
+   * Не позволяет устанавливать null для required полей
+   * {@includeCode ./test/update.spec.ts#requiredNull}
+   *
+   * @param values - Значения для обновления
+   * @returns Значения, которые были обновлены
    */
   update = (values: Partial<Values<C>>): Partial<Values<C>> => {
     const entries = Object.entries(values).filter(([, v]) => v !== undefined) as [string, any][]
@@ -108,13 +118,12 @@ export abstract class ContextBase<C extends Schema> {
 
       // Проверяем null для required полей
       if (nextRaw === null && def?.required) {
-        throw new TypeError(`Поле ${key} не может быть null`)
+        throw new TypeError(`[Context.update] "${key}": поле не может быть null`)
       }
 
       if (def?.type === "array") {
         if (nextRaw === null) {
-          // null разрешен для optional массивов
-          next = nextRaw
+          next = nextRaw // null разрешен для optional массивов
         } else if (!isFlatPrimitiveArray(nextRaw)) {
           throw new TypeError(
             `[Context.update] "${key}": ожидается плоский массив примитивов (string | number | boolean | null).`
@@ -136,10 +145,10 @@ export abstract class ContextBase<C extends Schema> {
       } else if (def?.type === "enum") {
         const allowed = (def as any).values as ReadonlyArray<string | number>
         if (nextRaw === null) {
-          next = nextRaw
+          next = nextRaw // null разрешен для optional enum
         } else if (!allowed?.includes(nextRaw as any)) {
           const variants = Array.isArray(allowed) ? allowed.map(String).join("' или '") : String(allowed)
-          throw new TypeError(`Поле ${key} должно быть '${variants}', получено '${String(nextRaw)}'`)
+          throw new TypeError(`[Context.update] "${key}": должно быть '${variants}', получено '${String(nextRaw)}'`)
         } else {
           next = nextRaw
         }

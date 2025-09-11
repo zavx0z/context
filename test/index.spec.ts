@@ -31,7 +31,7 @@ describe("контекст", () => {
         enumOptional: types.enum("user", "admin").optional(),
         enumOptionalDefault: types.enum("user", "admin").optional("user"),
       }))
-      
+
       it("не обязательные значения без значений по умолчанию должны быть null", () => {
         expect(context.stringShort, "string в короткой версии должен быть null").toBeNull()
         expect(context.stringOptional, "string в опциональной версии должен быть null").toBeNull()
@@ -67,34 +67,5 @@ describe("контекст", () => {
       })
     })
     // #endregion optional
-    // #region required
-    describe("не позволяет устанавливать null для required полей", () => {
-      const { update } = new Context((types) => ({
-        name: types.string.required("Гость"),
-        age: types.number.required(18),
-        isActive: types.boolean.required(true),
-        tags: types.array.required([]),
-        role: types.enum("user", "admin").required("user"),
-      }))
-      it("null для required string", () => {
-        expect(() => {
-          // @ts-expect-error - TypeScript запрещает null
-          update({ name: null })
-        }).toThrow("Поле name не может быть null")
-      })
-      it("null для required enum", () => {
-        expect(() => {
-          // @ts-expect-error - TypeScript запрещает null
-          update({ role: null })
-        }).toThrow("Поле role не может быть null")
-      })
-      it("null для required array", () => {
-        expect(() => {
-          // @ts-expect-error - TypeScript запрещает null
-          update({ tags: null })
-        }).toThrow("Поле tags не может быть null")
-      })
-    })
-    // #endregion required
   })
 })

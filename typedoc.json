@@ -36,9 +36,9 @@
     "gitRemote": "origin",
     "githubPages": true,
     "cleanOutputDir": true,
-    "hideGenerator": false,
+    "hideGenerator": true,
     "sidebarLinks": {
+        "npm": "https://www.npmjs.com/package/@zavx0z/context",
         "github": "https://github.com/zavx0z/context",
-        "npm": "https://www.npmjs.com/package/@zavx0z/context"
     }
 }

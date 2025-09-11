@@ -24,12 +24,15 @@ describe("boolean", () => {
       // #region booleanSchema
       {
         short: { type: "boolean" },
+
         callable: { type: "boolean" },
         callableOptions: { type: "boolean", title: "boolean" },
         callableDefault: { type: "boolean", default: true },
+
         optional: { type: "boolean" },
         optionalOptions: { type: "boolean", title: "boolean" },
         optionalDefault: { type: "boolean", default: true },
+
         required: { type: "boolean", default: true, required: true },
         requiredOptions: { type: "boolean", default: true, required: true, title: "boolean" },
       }
