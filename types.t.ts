@@ -52,24 +52,29 @@ export type Types = {
   /**
    * Строковый тип.
    *
-   * {@includeCode ./types.spec.ts#stringDefinition}
+   * {@includeCode ./test/string.spec.ts#stringDefinition}
    */
   string: TypePrimitive<string, "string">
 
   /**
    * Числовой тип.
    *
+   * {@includeCode ./test/number.spec.ts#numberDefinition}
    */
   number: TypePrimitive<number, "number">
 
   /**
    * Логический тип.
+   *
+   * {@includeCode ./test/boolean.spec.ts#booleanDefinition}
    */
   boolean: TypePrimitive<boolean, "boolean">
 
   /**
    * Массив примитивов.
    * Массив плоский и однородный.
+   *
+   * {@includeCode ./test/array.spec.ts#arrayDefinition}
    */
   array: TypeArray
 
@@ -77,6 +82,8 @@ export type Types = {
    * Перечисления.
    *
    * Перечисления однородные.
+   *
+   * {@includeCode ./test/enum.spec.ts#enumDefinition}
    */
   enum: TypeEnum
 }

@@ -1,83 +1,72 @@
-import { describe, test, expect } from "bun:test"
+import { describe, it, expect } from "bun:test"
 import { Context } from "../context"
 
 describe("строка", () => {
-  describe("краткая версия", () => {
-    // #region short
-    const { context, schema, snapshot } = new Context((t) => ({
-      nullable: t.string(),
-      nullableWithTitle: t.string()({ title: "nullable title" }),
+  it("string", () => {
+    const { schema: stringSchema } =
+      // #region stringDefinition
+      new Context((types) => ({
+        short: types.string,
 
-      default: t.string("default value"),
-      defaultWithTitle: t.string("default with title value")({ title: "default title" }),
-    }))
-    // #endregion short
+        callable: types.string(),
+        callableOptions: types.string()({ title: "title" }),
+        callableDefault: types.string("default"),
 
-    test("контекст", () => {
-      expect(context, "контекст").toEqual(
-        // #region shortContext
-        {
-          nullable: null,
-          nullableWithTitle: null,
+        optional: types.string.optional(),
+        optionalOptions: types.string.optional()({ title: "title" }),
+        optionalDefault: types.string.optional("default"),
 
-          default: "default value",
-          defaultWithTitle: "default with title value",
-        }
-        // #endregion shortContext
-      )
-    })
-    test("схема", () => {
-      expect(schema, "схема").toEqual(
-        // #region shortSchema
-        {
-          nullable: {
-            type: "string",
-          },
-          nullableWithTitle: {
-            type: "string",
-            title: "nullable title",
-          },
-          default: {
-            type: "string",
-            default: "default value",
-          },
-          defaultWithTitle: {
-            type: "string",
-            default: "default with title value",
-            title: "default title",
-          },
-        }
-        // #endregion shortSchema
-      )
-    })
-
-    test("снимок", () => {
-      expect(snapshot, "снимок").toEqual(
-        // #region shortSnapshot
-        {
-          nullable: {
-            type: "string",
-            value: null,
-          },
-          nullableWithTitle: {
-            type: "string",
-            title: "nullable title",
-            value: null,
-          },
-          default: {
-            type: "string",
-            default: "default value",
-            value: "default value",
-          },
-          defaultWithTitle: {
-            type: "string",
-            title: "default title",
-            default: "default with title value",
-            value: "default with title value",
-          },
-        }
-        // #endregion shortSnapshot
-      )
-    })
+        required: types.string.required("default"),
+        requiredOptions: types.string.required("default")({ title: "title" }),
+        requiredDefault: types.string.required("default"),
+      }))
+    // #endregion stringDefinition
+    expect(stringSchema).toEqual(
+      // #region stringSchema
+      {
+        short: {
+          type: "string",
+        },
+        callable: {
+          type: "string",
+        },
+        callableOptions: {
+          type: "string",
+          title: "title",
+        },
+        callableDefault: {
+          type: "string",
+          default: "default",
+        },
+        optional: {
+          type: "string",
+        },
+        optionalOptions: {
+          type: "string",
+          title: "title",
+        },
+        optionalDefault: {
+          type: "string",
+          default: "default",
+        },
+        required: {
+          type: "string",
+          default: "default",
+          required: true,
+        },
+        requiredOptions: {
+          type: "string",
+          default: "default",
+          required: true,
+          title: "title",
+        },
+        requiredDefault: {
+          type: "string",
+          required: true,
+          default: "default",
+        },
+      }
+      // #endregion stringSchema
+    )
   })
 })
