@@ -1,4 +1,4 @@
-import type { DeepReadonly, Snapshot, Values } from "./context.t"
+import type { Snapshot, Values } from "./context.t"
 import type { NormalizeSchema } from "./schema.t"
 import { normalizeSchema } from "./schema"
 import { types } from "./types"
@@ -29,10 +29,17 @@ const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.s
  * @template C - Чистая схема (нормализованная)
  */
 export abstract class ContextBase<C extends Schema> {
-  protected contextData!: Values<C>
+  protected data!: Values<C>
   schema!: C
   protected updateSubscribers = new Set<(updated: Partial<Values<C>>) => void>()
-  private contextView!: DeepReadonly<Values<C>>
+  /**
+   * @readonly
+   * Контекст
+   *
+   * Неизменяемый объект значений контекста.
+   * Для доступа к значениям всего объекта, должна использоваться деструктуризация `{...context}`
+   */
+  context!: Values<C>
 
   protected initializeContext(schema: C): void {
     for (const key in schema) {
@@ -62,28 +69,23 @@ export abstract class ContextBase<C extends Schema> {
         def.type === "enum" && (val = def.required ? def.values?.[0] : null)
         def.type === "array" && (val = def.required ? freezeArray<any>([]) : null)
       }
-      ;(this.contextData as any)[key] = val
+      ;(this.data as any)[key] = val
     }
 
-    Object.seal(this.contextData)
-    this.contextView = this.#createReadOnlyView()
+    Object.seal(this.data)
+    this.context = this.#createReadOnlyContext()
   }
 
-  #createReadOnlyView(): DeepReadonly<Values<C>> {
+  #createReadOnlyContext(): Values<C> {
     const view: any = {}
     for (const key of Object.keys(this.schema)) {
       Object.defineProperty(view, key, {
         enumerable: true,
         configurable: false,
-        get: () => this.contextData[key as keyof Values<C>],
+        get: () => this.data[key as keyof Values<C>],
       })
     }
     return Object.freeze(view)
-  }
-
-  /** {@inheritDoc Values} */
-  get context(): Values<C> {
-    return this.contextView as Values<C>
   }
 
   /**
@@ -99,7 +101,7 @@ export abstract class ContextBase<C extends Schema> {
     const updated: Partial<Values<C>> = {}
 
     for (const [key, nextRaw] of entries) {
-      if (!(key in this.contextData)) continue
+      if (!(key in this.data)) continue
 
       const def: any = (this.schema as any)[key]
       let next = nextRaw
@@ -148,9 +150,9 @@ export abstract class ContextBase<C extends Schema> {
         )
       }
 
-      const prev = (this.contextData as any)[key]
+      const prev = (this.data as any)[key]
       if (prev !== next) {
-        ;(this.contextData as any)[key] = next
+        ;(this.data as any)[key] = next
         ;(updated as any)[key] = next
       }
     }
@@ -198,7 +200,7 @@ export class Context<S, C extends Schema = NormalizeSchema<S>> extends ContextBa
     const clean = normalizeSchema(raw) as unknown as C
 
     this.schema = clean
-    this.contextData = {} as Values<C>
+    this.data = {} as Values<C>
     this.initializeContext(this.schema)
   }
 }
@@ -207,7 +209,7 @@ export class ContextClone<S, C extends Schema = NormalizeSchema<S>> extends Cont
   static fromSnapshot<S, C extends Schema = NormalizeSchema<S>>(snapshot: C): ContextClone<S, C> {
     const ctx = new ContextClone<S, C>()
     ctx.schema = snapshot
-    ctx.contextData = {} as Values<C>
+    ctx.data = {} as Values<C>
     ctx.initializeContext(ctx.schema)
     return ctx
   }
@@ -220,15 +222,15 @@ export class ContextClone<S, C extends Schema = NormalizeSchema<S>> extends Cont
 
       if (def?.type === "array") {
         if (v == null) {
-          ;(this.contextData as any)[key] = v
+          ;(this.data as any)[key] = v
         } else if (isFlatPrimitiveArray(v)) {
-          ;(this.contextData as any)[key] = freezeArray(v)
+          ;(this.data as any)[key] = freezeArray(v)
         } else {
           throw new TypeError(`[Context.restoreValues] "${key}": ожидается плоский массив примитивов.`)
         }
       } else {
         assertNonObject(v, `[Context.restoreValues] "${key}": объекты запрещены.`)
-        ;(this.contextData as any)[key] = v
+        ;(this.data as any)[key] = v
       }
     }
   }

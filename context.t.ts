@@ -1,9 +1,5 @@
 import type { SchemaType, Schema } from "./schema.t"
 
-export type DeepReadonly<T> = T extends Array<infer U>
-  ? ReadonlyArray<DeepReadonly<U>>
-  : T | string | number | boolean | null | undefined | symbol | bigint
-
 export type ExtractValue<E> = E extends SchemaType<infer T, infer N, infer R, infer V>
   ? N extends "enum"
     ? // для enum берём ЛИТЕРАЛЫ из V[number], а не общий T
@@ -31,7 +27,8 @@ export type ExtractValue<E> = E extends SchemaType<infer T, infer N, infer R, in
 export type Values<C extends Schema> = { [K in keyof C]: ExtractValue<C[K]> }
 
 /**
- * # Снимок
+ * @readonly
+ * Снимок
  *
  * @remarks содержит данные схемы + актуальные значения для каждого поля
  */
