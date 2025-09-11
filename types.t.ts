@@ -27,83 +27,56 @@ import type { SchemaType } from "./schema.t"
  *
  * ### Обязательный
  * {@includeCode ./types.spec.ts#requiredDefinition}
+ *
+ * ## Значение по умолчанию
+ * ----
+ * Поддерживается возможность передачи значения по умолчанию для опционального и обязательного поля.
+ *
+ * ### В опциональном поле
+ * {@includeCode ./types.spec.ts#defaultValueDefinition}
+ *
+ * ### В обязательном поле
+ * {@includeCode ./types.spec.ts#requiredDefaultValueDefinition}
+ *
+ * ### Без значения по умолчанию в обязательном поле
+ * Обязательное поле **должно** иметь значение по умолчанию.
+ * {@includeCode ./types.spec.ts#withoutDefaultValueDefinition}
+ *
+ * ## Метаданные
+ * ----
+ * ### Заголовок
+ * {@includeCode ./types.spec.ts#titleDefinition}
  */
 
 export type Types = {
   /**
    * Строковый тип.
    *
-   * @example
-   * ```ts
-   * const userName = types.string.required("MetaFor");
-   * const titled = userName({ title: "User name" });
-   * ```
+   * {@includeCode ./types.spec.ts#stringDefinition}
    */
   string: TypePrimitive<string, "string">
 
   /**
    * Числовой тип.
    *
-   * @example
-   * ```ts
-   * const retries = types.number(3); // необязательный по умолчанию
-   * ```
    */
   number: TypePrimitive<number, "number">
 
   /**
    * Логический тип.
-   *
-   * @example
-   * ```ts
-   * const enabled = types.boolean.required(false);
-   * ```
    */
   boolean: TypePrimitive<boolean, "boolean">
 
   /**
-   * Массив примитивов (`string | number | boolean`).
-   *
-   * По умолчанию — **необязательный**. Доступны `.optional()` и `.required()`.
-   *
-   * @remarks
-   * Поддерживаются только **плоские** массивы из простых типов.
-   *
-   * @example
-   * ```ts
-   * // Необязательный по умолчанию
-   * const tags = types.array<string>(["a", "b"]);
-   *
-   * // Явно необязательный
-   * const list = types.array.optional<number>([1, 2, 3]);
-   *
-   * // Обязательный
-   * const flags = types.array.required<boolean>([true, false]);
-   *
-   * // Метаданные
-   * const titled = flags({ title: "Feature flags" });
-   * ```
+   * Массив примитивов.
+   * Массив плоский и однородный.
    */
   array: TypeArray
 
   /**
    * Перечисления.
    *
-   * Вызов возвращает фабрику, которая:
-   * - поддерживает короткую запись (по умолчанию **необязательный**),
-   * - имеет варианты `.optional()` и `.required()`,
-   * - сохраняет исходные литералы в свойстве `.values` (с точной типизацией).
-   *
-   * @example
-   * ```ts
-   * const role = types.enum("admin", "user", "guest");
-   *
-   * const r1 = role();                // BaseTypeSchema<string | number, "enum"> & { values: ["admin","user","guest"] }
-   * const r2 = role.required("admin");// BaseTypeSchema<string | number, "enum", true> & { values: ... }
-   * const r3 = r1({ title: "User role" });
-   * ```
-   *
-   *
+   * Перечисления однородные.
    */
   enum: TypeEnum
 }
@@ -115,7 +88,7 @@ export interface TypePrimitive<T extends string | number | boolean, N extends "s
   ) => ((options?: { title?: string }) => SchemaType<T, N, false>) & SchemaType<T, N, false>
 
   required: <D extends T>(
-    defaultValue?: D
+    defaultValue: D
   ) => ((options?: { title?: string }) => SchemaType<T, N, true>) & SchemaType<T, N, true>
 }
 
@@ -126,7 +99,7 @@ export type TypeArray = {
     defaultValue?: T[]
   ) => SchemaType<T[], "array", false> & ((options?: { title?: string }) => SchemaType<T[], "array", false>)
   required: <T extends string | number | boolean>(
-    defaultValue?: T[]
+    defaultValue: T[]
   ) => SchemaType<T[], "array", true> & ((options?: { title?: string }) => SchemaType<T[], "array", true>)
 }
 
@@ -140,7 +113,7 @@ export type TypeEnum = <const T extends readonly (string | number)[]>(
   ) => SchemaType<string | number, "enum", false, T> &
     ((options?: { title?: string }) => SchemaType<string | number, "enum", false, T>)
   required: (
-    defaultValue?: T[number]
+    defaultValue: T[number]
   ) => SchemaType<string | number, "enum", true, T> &
     ((options?: { title?: string }) => SchemaType<string | number, "enum", true, T>)
 }

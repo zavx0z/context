@@ -5,7 +5,7 @@ describe("строка", () => {
   describe("краткая версия", () => {
     // #region short
     const { context, schema, snapshot } = new Context((t) => ({
-      nullable: t.string("not null"),
+      nullable: t.string(),
       nullableWithTitle: t.string()({ title: "nullable title" }),
 
       default: t.string("default value"),
@@ -70,7 +70,6 @@ describe("строка", () => {
             value: "default value",
           },
           defaultWithTitle: {
-            required: false,
             type: "string",
             title: "default title",
             default: "default with title value",

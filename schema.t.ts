@@ -31,7 +31,7 @@ export interface SchemaType<
    *
    * @remarks может быть как для обязательного, так и для необязательного поля
    */
-  default?: T | undefined
+default?: T | undefined
   /**
    * **Значения для enum**
    *

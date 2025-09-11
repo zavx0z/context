@@ -18,19 +18,19 @@ function expectThrow(fn: () => unknown) {
 describe("Context: примитивы и плоские массивы", () => {
   it("инициализация по умолчанию (required/optional + array)", () => {
     const ctx = new Context((t) => ({
-      name: t.string.required()({ title: "Имя" }),
+      name: t.string.required("default")({ title: "Имя" }),
       age: t.number.optional(),
-      ok: t.boolean.required(),
+      ok: t.boolean.required(true),
       role: t.enum("user", "admin").required("user"),
       tags: t.array.required([]), // плоский массив
       note: t.string.optional(),
     }))
 
     // required -> дефолты, optional -> null
-    expect(ctx.context).toEqual({
-      name: "",
+    expect({ ...ctx.context }).toEqual({
+      name: "default",
       age: null,
-      ok: false,
+      ok: true,
       role: "user",
       tags: [],
       note: null,
@@ -51,21 +51,21 @@ describe("Context: примитивы и плоские массивы", () => {
 
   it("schema сериализация не содержит функций и хранит метаданные", () => {
     const ctx = new Context((t) => ({
-      name: t.string.required()({ title: "Имя" }),
+      name: t.string.required("default")({ title: "Имя" }),
       role: t.enum("user", "admin").required("user"),
       tags: t.array.optional(), // optional array -> null
     }))
     expect(ctx.schema).toEqual({
-      name: { type: "string", required: true, title: "Имя" },
+      name: { type: "string", required: true, title: "Имя", default: "default" },
       role: { type: "enum", required: true, values: ["user", "admin"], default: "user" },
-      tags: { type: "array"},
+      tags: { type: "array" },
     })
   })
 
   it("update: примитивы и плоские массивы проходят, nested/objects — ошибка", () => {
     const ctx = new Context((t) => ({
       s: t.string.optional(),
-      n: t.number.required(),
+      n: t.number.required(1),
       b: t.boolean.optional(),
       arr: t.array.required([]),
     }))
@@ -101,7 +101,7 @@ describe("Context: примитивы и плоские массивы", () => {
 
   it("onUpdate: вызывается только при реальном изменении и отдаёт точечный патч", () => {
     const ctx = new Context((t) => ({
-      a: t.number.required(0),
+      a: t.number.required(1),
       b: t.string.optional(),
       arr: t.array.required([0, 1]),
     }))
@@ -114,8 +114,8 @@ describe("Context: примитивы и плоские массивы", () => {
     expect(patches.length).toBe(0)
 
     // реальное изменение
-    ctx.update({ a: 1 })
-    expect(patches.pop()).toEqual({ a: 1 })
+    ctx.update({ a: 2 })
+    expect(patches.pop()).toEqual({ a: 2 })
 
     // массив меняем — приходит новый frozen массив
     ctx.update({ arr: [2, 3, 4] })
@@ -126,7 +126,7 @@ describe("Context: примитивы и плоские массивы", () => {
 
     // повтор того же значения — не эмитит
     const cnt = patches.length
-    ctx.update({ a: 1 })
+    ctx.update({ a: 2 })
     expect(patches.length).toBe(cnt)
 
     off()
@@ -134,7 +134,7 @@ describe("Context: примитивы и плоские массивы", () => {
 
   it("snapshot: содержит схему + актуальные значения", () => {
     const ctx = new Context((t) => ({
-      name: t.string.required()({ title: "Имя" }),
+      name: t.string.required("default")({ title: "Имя" }),
       arr: t.array.required([0, 1]),
     }))
     ctx.update({ name: "MetaFor", arr: [10, 20] })

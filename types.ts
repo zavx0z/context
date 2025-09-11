@@ -19,7 +19,7 @@ const createArrayType = {
     const base = {
       type: "array" as const,
       required: true,
-      ...(defaultValue !== undefined && { default: defaultValue }),
+      default: defaultValue,
     } as const
     const configurator = (options: { title?: string } = {}) => ({ ...base, ...options })
     return Object.assign(configurator, base)
@@ -27,7 +27,6 @@ const createArrayType = {
   optional: <T extends string | number | boolean>(defaultValue?: T[]) => {
     const base = {
       type: "array" as const,
-      required: false,
       ...(defaultValue !== undefined && { default: defaultValue }),
     } as const
     const configurator = (options: { title?: string } = {}) => ({ ...base, ...options })
@@ -40,7 +39,7 @@ const createEnumType = <const T extends readonly (string | number)[]>(...values:
     const base = {
       type: "enum",
       required: true,
-      ...(defaultValue !== undefined && { default: defaultValue }),
+      default: defaultValue,
       values,
     } as const
     const configurator = (options: { title?: string } = {}) => ({ ...base, ...options })
