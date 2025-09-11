@@ -37,8 +37,11 @@
   "private": false,
   "devDependencies": {
     "@types/bun": "latest",
+    "concat-md": "^0.5.1",
     "dts-bundle-generator": "latest",
-    "typedoc": "latest"
+    "showdown": "^2.1.0",
+    "typedoc": "latest",
+    "typedoc-plugin-markdown": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -46,6 +49,7 @@
   "scripts": {
     "build": "bun run script/build.ts --dev",
     "docs": "typedoc",
+    "rules": "typedoc --options markdown.typedoc.json && concat-md --decrease-title-levels docs-markdown > rules.md",
     "prepublishOnly": "bun run build",
     "publish:npm": "bun publish --access public"
   }
