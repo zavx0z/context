@@ -1,4 +1,4 @@
-import type { BaseTypeSchema } from "./index.t"
+import type { SchemaType } from "./index.t"
 
 /**
  * Универсальный интерфейс конструктора примитивных типов контекста.
@@ -29,8 +29,7 @@ export interface TypePrimitive<T extends string | number | boolean, N extends "s
    * @param defaultValue Значение по умолчанию
    * @returns `BaseTypeSchema<T, N, false>` + функция для задания опций (`title`)
    */
-  <D extends T>(defaultValue?: D): ((options?: { title?: string }) => BaseTypeSchema<T, N>) &
-    BaseTypeSchema<T, N, false>
+  <D extends T>(defaultValue?: D): ((options?: { title?: string }) => SchemaType<T, N>) & SchemaType<T, N, false>
 
   /**
    * Явно **необязательный** тип.
@@ -46,7 +45,7 @@ export interface TypePrimitive<T extends string | number | boolean, N extends "s
    */
   optional: <D extends T>(
     defaultValue?: D
-  ) => ((options?: { title?: string }) => BaseTypeSchema<T, N, false>) & BaseTypeSchema<T, N, false>
+  ) => ((options?: { title?: string }) => SchemaType<T, N, false>) & SchemaType<T, N, false>
 
   /**
    * **Обязательный** тип.
@@ -62,7 +61,7 @@ export interface TypePrimitive<T extends string | number | boolean, N extends "s
    */
   required: <D extends T>(
     defaultValue?: D
-  ) => ((options?: { title?: string }) => BaseTypeSchema<T, N, true>) & BaseTypeSchema<T, N, true>
+  ) => ((options?: { title?: string }) => SchemaType<T, N, true>) & SchemaType<T, N, true>
 }
 
 export type TypeArray = {
@@ -72,8 +71,8 @@ export type TypeArray = {
    * @param defaultValue Значение по умолчанию (массив примитивов)
    * @returns `BaseTypeSchema<T[], "array", false, T[]>` + функция для задания опций (`title`)
    */
-  <T extends string | number | boolean>(defaultValue?: T[]): BaseTypeSchema<T[], "array"> &
-    ((options?: { title?: string }) => BaseTypeSchema<T[], "array">)
+  <T extends string | number | boolean>(defaultValue?: T[]): SchemaType<T[], "array"> &
+    ((options?: { title?: string }) => SchemaType<T[], "array">)
 
   /**
    * Явно **необязательный** массив.
@@ -83,7 +82,7 @@ export type TypeArray = {
    */
   optional: <T extends string | number | boolean>(
     defaultValue?: T[]
-  ) => BaseTypeSchema<T[], "array", false> & ((options?: { title?: string }) => BaseTypeSchema<T[], "array", false>)
+  ) => SchemaType<T[], "array", false> & ((options?: { title?: string }) => SchemaType<T[], "array", false>)
 
   /**
    * **Обязательный** массив.
@@ -93,7 +92,7 @@ export type TypeArray = {
    */
   required: <T extends string | number | boolean>(
     defaultValue?: T[]
-  ) => BaseTypeSchema<T[], "array", true> & ((options?: { title?: string }) => BaseTypeSchema<T[], "array", true>)
+  ) => SchemaType<T[], "array", true> & ((options?: { title?: string }) => SchemaType<T[], "array", true>)
 }
 
 export type TypeEnum = <const T extends readonly (string | number)[]>(
@@ -105,8 +104,8 @@ export type TypeEnum = <const T extends readonly (string | number)[]>(
    * @param defaultValue Значение по умолчанию (одно из `values`)
    * @returns `BaseTypeSchema<..., "enum", false, T>` + функция опций (`title`)
    */
-  (defaultValue?: T[number]): BaseTypeSchema<string | number, "enum", false, T> &
-    ((options?: { title?: string }) => BaseTypeSchema<string | number, "enum", false, T>)
+  (defaultValue?: T[number]): SchemaType<string | number, "enum", false, T> &
+    ((options?: { title?: string }) => SchemaType<string | number, "enum", false, T>)
 
   /**
    * Явно **необязательный** enum.
@@ -116,8 +115,8 @@ export type TypeEnum = <const T extends readonly (string | number)[]>(
    */
   optional: (
     defaultValue?: T[number]
-  ) => BaseTypeSchema<string | number, "enum", false, T> &
-    ((options?: { title?: string }) => BaseTypeSchema<string | number, "enum", false, T>)
+  ) => SchemaType<string | number, "enum", false, T> &
+    ((options?: { title?: string }) => SchemaType<string | number, "enum", false, T>)
 
   /**
    * **Обязательный** enum.
@@ -127,6 +126,6 @@ export type TypeEnum = <const T extends readonly (string | number)[]>(
    */
   required: (
     defaultValue?: T[number]
-  ) => BaseTypeSchema<string | number, "enum", true, T> &
-    ((options?: { title?: string }) => BaseTypeSchema<string | number, "enum", true, T>)
+  ) => SchemaType<string | number, "enum", true, T> &
+    ((options?: { title?: string }) => SchemaType<string | number, "enum", true, T>)
 }

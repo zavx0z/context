@@ -62,14 +62,12 @@ describe("строка", () => {
           nullable: {
             type: "string",
             required: false,
-            default: undefined,
             value: null,
           },
           nullableWithTitle: {
             type: "string",
             required: false,
             title: "nullable title",
-            default: undefined,
             value: null,
           },
           default: {

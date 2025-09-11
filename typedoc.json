@@ -8,18 +8,13 @@
     "excludeProtected": true,
     "excludeExternals": true,
     "includeVersion": true,
-    "categorizeByGroup": true,
-    "categoryOrder": [
-        "Context",
-        "Types",
-        "Factories",
-        "*"
+    "sort": [
+        "source-order"
     ],
     "navigation": {
         "includeCategories": false,
         "includeGroups": false
     },
-    "defaultCategory": "Other",
     "readme": "README.md",
     "name": "Контекст для MetaFor",
     "theme": "default",
@@ -36,7 +31,7 @@
     "cleanOutputDir": true,
     "hideGenerator": false,
     "sidebarLinks": {
-        "GitHub": "https://github.com/zavx0z/context",
-        "NPM": "https://www.npmjs.com/package/@zavx0z/context"
+        "github": "https://github.com/zavx0z/context",
+        "npm": "https://www.npmjs.com/package/@zavx0z/context"
     }
 }

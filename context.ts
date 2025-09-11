@@ -177,9 +177,9 @@ export abstract class ContextBase<C extends Schema> {
       context[key as keyof C] = {
         type: value.type,
         required: value.required,
-        default: value.default,
-        ...(value.title ? { title: value.title } : {}),
-        ...(value.values ? { values: value.values } : {}),
+        ...(value.default && { default: value.default }),
+        ...(value.title && { title: value.title }),
+        ...(value.values && { values: value.values }),
         value: this.context[key as keyof C],
       }
     }

@@ -84,24 +84,56 @@ export type Types = {
    */
   enum: TypeEnum
 }
-export interface BaseTypeSchema<
+/**
+ * Описание типа поля для схемы контекста
+ *
+ * @template T JavaScript тип значения
+ * @template N Название контекстного типа
+ * @template R Является ли поле обязательным (true | false)
+ * @template V Значения только для `enum` контекстного типа
+ */
+export interface SchemaType<
   T,
   N extends "string" | "number" | "boolean" | "array" | "enum",
   R extends boolean = false,
-  V extends readonly (string | number)[] | undefined = undefined
+  V extends readonly (string | number)[] | never = never
 > {
+  /**
+   * @description Тип поля контекста
+   */
   type: N
+  /**
+   * @description Является ли поле обязательным
+   *
+   * @default false
+   */
   required: R
+  /**
+   * @description Название поля (для отображения в UI)
+   */
   title?: string
-  default?: T | undefined
+  /**
+   * @description Значение по умолчанию
+   *
+   * @remarks может быть как для обязательного, так и для необязательного поля
+   */
+  default?: T
+  /**
+   * @description Значения для enum
+   *
+   * @remarks только для `enum` контекстного типа
+   */
   values?: V
 }
 
+/**
+ * Схема контекста
+ */
 export type Schema = Record<
   string,
-  | BaseTypeSchema<string, "string", true | false>
-  | BaseTypeSchema<boolean, "boolean", true | false>
-  | BaseTypeSchema<number, "number", true | false>
-  | BaseTypeSchema<(string | number | boolean)[], "array", true | false>
-  | BaseTypeSchema<string | number, "enum", true | false, readonly (string | number)[]>
+  | SchemaType<string, "string", true | false>
+  | SchemaType<boolean, "boolean", true | false>
+  | SchemaType<number, "number", true | false>
+  | SchemaType<(string | number | boolean)[], "array", true | false>
+  | SchemaType<string | number, "enum", true | false, readonly (string | number)[]>
 >
