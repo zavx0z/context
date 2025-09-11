@@ -9,10 +9,17 @@
     "excludeExternals": true,
     "includeVersion": true,
     "sort": [
+        "kind",
         "source-order"
     ],
+    "kindSortOrder": [
+        "Class",
+        "TypeAlias",
+        "Interface",
+        "Enum"
+    ],
     "navigation": {
-        "includeCategories": false,
+        "includeCategories": true,
         "includeGroups": false
     },
     "readme": "README.md",

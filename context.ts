@@ -1,8 +1,9 @@
-import type { DeepReadonly, Snapshot, Values, NormalizeSchema } from "./context.t"
-import { normalizeSchema } from "./context.t"
+import type { DeepReadonly, Snapshot, Values } from "./context.t"
+import type { NormalizeSchema } from "./schema.t"
+import { normalizeSchema } from "./schema"
 import { types } from "./types"
-import type { Schema } from "./index.t"
-import type { Types } from "./index.t"
+import type { Schema } from "./schema.t"
+import type { Types } from "./types.t"
 
 /* ------------------------------- утилиты ---------------------------------- */
 
@@ -176,8 +177,8 @@ export abstract class ContextBase<C extends Schema> {
     for (const [key, value] of Object.entries(this.schema)) {
       context[key as keyof C] = {
         type: value.type,
-        required: value.required,
-        ...(value.default && { default: value.default }),
+        ...(value.required && { required: true }),
+        ...(value.default && value.default !== undefined && { default: value.default }),
         ...(value.title && { title: value.title }),
         ...(value.values && { values: value.values }),
         value: this.context[key as keyof C],

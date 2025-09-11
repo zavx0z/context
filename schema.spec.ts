@@ -1,7 +1,33 @@
 import { describe, it, expect } from "bun:test"
-import { Context } from "../context"
+import { Context } from "./context"
 
 describe("Схема", () => {
+  describe("enum values", () => {
+    it("значения отсутствуют", () => {
+      const { schema: simpleEnum } =
+        // #region simpleEnum
+        new Context((types) => ({
+          empty: types.enum,
+        }))
+      // #endregion simpleEnum
+      const { schema: callableEnum } =
+        // #region callableEnum
+        new Context((types) => ({
+          empty: types.enum(),
+        }))
+      // #endregion callableEnum
+      expect(simpleEnum).toEqual(callableEnum)
+      expect(simpleEnum).toEqual(
+        // #region emptyEnumSnapshot
+        {
+          empty: {
+            type: "enum",
+          },
+        }
+        // #endregion emptyEnumSnapshot
+      )
+    })
+  })
   it("должен возвращать оригинальную схему через геттер", () => {
     const ctx = new Context((types) => ({
       name: types.string.required("Иван")({ title: "Имя пользователя" }),
@@ -28,7 +54,6 @@ describe("Схема", () => {
       },
       age: {
         type: "number",
-        required: false,
       },
       isActive: {
         type: "boolean",
@@ -51,18 +76,15 @@ describe("Схема", () => {
       },
       priority: {
         type: "enum",
-        required: false,
         values: ["low", "medium", "high"],
         title: "Приоритет",
       },
       description: {
         type: "string",
-        required: false,
         title: "Описание",
       },
       metadata: {
         type: "array",
-        required: false,
         title: "Метаданные",
       },
     })
@@ -98,22 +120,22 @@ describe("Схема", () => {
 
     // Проверяем optional поля
     expect(schema.age.type).toBe("number")
-    expect(schema.age.required).toBe(false)
+    expect(schema.age.required).toBeUndefined()
     expect(schema.age.default).toBeUndefined()
 
     expect(schema.description.type).toBe("string")
-    expect(schema.description.required).toBe(false)
+    expect(schema.description.required).toBeUndefined()
     expect(schema.description.default).toBeUndefined()
     expect(schema.description.title).toBe("Описание")
 
     expect(schema.priority.type).toBe("enum")
-    expect(schema.priority.required).toBe(false)
+    expect(schema.priority.required).toBeUndefined()
     expect(schema.priority.default).toBeUndefined()
     expect(schema.priority.title).toBe("Приоритет")
     expect(schema.priority.values).toEqual(["low", "medium", "high"])
 
     expect(schema.tags.type).toBe("array")
-    expect(schema.tags.required).toBe(false)
+    expect(schema.tags.required).toBeUndefined()
     expect(schema.tags.default).toBeUndefined()
     expect(schema.tags.title).toBe("Теги")
   })

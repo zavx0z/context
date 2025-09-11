@@ -11,7 +11,7 @@ function makePrimitiveType<TName extends "string" | "number" | "boolean", Req ex
 function createTypeWithRequiredOptional<TName extends "string" | "number" | "boolean">(type: TName) {
   const required = <D>(defaultValue?: D) => makePrimitiveType(type, true, defaultValue)
   const optional = <D>(defaultValue?: D) => makePrimitiveType(type, false, defaultValue)
-  return Object.assign(optional, { required, optional })
+  return Object.assign(optional, { required, optional }, { type: type })
 }
 
 const createArrayType = {
@@ -49,7 +49,6 @@ const createEnumType = <const T extends readonly (string | number)[]>(...values:
   optional: (defaultValue?: T[number]) => {
     const base = {
       type: "enum",
-      required: false,
       ...(defaultValue !== undefined && { default: defaultValue }),
       values,
     } as const
@@ -65,10 +64,16 @@ export const types = {
   array: Object.assign(
     <const T extends (string | number | boolean)[]>(defaultValue?: T) =>
       createArrayType.optional<T[number]>(defaultValue),
-    createArrayType
+    createArrayType,
+    { type: "array" }
   ),
-  enum: <const T extends readonly (string | number)[]>(...values: T) => {
-    const enumBase = createEnumType(...values)
-    return Object.assign((defaultValue?: T[number]) => enumBase.optional(defaultValue), enumBase)
-  },
+  enum: Object.assign(
+    <const T extends readonly (string | number)[]>(...values: T) => {
+      const enumBase = createEnumType(...values)
+      return Object.assign((defaultValue?: T[number]) => enumBase.optional(defaultValue), enumBase, {
+        type: "enum",
+      })
+    },
+    { type: "enum" }
+  ),
 }

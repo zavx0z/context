@@ -58,7 +58,7 @@ describe("Context: примитивы и плоские массивы", () => {
     expect(ctx.schema).toEqual({
       name: { type: "string", required: true, title: "Имя" },
       role: { type: "enum", required: true, values: ["user", "admin"], default: "user" },
-      tags: { type: "array", required: false },
+      tags: { type: "array"},
     })
   })
 
