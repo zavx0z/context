@@ -1,16 +1,10 @@
 {
   "name": "@zavx0z/context",
-  "version": "1.0.2",
-  "description": "Context library for creating typed, immutable contexts with schemas and change subscriptions",
+  "version": "1.0.3",
+  "description": "Контекст для MetaFor",
   "author": "zavx0z",
-  "homepage": "https://github.com/zavx0z/context#readme",
   "keywords": [
-    "context",
-    "state",
-    "proxy",
-    "immutable",
-    "schema",
-    "subscription"
+    "metafor"
   ],
   "license": "MIT",
   "repository": {
@@ -36,12 +30,11 @@
   "type": "module",
   "private": false,
   "devDependencies": {
-    "@types/bun": "latest",
+    "@types/bun": "^1.2.21",
     "concat-md": "^0.5.1",
-    "dts-bundle-generator": "latest",
-    "showdown": "^2.1.0",
-    "typedoc": "latest",
-    "typedoc-plugin-markdown": "latest"
+    "dts-bundle-generator": "^9.5.1",
+    "typedoc": "^0.28.12",
+    "typedoc-plugin-markdown": "^4.8.1"
   },
   "peerDependencies": {
     "typescript": "^5"

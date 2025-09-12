@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test"
+import { describe, test, expect } from "bun:test"
 import { Context, ContextClone } from "./context"
 
 // Утилита: безопасно проверить, что операция бросает TypeError (сообщение может отличаться в разных рантаймах)
@@ -16,7 +16,7 @@ function expectThrow(fn: () => unknown) {
 }
 
 describe("Context: примитивы и плоские массивы", () => {
-  it("инициализация по умолчанию (required/optional + array)", () => {
+  test("инициализация по умолчанию (required/optional + array)", () => {
     const ctx = new Context((t) => ({
       name: t.string.required("default")({ title: "Имя" }),
       age: t.number.optional(),
@@ -49,7 +49,7 @@ describe("Context: примитивы и плоские массивы", () => {
     })
   })
 
-  it("schema сериализация не содержит функций и хранит метаданные", () => {
+  test("schema сериализация не содержит функций и хранит метаданные", () => {
     const ctx = new Context((t) => ({
       name: t.string.required("default")({ title: "Имя" }),
       role: t.enum("user", "admin").required("user"),
@@ -62,40 +62,50 @@ describe("Context: примитивы и плоские массивы", () => {
     })
   })
 
-  it("onUpdate: вызывается только при реальном изменении и отдаёт точечный патч", () => {
-    const ctx = new Context((t) => ({
-      a: t.number.required(1),
-      b: t.string.optional(),
-      arr: t.array.required([0, 1]),
-    }))
-
-    const patches: any[] = []
-    const off = ctx.onUpdate((u) => patches.push(u))
-
-    // без изменений — пусто
-    ctx.update({})
-    expect(patches.length).toBe(0)
-
-    // реальное изменение
-    ctx.update({ a: 2 })
-    expect(patches.pop()).toEqual({ a: 2 })
-
-    // массив меняем — приходит новый frozen массив
-    ctx.update({ arr: [2, 3, 4] })
-    const last = patches.pop()
-    expect(Array.isArray(last.arr)).toBe(true)
-    expect(Object.isFrozen(last.arr)).toBe(true)
-    expect(last).toEqual({ arr: [2, 3, 4] })
-
-    // повтор того же значения — не эмитит
-    const cnt = patches.length
-    ctx.update({ a: 2 })
-    expect(patches.length).toBe(cnt)
-
-    off()
+  describe("onUpdate", () => {
+    // #region onUpdate
+    test("обновление значения", () => {
+      const { onUpdate, update } = new Context((types) => ({
+        string: types.string,
+        array: types.array.required([0, 1]),
+      }))
+      onUpdate((updated) => {
+        expect(Array.isArray(updated.array), "должен быть массив").toBe(true)
+        expect(Object.isFrozen(updated.array), "массив должен быть frozen").toBe(true)
+        expect(updated, "значение быть равно переданному").toEqual({ array: [2, 3, 4] })
+        expect(updated.string, "значения которые не были обновлены не должны быть в обновлении").toBeUndefined()
+      })
+      update({ array: [2, 3, 4] })
+    })
+    test("без изменений — пусто", () => {
+      const { onUpdate, update } = new Context((types) => ({ number: types.number.required(1) }))
+      let count = 0
+      onUpdate(() => count++)
+      update({})
+      expect(count, "обновление не должно быть вызвано").toBe(0)
+    })
+    test("повтор того же значения — не эмитит", () => {
+      const { onUpdate, update } = new Context((types) => ({ number: types.number.required(1) }))
+      let count = 0
+      onUpdate(() => count++)
+      update({ number: 1 })
+      expect(count, "обновление не должно быть вызвано").toBe(0)
+    })
+    test("отписка от обновлений", () => {
+      const { onUpdate, update, context } = new Context((types) => ({ count: types.number.required(0) }))
+      let count = 0
+      const unsubscribe = onUpdate(() => count++)
+      update({ count: 1 })
+      expect(context.count, "обновление должно быть вызвано").toBe(count)
+      unsubscribe()
+      update({ count: 2 })
+      expect(context.count, "контекст должен быть обновлен").toBe(2)
+      expect(count, "обновление не должно быть вызвано").toBe(1)
+    })
+    // #endregion onUpdate
   })
 
-  it("snapshot: содержит схему + актуальные значения", () => {
+  test("snapshot: содержит схему + актуальные значения", () => {
     const ctx = new Context((t) => ({
       name: t.string.required("default")({ title: "Имя" }),
       arr: t.array.required([0, 1]),
@@ -115,7 +125,7 @@ describe("Context: примитивы и плоские массивы", () => {
 })
 
 describe("Защита read-only витрины целиком", () => {
-  it("нельзя добавлять/удалять ключи контекста и менять дескрипторы", () => {
+  test("нельзя добавлять/удалять ключи контекста и менять дескрипторы", () => {
     const ctx = new Context((t) => ({
       s: t.string.required("x"),
       arr: t.array.required([1]),

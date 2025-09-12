@@ -159,11 +159,10 @@ export abstract class ContextBase<C extends Schema> {
   }
   /**
    * Подписка на обновления контекста
-   * @template C - Схема контекста
-   * @param callback - Функция, которая будет вызываться при обновлении контекста
-   * @returns Функция для отписки от обновлений
+   *
+   * {@includeCode ./context.spec.ts#onUpdate}
    */
-  onUpdate(callback: (updated: Partial<Values<C>>) => void): () => void {
+  onUpdate: (callback: (updated: Partial<Values<C>>) => void) => () => void = (callback) => {
     this.updateSubscribers.add(callback)
     return () => this.updateSubscribers.delete(callback)
   }
