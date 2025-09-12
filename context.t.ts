@@ -49,7 +49,7 @@ export type Snapshot<C extends Schema> = {
  * @param values - Значения для обновления
  * @returns Значения, которые были обновлены
  */
-export type Update<C extends Schema> = Partial<Values<C>>
+export type Update<C extends Schema> = (values: Partial<Values<C>>) => Partial<Values<C>>
 
 export type ExtractValue<E> = E extends SchemaType<infer T, infer N, infer R, infer V>
   ? N extends "enum"
