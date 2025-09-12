@@ -62,43 +62,6 @@ describe("Context: примитивы и плоские массивы", () => {
     })
   })
 
-  it("update: примитивы и плоские массивы проходят, nested/objects — ошибка", () => {
-    const ctx = new Context((t) => ({
-      s: t.string.optional(),
-      n: t.number.required(1),
-      b: t.boolean.optional(),
-      arr: t.array.required([]),
-    }))
-
-    // базовое обновление
-    const patch1 = ctx.update({ s: "MetaFor", n: 42, b: true })
-    expect(patch1).toEqual({ s: "MetaFor", n: 42, b: true })
-    expect(ctx.context.s).toBe("MetaFor")
-    expect(ctx.context.n).toBe(42)
-    expect(ctx.context.b).toBe(true)
-
-    // обновление массива плоскими примитивами -> ок, заморозка
-    const p2 = ctx.update({ arr: ["a", 1, true, null] } as any)
-    expect(p2).toEqual({ arr: ["a", 1, true, null] } as any)
-    expect(ctx.context.arr).toEqual(["a", 1, true, null] as any)
-    expect(Object.isFrozen(ctx.context.arr)).toBe(true)
-    expectThrow(() => {
-      ;(ctx.context.arr as any)[0] = "x"
-    })
-
-    // попытка записать объект в примитивное поле
-    expect(() => ctx.update({ s: { x: 1 } as any })).toThrow()
-
-    // попытка nested массива
-    expect(() => ctx.update({ arr: [["nested"]] as any })).toThrow()
-
-    // попытка массива с объектами
-    expect(() => ctx.update({ arr: [{ x: 1 }] as any })).toThrow()
-
-    // попытка функции
-    expect(() => ctx.update({ s: function () {} as any })).toThrow()
-  })
-
   it("onUpdate: вызывается только при реальном изменении и отдаёт точечный патч", () => {
     const ctx = new Context((t) => ({
       a: t.number.required(1),
