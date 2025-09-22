@@ -1,7 +1,11 @@
-import type { NormalizeSchema } from "./schema.t"
+import type { NormalizeSchema, Schema } from "./schema.t"
+import { types } from "./types"
+import type { Types } from "./types.t"
 
 // рантайм-очистка (оставляем только поля схемы)
-
+export function contextDefinitionToSchema<C extends Schema>(schema: (types: Types) => C): Schema {
+  return normalizeSchema(schema(types)) as Schema
+}
 export function normalizeSchema<S>(raw: S): NormalizeSchema<S> {
   const out: any = {}
   for (const [k, def] of Object.entries(raw as Record<string, any>)) {
