@@ -1,5 +1,11 @@
 # @zavx0z/context
 
+[![npm](https://img.shields.io/npm/v/@zavx0z/context)](https://www.npmjs.com/package/@zavx0z/context)
+[![bun](https://img.shields.io/badge/bun-1.0+-black)](https://bun.sh/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ESM-green)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules)
+[![MDN](https://img.shields.io/badge/MDN-HTML-red)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+
 Лёгкая библиотека для типобезопасных **контекстов состояния**: строгая схема, иммутабельный доступ к значениям, контролируемые обновления и подписки. **Часть фреймворка MetaFor** (модуль контекста/состояния), при этом может использоваться как самостоятельный пакет.
 
 ---
@@ -101,8 +107,8 @@ clone.restoreValues(ctx.context)
 ## Экспорты
 
 ```ts
-import { Context, ContextClone } from "@zavx0z/context"
-import type { Schema, Values, Snapshot } from "@zavx0z/context"
+import { Context, types } from "@zavx0z/context"
+import type { Schema, Values, Snapshot, Update } from "@zavx0z/context"
 ```
 
 ---
