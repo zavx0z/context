@@ -64,7 +64,7 @@ export type ExtractValue<E> = E extends SchemaType<infer T, infer N, infer R, in
       R extends true
       ? T
       : T | null
-    : // примитивы — как и раньше
+    : // примитивы
     R extends true
     ? T
     : T | null

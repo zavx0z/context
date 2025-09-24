@@ -34,7 +34,7 @@ export enum ToDo {
 
 export { fromSchema, fromSnapshot } from "./context"
 export { contextSchema } from "./schema"
-export type { ContextObject } from "./context"
+export type { Context as ContextObject } from "./context"
 export { types } from "./types"
 export type { Types } from "./types.t"
 export type { Values, Snapshot, Update } from "./context.t"

@@ -92,4 +92,3 @@ export type Schema = Record<
   | SchemaType<(string | number | boolean)[], "array", true | false>
   | SchemaType<string | number, "enum", true | false, readonly (string | number)[]>
 >
-
