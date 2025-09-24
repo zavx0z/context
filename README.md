@@ -88,9 +88,9 @@ const full = ctx.snapshot
 const schemaSnap = ctx.schema
 
 // Восстановление/клонирование
-import { ContextClone } from "@zavx0z/context"
-const clone = ContextClone.fromSnapshot(ctx.schema)
-clone.restoreValues(ctx.context)
+import { fromSchema, fromSnapshot } from "@zavx0z/context"
+const cloneA = fromSchema(ctx.schema)
+const cloneB = fromSnapshot(ctx.snapshot)
 ```
 
 ---
@@ -111,15 +111,14 @@ clone.restoreValues(ctx.context)
 - `update(values)` → `Partial<Values>` — только реально изменённые поля
 - `onUpdate(cb)` → `() => void` — отписка
 - `snapshot` (геттер) → `{ [key]: { type, required, default?, title?, values?, id?, data?, value } }`
-- `ContextClone.fromSnapshot(schema)` → `ContextClone`
-- `clone.restoreValues(values)`
+- `fromSchema(schema)` / `fromSnapshot(snapshot)` — создание контекста из схемы или полного снимка
 
 ---
 
 ## Экспорты
 
 ```ts
-import { Context, ContextClone, types } from "@zavx0z/context"
+import { Context, fromSchema, fromSnapshot, types } from "@zavx0z/context"
 import type { Schema, Values, Snapshot, Update } from "@zavx0z/context"
 ```
 

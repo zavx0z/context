@@ -201,33 +201,39 @@ export class Context<S, C extends Schema = NormalizeSchema<S>> extends ContextBa
   }
 }
 
-export class ContextClone<S, C extends Schema = NormalizeSchema<S>> extends ContextBase<C> {
-  static fromSnapshot<S, C extends Schema = NormalizeSchema<S>>(snapshot: C): ContextClone<S, C> {
-    const ctx = new ContextClone<S, C>()
-    ctx.schema = snapshot
-    ctx.data = {} as Values<C>
-    ctx.initializeContext(ctx.schema)
-    return ctx
+/** Внутренний класс для инициализации из готовой схемы без нормализации */
+class RawContext<C extends Schema> extends ContextBase<C> {
+  constructor(schema: C) {
+    super()
+    this.schema = schema
+    this.data = {} as Values<C>
+    this.initializeContext(this.schema)
   }
+}
 
-  /** Восстановление значений с валидацией и заморозкой массивов */
-  restoreValues(values: Values<C>): void {
-    for (const key of Object.keys(this.schema)) {
-      const def: any = (this.schema as any)[key]
-      const v = (values as any)[key]
+/**
+ * Создать контекст из готовой схемы (без значений). Схема НЕ нормализуется.
+ */
+export function fromSchema<C extends Schema>(schema: C): RawContext<C> {
+  return new RawContext<C>(schema)
+}
 
-      if (def?.type === "array") {
-        if (v == null) {
-          ;(this.data as any)[key] = v
-        } else if (isFlatPrimitiveArray(v)) {
-          ;(this.data as any)[key] = freezeArray(v)
-        } else {
-          throw new TypeError(`[Context.restoreValues] "${key}": ожидается плоский массив примитивов.`)
-        }
-      } else {
-        assertNonObject(v, `[Context.restoreValues] "${key}": объекты запрещены.`)
-        ;(this.data as any)[key] = v
-      }
-    }
+/**
+ * Создать контекст из полного снимка (schema + value)
+ */
+export function fromSnapshot<C extends Schema>(snapshot: Snapshot<C>): RawContext<C> {
+  // Формируем схему из snapshot без поля value (с сохранением required: false, если присутствует)
+  const schema: any = {}
+  for (const [key, snap] of Object.entries(snapshot as any)) {
+    const { value: _value, ...rest } = snap as any
+    schema[key] = rest
   }
+  const ctx = new RawContext<C>(schema as C)
+  // Восстановим значения через update(), чтобы применились валидации и freeze массивов
+  const values: any = {}
+  for (const [key, snap] of Object.entries(snapshot as any)) {
+    values[key] = (snap as any).value
+  }
+  ctx.update(values)
+  return ctx
 }

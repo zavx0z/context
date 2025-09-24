@@ -30,7 +30,8 @@ export enum ToDo {
   description = "Описание поля (для отображения в UI)",
 }
 
-export { Context, ContextClone } from "./context"
+export { Context } from "./context"
+export { fromSchema, fromSnapshot } from "./context"
 export { types } from "./types"
 export type { Types } from "./types.t"
 export type { Values, Snapshot, Update } from "./context.t"
