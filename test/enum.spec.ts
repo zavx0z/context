@@ -7,11 +7,11 @@ describe("enum", () => {
       // prettier-ignore
       // #region enumDefinition
       new Context((types) => ({
-          short: types.enum,
+          short: types.enum().optional(),
 
-          callable: types.enum(),
-          callableOptions: types.enum(1, 2)()({ title: "enum" }),
-          callableDefault: types.enum("user", "admin")("user"),
+          callable: types.enum().optional(),
+          callableOptions: types.enum(1, 2).optional()({ title: "enum" }),
+          callableDefault: types.enum("user", "admin").optional("user"),
 
           optional: types.enum().optional(),
           optionalOptions: types.enum().optional()({ title: "enum" }),
@@ -74,8 +74,8 @@ describe("enum", () => {
     const { context, schema, snapshot } =
       // #region emptyType
       new Context((types) => ({
-        short: types.enum,
-        callable: types.enum(),
+        short: types.enum().optional(),
+        callable: types.enum().optional(),
         optional: types.enum().optional(),
       }))
     // #endregion emptyType

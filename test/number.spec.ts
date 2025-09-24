@@ -6,10 +6,10 @@ describe("number", () => {
     const { schema: numberSchema } =
       // #region numberDefinition
       new Context((types) => ({
-        number: types.number,
-        callable: types.number(),
-        callableOptions: types.number()({ title: "number" }),
-        callableDefault: types.number(4),
+        number: types.number.optional(),
+        callable: types.number.optional(),
+        callableOptions: types.number.optional()({ title: "number" }),
+        callableDefault: types.number.optional(4),
 
         optional: types.number.optional(),
         optionalOptions: types.number.optional()({ title: "number" }),

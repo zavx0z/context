@@ -5,7 +5,7 @@ describe("update", () => {
   it("обновляет только переданные значения", () => {
     const { context, update } = new Context((types) => ({
       name: types.string.required("Гость"),
-      nickname: types.string(),
+      nickname: types.string.optional(),
       age: types.number.optional(),
     }))
 
@@ -141,7 +141,7 @@ describe("update", () => {
   // #region optionalNull
   it("позволяет устанавливать null для optional полей", () => {
     const { context, update } = new Context((types) => ({
-      nickname: types.string(""),
+      nickname: types.string.optional(""),
       age: types.number.optional(4),
       isActive: types.boolean.optional(false),
       tags: types.array.optional([]),
@@ -168,16 +168,16 @@ describe("update", () => {
   it("работает со всеми типами данных", () => {
     const { context, update } = new Context((types) => ({
       title: types.string.required("Заголовок"),
-      description: types.string(),
+      description: types.string.optional(),
       age: types.number.required(18),
-      score: types.number(),
+      score: types.number.optional(),
       isActive: types.boolean.required(true),
-      isVerified: types.boolean(),
+      isVerified: types.boolean.optional(),
       status: types.enum("draft", "published", "archived").required("draft"),
-      category: types.enum("tech", "design", "business")(),
+      category: types.enum("tech", "design", "business").optional(),
       tags: types.array.required<string>([]),
-      permissions: types.array(),
-      flags: types.array(),
+      permissions: types.array.optional(),
+      flags: types.array.optional(),
     }))
 
     update({

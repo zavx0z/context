@@ -7,11 +7,11 @@ describe("массив", () => {
       // #region arrayDefinition
       new Context(
         (types) => ({
-          short: types.array,
+          short: types.array.optional(),
 
-          callable: types.array(),
-          callableOptions: types.array()({ title: "array" }),
-          callableDefault: types.array([1, 2, 3]),
+          callable: types.array.optional(),
+          callableOptions: types.array.optional()({ title: "array" }),
+          callableDefault: types.array.optional([1, 2, 3]),
 
           optional: types.array.optional(),
           optionalOptions: types.array.optional()({ title: "array" }),

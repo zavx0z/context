@@ -3,26 +3,6 @@ import { Context } from "./context"
 
 describe("Определение типов", () => {
   it("optional", () => {
-    const { schema: simpleSchema } =
-      // #region simpleDefinition
-      new Context((types) => ({
-        string: types.string,
-        number: types.number,
-        boolean: types.boolean,
-        array: types.array,
-        enum: types.enum,
-      }))
-    // #endregion simpleDefinition
-    const { schema: simpleSchemaCall } =
-      // #region simpleDefinitionCall
-      new Context((types) => ({
-        string: types.string(),
-        number: types.number(),
-        boolean: types.boolean(),
-        array: types.array(),
-        enum: types.enum(),
-      }))
-    // #endregion simpleDefinitionCall
     const { schema: optionalSchema } =
       // #region optionalDefinition
       new Context((types) => ({
@@ -30,13 +10,10 @@ describe("Определение типов", () => {
         number: types.number.optional(),
         boolean: types.boolean.optional(),
         array: types.array.optional(),
-        enum: types.enum().optional(),
+        enum: types.enum("a", "b", "c").optional(),
       }))
     // #endregion optionalDefinition
-    expect(simpleSchema).toEqual(simpleSchemaCall)
-    expect(simpleSchema).toEqual(optionalSchema)
-    expect(simpleSchemaCall).toEqual(optionalSchema)
-    expect(simpleSchema).toEqual(
+    expect(optionalSchema).toEqual(
       // #region optionalSchema
       {
         string: {
@@ -53,6 +30,7 @@ describe("Определение типов", () => {
         },
         enum: {
           type: "enum",
+          values: ["a", "b", "c"],
         },
       }
       // #endregion optionalSchema
@@ -86,15 +64,15 @@ describe("Определение типов", () => {
       const { schema: defaultValueSchema } =
         // #region defaultValueDefinition
         new Context((types) => ({
-          string: types.string("default"),
-          stringWithoutDefault: types.string(),
-          number: types.number(1),
-          numberWithoutDefault: types.number(),
-          boolean: types.boolean(true),
-          booleanWithoutDefault: types.boolean(),
-          array: types.array([1, 2, 3]),
-          arrayWithoutDefault: types.array(),
-          enum: types.enum("a", "b", "c")("a"),
+          string: types.string.optional("default"),
+          stringWithoutDefault: types.string.optional(),
+          number: types.number.optional(1),
+          numberWithoutDefault: types.number.optional(),
+          boolean: types.boolean.optional(true),
+          booleanWithoutDefault: types.boolean.optional(),
+          array: types.array.optional([1, 2, 3]),
+          arrayWithoutDefault: types.array.optional(),
+          enum: types.enum("a", "b", "c").optional("a"),
         }))
       // #endregion defaultValueDefinition
       expect(defaultValueSchema).toEqual(
@@ -162,11 +140,11 @@ describe("Определение типов", () => {
       const { schema: titleSchema } =
         // #region titleDefinition
         new Context((types) => ({
-          string: types.string()({ title: "string" }),
-          number: types.number()({ title: "number" }),
-          boolean: types.boolean()({ title: "boolean" }),
-          array: types.array()({ title: "array" }),
-          enum: types.enum()()({ title: "enum" }),
+          string: types.string.optional()({ title: "string" }),
+          number: types.number.optional()({ title: "number" }),
+          boolean: types.boolean.optional()({ title: "boolean" }),
+          array: types.array.optional()({ title: "array" }),
+          enum: types.enum("a", "b", "c").optional()({ title: "enum" }),
         }))
       // #endregion titleDefinition
       expect(titleSchema).toEqual(
@@ -176,7 +154,7 @@ describe("Определение типов", () => {
           number: { type: "number", title: "number" },
           boolean: { type: "boolean", title: "boolean" },
           array: { type: "array", title: "array" },
-          enum: { type: "enum", title: "enum" },
+          enum: { type: "enum", title: "enum", values: ["a", "b", "c"] },
         }
       )
     })

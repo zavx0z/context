@@ -6,11 +6,11 @@ describe("boolean", () => {
     const { schema: booleanSchema } =
       // #region booleanDefinition
       new Context((types) => ({
-        short: types.boolean,
+        short: types.boolean.optional(),
 
-        callable: types.boolean(),
-        callableOptions: types.boolean()({ title: "boolean" }),
-        callableDefault: types.boolean(true),
+        callable: types.boolean.optional(),
+        callableOptions: types.boolean.optional()({ title: "boolean" }),
+        callableDefault: types.boolean.optional(true),
 
         optional: types.boolean.optional(),
         optionalOptions: types.boolean.optional()({ title: "boolean" }),

@@ -6,11 +6,11 @@ describe("строка", () => {
     const { schema: stringSchema } =
       // #region stringDefinition
       new Context((types) => ({
-        short: types.string,
+        short: types.string.optional(),
 
-        callable: types.string(),
-        callableOptions: types.string()({ title: "title" }),
-        callableDefault: types.string("default"),
+        callable: types.string.optional(),
+        callableOptions: types.string.optional()({ title: "title" }),
+        callableDefault: types.string.optional("default"),
 
         optional: types.string.optional(),
         optionalOptions: types.string.optional()({ title: "title" }),

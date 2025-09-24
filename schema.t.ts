@@ -102,40 +102,5 @@ export type NormalizeSchema<S> = {
       : N extends "enum"
       ? SchemaType<V extends readonly (string | number)[] ? V[number] : string | number, "enum", R, V>
       : never
-    : S[K] extends {
-        type: infer N extends "string" | "number" | "boolean" | "array" | "enum"
-        required: infer R extends boolean
-      }
-    ? N extends "string"
-      ? SchemaType<string, "string", R>
-      : N extends "number"
-      ? SchemaType<number, "number", R>
-      : N extends "boolean"
-      ? SchemaType<boolean, "boolean", R>
-      : N extends "array"
-      ? SchemaType<(string | number | boolean)[], "array", R>
-      : N extends "enum"
-      ? S[K] extends { values: infer V extends readonly (string | number)[] }
-        ? SchemaType<V[number], "enum", R, V>
-        : SchemaType<string | number, "enum", R, readonly (string | number)[]>
-      : never
     : never
-} extends infer T
-  ? T extends Record<string, SchemaType<any, any, any, any>>
-    ? {
-        [K in keyof T]: T[K] extends SchemaType<infer A, infer N, infer R, infer V>
-          ? N extends "string"
-            ? SchemaType<string, "string", R>
-            : N extends "number"
-            ? SchemaType<number, "number", R>
-            : N extends "boolean"
-            ? SchemaType<boolean, "boolean", R>
-            : N extends "array"
-            ? SchemaType<A, "array", R>
-            : N extends "enum"
-            ? SchemaType<V extends readonly (string | number)[] ? V[number] : string | number, "enum", R, V>
-            : never
-          : never
-      }
-    : never
-  : never
+}

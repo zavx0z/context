@@ -66,7 +66,7 @@ describe("Context: примитивы и плоские массивы", () => {
     // #region onUpdate
     test("обновление значения", () => {
       const { onUpdate, update } = new Context((types) => ({
-        string: types.string,
+        string: types.string.optional(),
         array: types.array.required([0, 1]),
       }))
       onUpdate((updated) => {
