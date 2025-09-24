@@ -6,6 +6,7 @@ import type { Types } from "./types.t"
 export function contextDefinitionToSchema<C extends Schema>(schema: (types: Types) => C): Schema {
   return normalizeSchema(schema(types)) as Schema
 }
+
 export function normalizeSchema<S>(raw: S): NormalizeSchema<S> {
   const out: any = {}
   for (const [k, def] of Object.entries(raw as Record<string, any>)) {

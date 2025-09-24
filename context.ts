@@ -20,29 +20,29 @@ const isFlatPrimitiveArray = (v: unknown): v is Array<string | number | boolean 
 /** Копия массива с заморозкой (элементы — примитивы, так что глубокая не нужна) */
 const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.slice()) as T
 
-/* ----------------------------`--- Базов`ый класс ---------------------------- */
+/* -------------------------------- Контекст -------------------------------- */
 
-/**
- * Базовый класс для контекста
- * @template C - Чистая схема (нормализованная)
- */
-export abstract class ContextBase<C extends Schema> {
+export class Context<S = any, C extends Schema = NormalizeSchema<S>> {
   protected data!: Values<C>
-  /**
-   * @readonly
-   *
-   * {@link Schema | Схема контекста}
-   */
+  /** {@link Schema | Схема контекста} */
   schema!: C
   protected updateSubscribers = new Set<(updated: Partial<Values<C>>) => void>()
-  /**
-   * @readonly
-   * Контекст
-   *
-   * Неизменяемый объект значений контекста.
-   * Для доступа к значениям всего объекта, должна использоваться деструктуризация `{...context}`
-   */
+  /** Иммутабельный объект значений контекста */
   context!: Values<C>
+
+  constructor(schema: S | ((types: Types) => S))
+  constructor(schema: C, options: { raw: true })
+  constructor(schema: any, options?: { raw: true }) {
+    if (options?.raw) {
+      this.schema = schema as C
+    } else {
+      const raw = typeof schema === "function" ? (schema as (t: Types) => S)(types) : (schema as S)
+      const clean = normalizeSchema(raw) as unknown as C
+      this.schema = clean
+    }
+    this.data = {} as Values<C>
+    this.initializeContext(this.schema)
+  }
 
   protected initializeContext(schema: C): void {
     for (const key in schema) {
@@ -186,49 +186,24 @@ export abstract class ContextBase<C extends Schema> {
   }
 }
 
-/* -------------------------------- Реализации -------------------------------- */
-
-export class Context<S, C extends Schema = NormalizeSchema<S>> extends ContextBase<C> {
-  constructor(schema: S | ((types: Types) => S)) {
-    super()
-    const raw = typeof schema === "function" ? (schema as (t: Types) => S)(types) : schema
-
-    const clean = normalizeSchema(raw) as unknown as C
-
-    this.schema = clean
-    this.data = {} as Values<C>
-    this.initializeContext(this.schema)
-  }
-}
-
-/** Внутренний класс для инициализации из готовой схемы без нормализации */
-class RawContext<C extends Schema> extends ContextBase<C> {
-  constructor(schema: C) {
-    super()
-    this.schema = schema
-    this.data = {} as Values<C>
-    this.initializeContext(this.schema)
-  }
-}
-
 /**
- * Создать контекст из готовой схемы (без значений). Схема НЕ нормализуется.
+ * Создать контекст из готовой схемы (без значений). Схема может быть уже нормализована.
  */
-export function fromSchema<C extends Schema>(schema: C): RawContext<C> {
-  return new RawContext<C>(schema)
+export function fromSchema<C extends Schema>(schema: C): Context<C, C> {
+  return new Context<C, C>(schema as unknown as C, { raw: true })
 }
 
 /**
  * Создать контекст из полного снимка (schema + value)
  */
-export function fromSnapshot<C extends Schema>(snapshot: Snapshot<C>): RawContext<C> {
-  // Формируем схему из snapshot без поля value (с сохранением required: false, если присутствует)
+export function fromSnapshot<C extends Schema>(snapshot: Snapshot<C>): Context<C, C> {
+  // Формируем схему из snapshot без поля value
   const schema: any = {}
   for (const [key, snap] of Object.entries(snapshot as any)) {
     const { value: _value, ...rest } = snap as any
     schema[key] = rest
   }
-  const ctx = new RawContext<C>(schema as C)
+  const ctx = new Context<C, C>(schema as C, { raw: true })
   // Восстановим значения через update(), чтобы применились валидации и freeze массивов
   const values: any = {}
   for (const [key, snap] of Object.entries(snapshot as any)) {
