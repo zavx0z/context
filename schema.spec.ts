@@ -1,11 +1,11 @@
 import { describe, it, expect } from "bun:test"
 import { contextSchema } from "./schema"
-import { fromSchema } from "./context"
+import { contextFromSchema } from "./context"
 
 describe("Схема", () => {
   describe("enum values", () => {
     it("должен возвращать оригинальную схему через геттер", () => {
-      const ctx = fromSchema(
+      const ctx = contextFromSchema(
         contextSchema((types) => ({
           name: types.string.required("Иван", { title: "Имя пользователя" }),
           age: types.number.optional(),
@@ -69,7 +69,7 @@ describe("Схема", () => {
     })
 
     it("должен сохранять типизацию схемы", () => {
-      const { schema } = fromSchema(
+      const { schema } = contextFromSchema(
         contextSchema((types) => ({
           name: types.string.required("Иван", { title: "Имя пользователя" }),
           age: types.number.optional(),

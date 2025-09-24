@@ -1,12 +1,12 @@
 import { describe, it, expect } from "bun:test"
 import { contextSchema } from "../schema"
-import { fromSchema } from "../context"
+import { contextFromSchema } from "../context"
 
 describe("массив", () => {
   it("definition", () => {
     const { schema: arraySchema } =
       // #region arrayDefinition
-      fromSchema(
+      contextFromSchema(
         contextSchema(
           (types) => ({
             short: types.array.optional(),
@@ -70,7 +70,7 @@ describe("массив", () => {
     )
   })
   describe("обновление", () => {
-    const { schema, update, context } = fromSchema(
+    const { schema, update, context } = contextFromSchema(
       contextSchema((t) => ({
         array: t.array.required([1, 2, 3]),
       }))

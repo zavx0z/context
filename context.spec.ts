@@ -1,6 +1,6 @@
 import { describe, test, expect } from "bun:test"
 import { contextSchema } from "./schema"
-import { fromSchema } from "./context"
+import { contextFromSchema } from "./context"
 
 // Утилита: безопасно проверить, что операция бросает TypeError (сообщение может отличаться в разных рантаймах)
 function expectThrow(fn: () => unknown) {
@@ -18,7 +18,7 @@ function expectThrow(fn: () => unknown) {
 
 describe("Context: примитивы и плоские массивы", () => {
   test("инициализация по умолчанию (required/optional + array)", () => {
-    const ctx = fromSchema(
+    const ctx = contextFromSchema(
       contextSchema((t) => ({
         name: t.string.required("default", { title: "Имя" }),
         age: t.number.optional(),
@@ -53,7 +53,7 @@ describe("Context: примитивы и плоские массивы", () => {
   })
 
   test("schema сериализация не содержит функций и хранит метаданные", () => {
-    const ctx = fromSchema(
+    const ctx = contextFromSchema(
       contextSchema((t) => ({
         name: t.string.required("default", { title: "Имя" }),
         role: t.enum("user", "admin").required("user"),
@@ -70,7 +70,7 @@ describe("Context: примитивы и плоские массивы", () => {
   describe("onUpdate", () => {
     // #region onUpdate
     test("обновление значения", () => {
-      const { onUpdate, update } = fromSchema(
+      const { onUpdate, update } = contextFromSchema(
         contextSchema((types) => ({
           string: types.string.optional(),
           array: types.array.required([0, 1]),
@@ -85,21 +85,23 @@ describe("Context: примитивы и плоские массивы", () => {
       update({ array: [2, 3, 4] })
     })
     test("без изменений — пусто", () => {
-      const { onUpdate, update } = fromSchema(contextSchema((types) => ({ number: types.number.required(1) })))
+      const { onUpdate, update } = contextFromSchema(contextSchema((types) => ({ number: types.number.required(1) })))
       let count = 0
       onUpdate(() => count++)
       update({})
       expect(count, "обновление не должно быть вызвано").toBe(0)
     })
     test("повтор того же значения — не эмитит", () => {
-      const { onUpdate, update } = fromSchema(contextSchema((types) => ({ number: types.number.required(1) })))
+      const { onUpdate, update } = contextFromSchema(contextSchema((types) => ({ number: types.number.required(1) })))
       let count = 0
       onUpdate(() => count++)
       update({ number: 1 })
       expect(count, "обновление не должно быть вызвано").toBe(0)
     })
     test("отписка от обновлений", () => {
-      const { onUpdate, update, context } = fromSchema(contextSchema((types) => ({ count: types.number.required(0) })))
+      const { onUpdate, update, context } = contextFromSchema(
+        contextSchema((types) => ({ count: types.number.required(0) }))
+      )
       let count = 0
       const unsubscribe = onUpdate(() => count++)
       update({ count: 1 })
@@ -113,7 +115,7 @@ describe("Context: примитивы и плоские массивы", () => {
   })
 
   test("snapshot: содержит схему + актуальные значения", () => {
-    const ctx = fromSchema(
+    const ctx = contextFromSchema(
       contextSchema((t) => ({
         name: t.string.required("default", { title: "Имя" }),
         arr: t.array.required([0, 1]),
@@ -135,7 +137,7 @@ describe("Context: примитивы и плоские массивы", () => {
 
 describe("Защита read-only витрины целиком", () => {
   test("нельзя добавлять/удалять ключи контекста и менять дескрипторы", () => {
-    const ctx = fromSchema(
+    const ctx = contextFromSchema(
       contextSchema((t) => ({
         s: t.string.required("x"),
         arr: t.array.required([1]),

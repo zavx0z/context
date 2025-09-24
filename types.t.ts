@@ -2,82 +2,91 @@ import type { SchemaType } from "./schema.t"
 
 /**
  * # Типы для описания контекста.
+ * 
  * Является фабрикой для создания {@link Schema | схемы контекста}.
+ * Каждый тип предоставляет методы `.optional()` и `.required()` с унифицированным API.
  *
- * > Декларация всех типов однообразна и требует явного указания `.optional()` или `.required()`.
+ * @example Базовое использование
+ * ```ts
+ * const schema = contextSchema((types) => ({
+ *   name: types.string.required("Иван", { title: "Имя" }),
+ *   age: types.number.optional({ title: "Возраст" }),
+ *   tags: types.array.optional({ title: "Теги", data: "user_tags" }),
+ *   role: types.enum("user", "admin").required("user", { id: true })
+ * }))
+ * ```
  *
- * ## Ограничения
- * ----
- * ### Опциональный
- * Опциональные поля {@link Context.update | могут принимать значения } `null`.
- * Определяются только через вызов `.optional()`.
+ * ## Метаданные полей
+ * 
+ * - `title?: string` — заголовок поля для UI
+ * - `id?: true` — только для обязательных примитивов и enum (отметка идентификатора)
+ * - `data?: string` — только для array (имя таблицы/источника данных)
  *
- * ### Обязательный
- * Определяются только через вызов `.required()` и должны иметь значение по умолчанию.
- * {@includeCode ./types.spec.ts#requiredDefinition}
- *
- * ## Значение по умолчанию
- * ----
- * Поддерживается возможность передачи значения по умолчанию для опционального и обязательного поля.
- *
- * ### В опциональном поле
- * {@includeCode ./types.spec.ts#defaultValueDefinition}
- *
- * ### В обязательном поле
- * {@includeCode ./types.spec.ts#requiredDefaultValueDefinition}
- *
- * ### Без значения по умолчанию в обязательном поле
- * Обязательное поле **должно** иметь значение по умолчанию.
- * {@includeCode ./types.spec.ts#withoutDefaultValueDefinition}
- *
- * ## Метаданные
- * ----
- * - `title?: string` — заголовок поля
- * - `id?: true` — только для обязательных примитивов и enum (идентификатор)
- * - `data?: string` — только для array (имя таблицы данных)
- * {@includeCode ./types.spec.ts#titleDefinition}
+ * ## Правила типизации
+ * 
+ * - **Опциональные** поля могут принимать `null` и имеют опциональный default
+ * - **Обязательные** поля всегда должны иметь значение по умолчанию
+ * - Все параметры передаются в одном вызове: `method(default?, options?)`
  */
 
 export type Types = {
   /**
-   * Строковый тип.
-   *
-   * {@includeCode ./test/string.spec.ts#stringDefinition}
+   * Строковый тип. Поддерживает значения по умолчанию и метаданные title, id.
+   * 
+   * @example
+   * ```ts
+   * types.string.required("default", { title: "Имя", id: true })
+   * types.string.optional({ title: "Описание" })
+   * types.string.optional("default")
+   * ```
    */
   string: TypePrimitive<string, "string">
 
   /**
-   * Числовой тип.
-   *
-   * {@includeCode ./test/number.spec.ts#numberDefinition}
+   * Числовой тип. Поддерживает значения по умолчанию и метаданные title, id.
+   * 
+   * @example
+   * ```ts
+   * types.number.required(0, { title: "Возраст", id: true })
+   * types.number.optional({ title: "Счетчик" })
+   * types.number.optional(100)
+   * ```
    */
   number: TypePrimitive<number, "number">
 
   /**
-   * Логический тип.
-   *
-   * {@includeCode ./test/boolean.spec.ts#booleanDefinition}
+   * Логический тип. Поддерживает значения по умолчанию и метаданные title, id.
+   * 
+   * @example
+   * ```ts
+   * types.boolean.required(false, { title: "Активен" })
+   * types.boolean.optional({ title: "Флаг" })
+   * types.boolean.optional(true)
+   * ```
    */
   boolean: TypePrimitive<boolean, "boolean">
 
   /**
-   * Массив примитивов.
-   * Массив плоский и однородный.
-   *
-   * {@includeCode ./test/array.spec.ts#arrayDefinition}
+   * Массив примитивов. Плоский и однородный. Поддерживает метаданные title, data.
+   * 
+   * @example
+   * ```ts
+   * types.array.required<string>([], { title: "Теги", data: "tags" })
+   * types.array.optional<number>({ title: "Значения" })
+   * types.array.optional([1, 2, 3])
+   * ```
    */
   array: TypeArray
 
   /**
-   * Перечисления.
-   *
-   * Перечисления однородные.
-   *
-   * Значения для enum могут отсутствовать. ({@link SchemaType.values | схема})
-   * {@includeCode ./test/enum.spec.ts#emptyType}
-   *
-   * Варианты декларации.
-   * {@includeCode ./test/enum.spec.ts#enumDefinition}
+   * Перечисления. Однородные значения строк или чисел. Значения могут отсутствовать.
+   * 
+   * @example
+   * ```ts
+   * types.enum("user", "admin").required("user", { title: "Роль", id: true })
+   * types.enum(1, 2, 3).optional({ title: "Приоритет" })
+   * types.enum().optional() // без значений
+   * ```
    */
   enum: TypeEnum
 }

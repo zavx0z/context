@@ -1,11 +1,11 @@
 import { describe, it, expect } from "bun:test"
 import { contextSchema } from "../schema"
-import { fromSchema, fromSnapshot } from "../context"
+import { contextFromSchema, contextFromSnapshot } from "../context"
 
 describe("десериализация", () => {
   it("создание из снимка", () => {
     // Создаем оригинальный контекст
-    const originalContext = fromSchema(
+    const originalContext = contextFromSchema(
       contextSchema((types) => ({
         name: types.string.required("Гость"),
         age: types.number.optional(),
@@ -21,7 +21,7 @@ describe("десериализация", () => {
     const snapshot = originalContext.snapshot
 
     // Создаем клон из снимка (через функцию)
-    const clonedContext = fromSnapshot(snapshot)
+    const clonedContext = contextFromSnapshot(snapshot)
 
     // Проверяем, что структура сохранена
     expect(clonedContext.context.name, "имя должно сохраниться").toBe("Иван")
@@ -37,7 +37,7 @@ describe("десериализация", () => {
   })
 
   it("обновление клонированного контекста", () => {
-    const originalContext = fromSchema(
+    const originalContext = contextFromSchema(
       contextSchema((types) => ({
         name: types.string.required("Гость"),
         age: types.number.optional(),
@@ -46,8 +46,8 @@ describe("десериализация", () => {
 
     const snapshot = originalContext.schema
     const valuesSnapshot = originalContext.context
-    const clonedContext = fromSchema(snapshot)
-    clonedContext.update(valuesSnapshot as any)
+    const clonedContext = contextFromSchema(snapshot)
+    clonedContext.update(valuesSnapshot)
 
     // Обновляем клонированный контекст
     const updated = clonedContext.update({ name: "Новое имя", age: 30 })
@@ -59,10 +59,10 @@ describe("десериализация", () => {
   })
 
   it("пустой снимок", () => {
-    const emptySnapshot = {} as any
-    const clonedContext = fromSchema(emptySnapshot)
+    const emptySnapshot = {}
+    const clonedContext = contextFromSchema(emptySnapshot)
 
-    expect(clonedContext.context as any, "пустой контекст должен быть пустым объектом").toEqual({})
+    expect(clonedContext.context, "пустой контекст должен быть пустым объектом").toEqual({})
     expect(clonedContext.schema, "пустая схема должна быть пустым объектом").toEqual({})
   })
 
@@ -89,7 +89,7 @@ describe("десериализация", () => {
       },
     }
 
-    const clonedContext = fromSchema(schema)
+    const clonedContext = contextFromSchema(schema)
 
     expect(clonedContext.schema.name.type, "тип должен сохраниться").toBe("string")
     expect(clonedContext.schema.name.required, "required должен сохраниться").toBe(true)
@@ -107,14 +107,14 @@ describe("десериализация", () => {
   })
 
   it("подписка на обновления", () => {
-    const originalContext = fromSchema(
+    const originalContext = contextFromSchema(
       contextSchema((types) => ({
         name: types.string.required("Гость"),
       }))
     )
 
     const snapshot = originalContext.snapshot
-    const clonedContext = fromSnapshot(snapshot)
+    const clonedContext = contextFromSnapshot(snapshot)
 
     let updateCount = 0
     let lastUpdate: any = null

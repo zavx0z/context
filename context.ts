@@ -19,9 +19,21 @@ const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.s
 /* -------------------------------- Контекст -------------------------------- */
 
 /**
- * Создает контекст из схемы
+ * Создает контекст из готовой схемы.
+ *
+ * @param schema - Схема контекста
+ * @returns Функциональный контекст с методами update, onUpdate и иммутабельным доступом
+ *
+ * @example
+ * ```ts
+ * const schema = contextSchema((t) => ({
+ *   name: t.string.required("Гость", { title: "Имя" }),
+ *   age: t.number.optional()
+ * }))
+ * const ctx = contextFromSchema(schema)
+ * ```
  */
-function createContextFromSchema<C extends Schema>(schema: C): Context<C> {
+export function contextFromSchema<C extends Schema>(schema: C): Context<C> {
   // Приватные данные контекста (замыкание)
   const data = {} as Values<C>
   const updateSubscribers = new Set<(updated: Partial<Values<C>>) => void>()
@@ -179,23 +191,25 @@ function createContextFromSchema<C extends Schema>(schema: C): Context<C> {
 }
 
 /**
- * Создает контекст из схемы.
+ * Создает контекст из полного снимка (схема + текущие значения).
+ *
+ * @param snapshot - Снимок контекста с метаданными и значениями
+ * @returns Контекст, восстановленный с сохранёнными значениями
+ *
+ * @example
+ * ```ts
+ * const snapshot = ctx.snapshot
+ * const restored = contextFromSnapshot(snapshot)
+ * ```
  */
-export function fromSchema<C extends Schema>(schema: C): Context<C> {
-  return createContextFromSchema(schema)
-}
-
-/**
- * Создает контекст из снимка.
- */
-export function fromSnapshot<C extends Schema>(snapshot: Snapshot<C>): Context<C> {
+export function contextFromSnapshot<C extends Schema>(snapshot: Snapshot<C>): Context<C> {
   // Формируем схему из snapshot без поля value
   const schema: any = {}
   for (const [key, snap] of Object.entries(snapshot as any)) {
     const { value: _value, ...rest } = snap as any
     schema[key] = rest
   }
-  const ctx = createContextFromSchema(schema as C)
+  const ctx = contextFromSchema(schema as C)
   // Восстановим значения через update(), чтобы применились валидации и freeze массивов
   const values: any = {}
   for (const [key, snap] of Object.entries(snapshot as any)) {

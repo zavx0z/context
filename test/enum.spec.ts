@@ -1,13 +1,13 @@
 import { describe, it, expect } from "bun:test"
 import { contextSchema } from "../schema"
-import { fromSchema } from "../context"
+import { contextFromSchema } from "../context"
 
 describe("enum", () => {
   it("варианты декларации", () => {
     const { schema } =
       // prettier-ignore
       // #region enumDefinition
-      fromSchema(contextSchema((types) => ({
+      contextFromSchema(contextSchema((types) => ({
           short: types.enum().optional(),
 
           callable: types.enum().optional(),
@@ -74,7 +74,7 @@ describe("enum", () => {
   it("значения отсутствуют", () => {
     const { context, schema, snapshot } =
       // #region emptyType
-      fromSchema(
+      contextFromSchema(
         contextSchema((types) => ({
           short: types.enum().optional(),
           callable: types.enum().optional(),
@@ -125,7 +125,7 @@ describe("enum", () => {
       // #endregion emptySnapshot
     )
   })
-  const { context, update } = fromSchema(
+  const { context, update } = contextFromSchema(
     contextSchema((types) => ({
       role: types.enum("user", "admin").required("user"),
     }))

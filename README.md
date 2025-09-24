@@ -27,21 +27,25 @@ bun add @zavx0z/context
 ## Быстрый пример
 
 ```ts
-import { contextSchema, types } from "@zavx0z/context"
+import { fromSchema, contextSchema } from "@zavx0z/context"
 
-const ctx = contextSchema((t) => ({
+// 1. Создаём схему
+const schema = contextSchema((t) => ({
   // обязательные примитивы/enum — могут быть помечены как идентификаторы
-  id: t.string.required("1")({ title: "ID", id: true }),
-  role: t.enum("user", "admin").required("user")({ id: true }),
+  id: t.string.required("1", { title: "ID", id: true }),
+  role: t.enum("user", "admin").required("user", { id: true }),
 
   // обычные поля
-  name: t.string.required("Гость")({ title: "Имя" }),
-  age: t.number.optional()({ title: "Возраст" }),
+  name: t.string.required("Гость", { title: "Имя" }),
+  age: t.number.optional({ title: "Возраст" }),
   isActive: t.boolean.required(true),
 
   // массивы — можно указывать имя источника данных (таблицы)
-  tags: t.array.required<string>([])({ title: "Теги", data: "tags" }),
+  tags: t.array.required<string>([], { title: "Теги", data: "tags" }),
 }))
+
+// 2. Создаём контекст из схемы
+const ctx = contextFromSchema(schema)
 
 // чтение — только через иммутабельный снимок
 console.log(ctx.context.name) // "Гость"
@@ -78,19 +82,18 @@ off()
 
 ---
 
-## Снимки и клонирование
+## Снимки и создание контекста
 
 ```ts
 // Снимок с метаданными и текущими value
 const full = ctx.snapshot
 
-// Сериализуемая схема (без текущих value)
+// Схема (без текущих value)
 const schemaSnap = ctx.schema
 
-// Восстановление/клонирование
-import { fromSchema, fromSnapshot } from "@zavx0z/context"
-const cloneA = fromSchema(ctx.schema)
-const cloneB = fromSnapshot(ctx.snapshot)
+// Создание контекста
+const contextA = contextFromSchema(ctx.schema) // из схемы
+const contextB = contextFromSnapshot(ctx.snapshot) // из полного снимка
 ```
 
 ---
@@ -99,27 +102,30 @@ const cloneB = fromSnapshot(ctx.snapshot)
 
 ### `contextSchema((types) => schema)`
 
-Создает контекст по фабрике схемы. Доступные фабрики: `types.string`, `types.number`, `types.boolean`, `types.array`, `types.enum(...values)`.
+Создает схему контекста. Для создания полного контекста используйте `contextFromSchema()`.
 
-- Примитивы и enum: `.required(default).({ title?, id? })`, `.optional(default?).({ title? })`
-- Массивы: `.required(default[]).({ title?, data? })`, `.optional(default[]?).({ title?, data? })`
+**Доступные фабрики:** `types.string`, `types.number`, `types.boolean`, `types.array`, `types.enum(...values)`.
 
-### Свойства и методы
+- Примитивы и enum: `.required(default, { title?, id? })`, `.optional(default?, { title? })`
+- Массивы: `.required(default[], { title?, data? })`, `.optional(default[]?, { title?, data? })`
+
+### `contextFromSchema(schema)` / `contextFromSnapshot(snapshot)`
+
+Создание контекста из схемы или полного снимка. Возвращает объект с методами:
 
 - `context` — иммутабельный доступ к значениям (только для чтения)
-- `schema` — сериализованная схема (типы, required, default, title, values?, id?, data?)
+- `schema` — схема (типы, required, default, title, values?, id?, data?)
 - `update(values)` → `Partial<Values>` — только реально изменённые поля
 - `onUpdate(cb)` → `() => void` — отписка
 - `snapshot` (геттер) → `{ [key]: { type, required, default?, title?, values?, id?, data?, value } }`
-- `fromSchema(schema)` / `fromSnapshot(snapshot)` — создание контекста из схемы или полного снимка
 
 ---
 
 ## Экспорты
 
 ```ts
-import { Context, fromSchema, fromSnapshot, types } from "@zavx0z/context"
-import type { Schema, Values, Snapshot, Update } from "@zavx0z/context"
+import { contextFromSchema, contextFromSnapshot, contextSchema } from "@zavx0z/context"
+import type { Context, Schema, Values, Snapshot, Update } from "@zavx0z/context"
 ```
 
 ---

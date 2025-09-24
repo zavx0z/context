@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test"
 import { contextSchema } from "../schema"
-import { fromSchema } from "../context"
+import { contextFromSchema } from "../context"
 
 describe("update", () => {
   it("обновляет только переданные значения", () => {
-    const { context, update } = fromSchema(
+    const { context, update } = contextFromSchema(
       contextSchema((types) => ({
         name: types.string.required("Гость"),
         nickname: types.string.optional(),
@@ -24,7 +24,7 @@ describe("update", () => {
   })
   // #region undefined
   it("игнорирует undefined значения", () => {
-    const { context, update } = fromSchema(
+    const { context, update } = contextFromSchema(
       contextSchema((types) => ({
         name: types.string.required("Гость"),
       }))
@@ -36,7 +36,7 @@ describe("update", () => {
   // #endregion undefined
   // #region requiredNull
   describe("не позволяет устанавливать null для required полей", () => {
-    const { context, update } = fromSchema(
+    const { context, update } = contextFromSchema(
       contextSchema((types) => ({
         name: types.string.required("Гость"),
         age: types.number.required(18),
@@ -74,7 +74,7 @@ describe("update", () => {
   // #endregion requiredNull
   // #region arrayErrors
   describe("валидация массивов", () => {
-    const { context, update } = fromSchema(
+    const { context, update } = contextFromSchema(
       contextSchema((types) => ({
         tags: types.array.required([]),
         items: types.array.optional([]),
@@ -103,7 +103,7 @@ describe("update", () => {
   // #endregion arrayErrors
   // #region primitiveErrors
   describe("валидация примитивных полей", () => {
-    const { context, update } = fromSchema(
+    const { context, update } = contextFromSchema(
       contextSchema((types) => ({
         name: types.string.required("test"),
         age: types.number.required(18),
@@ -129,7 +129,7 @@ describe("update", () => {
   // #endregion primitiveErrors
   // #region enumErrors
   describe("валидация enum полей", () => {
-    const { context, update } = fromSchema(
+    const { context, update } = contextFromSchema(
       contextSchema((types) => ({
         role: types.enum("user", "admin").required("user"),
         status: types.enum("active", "inactive").optional("active"),
@@ -153,7 +153,7 @@ describe("update", () => {
   // #endregion enumErrors
   // #region optionalNull
   it("позволяет устанавливать null для optional полей", () => {
-    const { context, update } = fromSchema(
+    const { context, update } = contextFromSchema(
       contextSchema((types) => ({
         nickname: types.string.optional(""),
         age: types.number.optional(4),
@@ -181,7 +181,7 @@ describe("update", () => {
   // #endregion optionalNull
 
   it("работает со всеми типами данных", () => {
-    const { context, update } = fromSchema(
+    const { context, update } = contextFromSchema(
       contextSchema((types) => ({
         title: types.string.required("Заголовок"),
         description: types.string.optional(),
@@ -225,7 +225,7 @@ describe("update", () => {
   })
 
   it("возвращает обновленный контекст", () => {
-    const { update } = fromSchema(
+    const { update } = contextFromSchema(
       contextSchema((types) => ({
         name: types.string.required("Гость"),
         status: types.enum("start", "process", "end").required("start"),
@@ -245,7 +245,7 @@ describe("update", () => {
   })
 
   it("сохраняет иммутабельность после обновления", () => {
-    const { context, update } = fromSchema(
+    const { context, update } = contextFromSchema(
       contextSchema((types) => ({
         name: types.string.required("Гость"),
         status: types.enum("start", "process", "end").required("start"),

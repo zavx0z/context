@@ -1,12 +1,12 @@
 import { describe, it, expect } from "bun:test"
-import { fromSchema } from "./context"
+import { contextFromSchema } from "./context"
 import { contextSchema } from "./schema"
 
 describe("Определение типов", () => {
   it("optional", () => {
     const { schema: optionalSchema } =
       // #region optionalDefinition
-      fromSchema(
+      contextFromSchema(
         contextSchema((types) => ({
           string: types.string.optional(),
           number: types.number.optional(),
@@ -42,7 +42,7 @@ describe("Определение типов", () => {
   it("required", () => {
     const { schema: requiredSchema } =
       // #region requiredDefinition
-      fromSchema(
+      contextFromSchema(
         contextSchema((types) => ({
           string: types.string.required("default"),
           number: types.number.required(1),
@@ -68,7 +68,7 @@ describe("Определение типов", () => {
     it("optional", () => {
       const { schema: defaultValueSchema } =
         // #region defaultValueDefinition
-        fromSchema(
+        contextFromSchema(
           contextSchema((types) => ({
             string: types.string.optional("default"),
             stringWithoutDefault: types.string.optional(),
@@ -101,7 +101,7 @@ describe("Определение типов", () => {
     it("required", () => {
       const { schema: requiredDefaultValueSchema } =
         // #region requiredDefaultValueDefinition
-        fromSchema(
+        contextFromSchema(
           contextSchema((types) => ({
             string: types.string.required("default"),
             number: types.number.required(1),
@@ -128,7 +128,7 @@ describe("Определение типов", () => {
       expect(
         () =>
           // #region withoutDefaultValueDefinition
-          fromSchema(
+          contextFromSchema(
             contextSchema((types) => ({
               // @ts-expect-error - TypeScript запрещает null для required string
               string: types.string.required(),
@@ -150,7 +150,7 @@ describe("Определение типов", () => {
     it("title", () => {
       const { schema: titleSchema } =
         // #region titleDefinition
-        fromSchema(
+        contextFromSchema(
           contextSchema((types) => ({
             string: types.string.optional({ title: "string" }),
             number: types.number.optional({ title: "number" }),
@@ -172,7 +172,7 @@ describe("Определение типов", () => {
       )
     })
     it("id и data", () => {
-      const { schema } = fromSchema(
+      const { schema } = contextFromSchema(
         contextSchema((types) => ({
           idString: types.string.required("ID", { id: true, title: "ID String" }),
           idEnum: types.enum("u", "a").required("u", { id: true }),

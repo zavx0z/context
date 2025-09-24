@@ -70,19 +70,54 @@ export type ExtractValue<E> = E extends SchemaType<infer T, infer N, infer R, in
     : T | null
   : never
 
+/**
+ * Основной интерфейс контекста. Предоставляет типобезопасный доступ к схеме и значениям,
+ * контролируемые обновления и подписки на изменения.
+ *
+ * @template C - Тип схемы контекста
+ *
+ * @example Создание и использование контекста
+ * ```ts
+ * const ctx = fromSchema(contextSchema((t) => ({
+ *   name: t.string.required("Гость", { title: "Имя" }),
+ *   age: t.number.optional()
+ * })))
+ *
+ * // чтение через иммутабельный объект
+ * console.log(ctx.context.name) // "Гость"
+ *
+ * // обновление с возвратом изменённых полей
+ * const changed = ctx.update({ name: "Иван", age: 25 })
+ *
+ * // подписка на обновления
+ * const unsubscribe = ctx.onUpdate((updated) => {
+ *   console.log("Changed:", updated)
+ * })
+ * ```
+ */
 export interface Context<C extends Schema> {
-  /** {@link Schema | Схема контекста} */
+  /** Схема контекста с метаданными полей */
   schema: C
-  /** Иммутабельный объект значений контекста */
+
+  /** Иммутабельный объект значений контекста (только для чтения) */
   context: Values<C>
-  /** {@link Update | Обновление значений контекста} */
-  update: (values: Partial<Values<C>>) => Partial<Values<C>>
+
   /**
-   * Подписка на обновления контекста
+   * Обновляет значения контекста. Возвращает только реально изменённые поля.
    *
-   * {@includeCode ./context.spec.ts#onUpdate}
+   * @param values - Частичное обновление значений
+   * @returns Объект с изменёнными полями
+   */
+  update: (values: Partial<Values<C>>) => Partial<Values<C>>
+
+  /**
+   * Подписка на обновления контекста.
+   *
+   * @param callback - Функция, вызываемая при изменениях
+   * @returns Функция отписки
    */
   onUpdate: (callback: (updated: Partial<Values<C>>) => void) => () => void
-  /** {@inheritDoc Snapshot} */
+
+  /** Полный снимок контекста с метаданными и текущими значениями */
   snapshot: Snapshot<C>
 }
