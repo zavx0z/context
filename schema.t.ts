@@ -41,6 +41,16 @@ export interface SchemaType<
    * {@includeCode ./test/enum.spec.ts#emptySchema}
    */
   values?: V
+  /**
+   * **Флаг идентификатора** (только для примитивов и enum которые являются обязательными)
+   *
+   * @remarks Позволяет пометить поле как идентификатор (id)
+   */
+  id?: true
+  /**
+   * **Имя таблицы данных** (только для array)
+   */
+  data?: string
 }
 
 /**

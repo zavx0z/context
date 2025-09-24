@@ -158,5 +158,24 @@ describe("Определение типов", () => {
         }
       )
     })
+    it("id и data", () => {
+      const { schema } = new Context((types) => ({
+        idString: types.string.required("ID")({ id: true, title: "ID String" }),
+        idEnum: types.enum("u", "a").required("u")({ id: true }),
+        dataArray: types.array.required([1])({ data: "users", title: "Users" }),
+        plainArray: types.array.optional()({ data: "logs" }),
+        // опциональные поля не могут иметь id
+        optionalString: types.string.optional()({ title: "opt" }),
+        optionalEnum: types.enum("x", "y").optional()({ title: "opt" }),
+      }))
+      expect(schema).toEqual({
+        idString: { type: "string", required: true, default: "ID", title: "ID String", id: true },
+        idEnum: { type: "enum", required: true, default: "u", values: ["u", "a"], id: true },
+        dataArray: { type: "array", required: true, default: [1], title: "Users", data: "users" },
+        plainArray: { type: "array", data: "logs" },
+        optionalString: { type: "string", title: "opt" },
+        optionalEnum: { type: "enum", title: "opt", values: ["x", "y"] },
+      })
+    })
   })
 })

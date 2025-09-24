@@ -9,20 +9,27 @@ function makePrimitiveType<TName extends "string" | "number" | "boolean", Req ex
 }
 
 function createTypeWithRequiredOptional<TName extends "string" | "number" | "boolean">(type: TName) {
-  return {
-    required: <D>(defaultValue?: D) => makePrimitiveType(type, true, defaultValue),
-    optional: <D>(defaultValue?: D) => makePrimitiveType(type, false, defaultValue),
+  const required = <D>(defaultValue?: D) => {
+    const base = {
+      type,
+      required: true as const,
+      ...(defaultValue !== undefined && { default: defaultValue }),
+    } as const
+    const configurator = (options: { title?: string; id?: true } = {}) => ({ ...base, ...options })
+    return Object.assign(configurator, base)
   }
+  const optional = <D>(defaultValue?: D) => makePrimitiveType(type, false, defaultValue)
+  return Object.assign(optional, { required, optional }, { type: type })
 }
 
 const createArrayType = {
-  required: <T extends string | number | boolean>(defaultValue: T[]) => {
+  required: <T extends string | number | boolean>(defaultValue?: T[]) => {
     const base = {
       type: "array" as const,
       required: true,
       default: defaultValue,
     } as const
-    const configurator = (options: { title?: string } = {}) => ({ ...base, ...options })
+    const configurator = (options: { title?: string; data?: string } = {}) => ({ ...base, ...options })
     return Object.assign(configurator, base)
   },
   optional: <T extends string | number | boolean>(defaultValue?: T[]) => {
@@ -30,7 +37,7 @@ const createArrayType = {
       type: "array" as const,
       ...(defaultValue !== undefined && { default: defaultValue }),
     } as const
-    const configurator = (options: { title?: string } = {}) => ({ ...base, ...options })
+    const configurator = (options: { title?: string; data?: string } = {}) => ({ ...base, ...options })
     return Object.assign(configurator, base)
   },
 }
@@ -43,7 +50,7 @@ const createEnumType = <const T extends readonly (string | number)[]>(...values:
       default: defaultValue,
       values,
     } as const
-    const configurator = (options: { title?: string } = {}) => ({ ...base, ...options })
+    const configurator = (options: { title?: string; id?: true } = {}) => ({ ...base, ...options })
     return Object.assign(configurator, base)
   },
   optional: (defaultValue?: T[number]) => {
@@ -62,5 +69,13 @@ export const types = {
   number: createTypeWithRequiredOptional("number"),
   boolean: createTypeWithRequiredOptional("boolean"),
   array: createArrayType,
-  enum: createEnumType,
+  enum: Object.assign(
+    <const T extends readonly (string | number)[]>(...values: T) => {
+      const enumBase = createEnumType(...values)
+      return Object.assign((defaultValue?: T[number]) => enumBase.optional(defaultValue), enumBase, {
+        type: "enum",
+      })
+    },
+    { type: "enum" }
+  ),
 }

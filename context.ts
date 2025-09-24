@@ -177,8 +177,10 @@ export abstract class ContextBase<C extends Schema> {
         ...(value.default && value.default !== undefined && { default: value.default }),
         ...(value.title && { title: value.title }),
         ...(value.values && { values: value.values }),
+        ...(value.id && { id: true }),
+        ...(value.data && { data: value.data }),
         value: this.context[key as keyof C],
-      }
+      } as any
     }
     return context
   }

@@ -30,11 +30,17 @@ bun add @zavx0z/context
 import { Context, types } from "@zavx0z/context"
 
 const ctx = new Context((t) => ({
+  // обязательные примитивы/enum — могут быть помечены как идентификаторы
+  id: t.string.required("1")({ title: "ID", id: true }),
+  role: t.enum("user", "admin").required("user")({ id: true }),
+
+  // обычные поля
   name: t.string.required("Гость")({ title: "Имя" }),
   age: t.number.optional()({ title: "Возраст" }),
   isActive: t.boolean.required(true),
-  role: t.enum("user", "admin", "moderator").required("user"),
-  tags: t.array.required([])({ title: "Теги" }),
+
+  // массивы — можно указывать имя источника данных (таблицы)
+  tags: t.array.required<string>([])({ title: "Теги", data: "tags" }),
 }))
 
 // чтение — только через иммутабельный снимок
@@ -49,7 +55,7 @@ ctx.update({ tags: ["важно", "срочно"] }) // { tags: ["важно", "
 
 // подписка на обновления
 const off = ctx.onUpdate((updated) => {
-  console.log("changed:", updated) // например: { age: 30 }
+  console.log("changed:", updated)
 })
 off()
 ```
@@ -58,13 +64,17 @@ off()
 
 ## Ключевые возможности
 
-- **Типизированные схемы** (`string`, `number`, `boolean`, `array`, `enum`).
-- **Chainable-опции** для полей (например, `{ title: "Имя" }`).
-- **Иммутабельный доступ** к значениям: прямое присваивание запрещено.
-- **Поддержка плоских массивов** примитивов с автоматической заморозкой.
-- `update(values)` **игнорирует** `undefined` и **возвращает только изменённые** ключи.
-- `onUpdate(cb)` — подписка передаёт `updated: Partial<Values>`.
-- Заголовки полей доступны через `schema`.
+- **Типизированные схемы** (`string`, `number`, `boolean`, `array`, `enum`)
+- **Chainable-опции** для полей (например, `{ title: "Имя" }`)
+- **Метаданные**:
+  - `title?: string` — заголовок
+  - `id?: true` — только для обязательных примитивов и enum (отмечает поле как идентификатор)
+  - `data?: string` — только для `array` (имя таблицы/источника данных)
+- **Иммутабельный доступ** к значениям: прямое присваивание запрещено
+- **Поддержка плоских массивов** примитивов с автоматической заморозкой
+- `update(values)` **игнорирует** `undefined` и **возвращает только изменённые** ключи
+- `onUpdate(cb)` — подписка передаёт `updated: Partial<Values>`
+- Заголовки и метаданные доступны через `schema`
 
 ---
 
@@ -90,24 +100,26 @@ clone.restoreValues(ctx.context)
 ### `new Context((types) => schema)`
 
 Создает контекст по фабрике схемы. Доступные фабрики: `types.string`, `types.number`, `types.boolean`, `types.array`, `types.enum(...values)`.
-У каждой есть `.required(default?)` и `.optional(default?)` + chainable-настройки (напр. `{ title: string }`).
+
+- Примитивы и enum: `.required(default).({ title?, id? })`, `.optional(default?).({ title? })`
+- Массивы: `.required(default[]).({ title?, data? })`, `.optional(default[]?).({ title?, data? })`
 
 ### Свойства и методы
 
-- `context` — иммутабельный доступ к значениям (только для чтения).
-- `schema` — сериализованная схема (типы, required, default, title, values?).
-- `update(values)` → `Partial<Values>` — только реально изменённые поля.
-- `onUpdate(cb)` → `() => void` — отписка.
-- `snapshot` (геттер) → `{ [key]: { type, required, default?, title?, values?, value } }`.
-- `ContextClone.fromSnapshot(schema)` → `ContextClone`.
-- `clone.restoreValues(values)`.
+- `context` — иммутабельный доступ к значениям (только для чтения)
+- `schema` — сериализованная схема (типы, required, default, title, values?, id?, data?)
+- `update(values)` → `Partial<Values>` — только реально изменённые поля
+- `onUpdate(cb)` → `() => void` — отписка
+- `snapshot` (геттер) → `{ [key]: { type, required, default?, title?, values?, id?, data?, value } }`
+- `ContextClone.fromSnapshot(schema)` → `ContextClone`
+- `clone.restoreValues(values)`
 
 ---
 
 ## Экспорты
 
 ```ts
-import { Context, types } from "@zavx0z/context"
+import { Context, ContextClone, types } from "@zavx0z/context"
 import type { Schema, Values, Snapshot, Update } from "@zavx0z/context"
 ```
 

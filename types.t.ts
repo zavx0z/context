@@ -10,12 +10,10 @@ import type { SchemaType } from "./schema.t"
  * ----
  * ### Опциональный
  * Опциональные поля {@link Context.update | могут принимать значения } `null`.
- * Определяется через явный вызов `.optional()`:
- * {@includeCode ./types.spec.ts#optionalDefinition}
+ * Определяются только через вызов `.optional()`.
  *
  * ### Обязательный
- * Обязательные поля не могут быть `null` и должны иметь значение по умолчанию.
- * Определяется через явный вызов `.required()`:
+ * Определяются только через вызов `.required()` и должны иметь значение по умолчанию.
  * {@includeCode ./types.spec.ts#requiredDefinition}
  *
  * ## Значение по умолчанию
@@ -34,7 +32,9 @@ import type { SchemaType } from "./schema.t"
  *
  * ## Метаданные
  * ----
- * ### Заголовок
+ * - `title?: string` — заголовок поля
+ * - `id?: true` — только для обязательных примитивов и enum (идентификатор)
+ * - `data?: string` — только для array (имя таблицы данных)
  * {@includeCode ./types.spec.ts#titleDefinition}
  */
 
@@ -89,16 +89,18 @@ export interface TypePrimitive<T extends string | number | boolean, N extends "s
 
   required: <D extends T>(
     defaultValue: D
-  ) => ((options?: { title?: string }) => SchemaType<T, N, true>) & SchemaType<T, N, true>
+  ) => ((options?: { title?: string; id?: true }) => SchemaType<T, N, true>) & SchemaType<T, N, true>
 }
 
 export type TypeArray = {
   optional: <T extends string | number | boolean>(
     defaultValue?: T[]
-  ) => SchemaType<T[], "array", false> & ((options?: { title?: string }) => SchemaType<T[], "array", false>)
+  ) => SchemaType<T[], "array", false> &
+    ((options?: { title?: string; data?: string }) => SchemaType<T[], "array", false>)
   required: <T extends string | number | boolean>(
     defaultValue: T[]
-  ) => SchemaType<T[], "array", true> & ((options?: { title?: string }) => SchemaType<T[], "array", true>)
+  ) => SchemaType<T[], "array", true> &
+    ((options?: { title?: string; data?: string }) => SchemaType<T[], "array", true>)
 }
 
 export type TypeEnum = <const T extends readonly (string | number)[]>(
@@ -111,5 +113,5 @@ export type TypeEnum = <const T extends readonly (string | number)[]>(
   required: (
     defaultValue: T[number]
   ) => SchemaType<string | number, "enum", true, T> &
-    ((options?: { title?: string }) => SchemaType<string | number, "enum", true, T>)
+    ((options?: { title?: string; id?: true }) => SchemaType<string | number, "enum", true, T>)
 }
