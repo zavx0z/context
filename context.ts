@@ -1,24 +1,5 @@
-import type { Snapshot, Values } from "./context.t"
+import type { Context, Snapshot, Values } from "./context.t"
 import type { Schema } from "./schema.t"
-
-/* --------------------------------- Типы ----------------------------------- */
-
-export interface Context<C extends Schema> {
-  /** {@link Schema | Схема контекста} */
-  schema: C
-  /** Иммутабельный объект значений контекста */
-  context: Values<C>
-  /** {@link Update | Обновление значений контекста} */
-  update: (values: Partial<Values<C>>) => Partial<Values<C>>
-  /**
-   * Подписка на обновления контекста
-   *
-   * {@includeCode ./context.spec.ts#onUpdate}
-   */
-  onUpdate: (callback: (updated: Partial<Values<C>>) => void) => () => void
-  /** {@inheritDoc Snapshot} */
-  snapshot: Snapshot<C>
-}
 
 /* ------------------------------- утилиты ---------------------------------- */
 
@@ -38,7 +19,7 @@ const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.s
 /* -------------------------------- Контекст -------------------------------- */
 
 /**
- * Создает функциональный контекст из нормализованной схемы
+ * Создает контекст из схемы
  */
 function createContextFromSchema<C extends Schema>(schema: C): Context<C> {
   // Приватные данные контекста (замыкание)
@@ -198,14 +179,14 @@ function createContextFromSchema<C extends Schema>(schema: C): Context<C> {
 }
 
 /**
- * Создать контекст из готовой схемы (без значений). Схема может быть уже нормализована.
+ * Создает контекст из схемы.
  */
 export function fromSchema<C extends Schema>(schema: C): Context<C> {
   return createContextFromSchema(schema)
 }
 
 /**
- * Создать контекст из полного снимка (schema + value)
+ * Создает контекст из снимка.
  */
 export function fromSnapshot<C extends Schema>(snapshot: Snapshot<C>): Context<C> {
   // Формируем схему из snapshot без поля value

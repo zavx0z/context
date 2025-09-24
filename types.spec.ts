@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test"
-import { contextSchema } from "./schema"
 import { fromSchema } from "./context"
+import { contextSchema } from "./schema"
 
 describe("Определение типов", () => {
   it("optional", () => {
@@ -178,8 +178,8 @@ describe("Определение типов", () => {
           idEnum: types.enum("u", "a").required("u", { id: true }),
           dataArray: types.array.required([1], { data: "users", title: "Users" }),
           plainArray: types.array.optional({ data: "logs" }),
-          // опциональные поля не могут иметь id
-          optionalString: types.string.optional({ title: "opt" }),
+          // @ts-expect-error опциональные поля не могут иметь id
+          optionalString: types.string.optional({ title: "opt", id: "identifier" }),
           optionalEnum: types.enum("x", "y").optional({ title: "opt" }),
         }))
       )

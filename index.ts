@@ -7,8 +7,8 @@
  * - {@link fromSnapshot | Создание контекста из снимка}
  *
  * ## Функциональность
- * - {@link ContextObject.update | Обновление значений контекста}
- * - {@link ContextObject.onUpdate | Подписка на обновления значений контекста}
+ * - {@link Context.update | Обновление значений контекста}
+ * - {@link Context.onUpdate | Подписка на обновления значений контекста}
  * - {@link ToDo.editSchema | Редактирование схемы контекста}
  *
  * ## Входные параметры
@@ -34,7 +34,7 @@ export enum ToDo {
 
 export { fromSchema, fromSnapshot } from "./context"
 export { contextSchema } from "./schema"
-export type { Context as ContextObject } from "./context"
+export type { Context } from "./context.t"
 export { types } from "./types"
 export type { Types } from "./types.t"
 export type { Values, Snapshot, Update } from "./context.t"

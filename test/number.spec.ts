@@ -3,7 +3,7 @@ import { contextSchema } from "../schema"
 
 describe("number", () => {
   it("number", () => {
-    const numberSchema =
+    const schema =
       // #region numberDefinition
       contextSchema((types) => ({
         number: types.number.optional(),
@@ -20,7 +20,7 @@ describe("number", () => {
       }))
     // #endregion numberDefinition
 
-    expect(numberSchema).toEqual(
+    expect(schema).toEqual(
       // #region numberSchema
       {
         number: { type: "number" },

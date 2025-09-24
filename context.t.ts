@@ -69,3 +69,20 @@ export type ExtractValue<E> = E extends SchemaType<infer T, infer N, infer R, in
     ? T
     : T | null
   : never
+
+export interface Context<C extends Schema> {
+  /** {@link Schema | Схема контекста} */
+  schema: C
+  /** Иммутабельный объект значений контекста */
+  context: Values<C>
+  /** {@link Update | Обновление значений контекста} */
+  update: (values: Partial<Values<C>>) => Partial<Values<C>>
+  /**
+   * Подписка на обновления контекста
+   *
+   * {@includeCode ./context.spec.ts#onUpdate}
+   */
+  onUpdate: (callback: (updated: Partial<Values<C>>) => void) => () => void
+  /** {@inheritDoc Snapshot} */
+  snapshot: Snapshot<C>
+}
