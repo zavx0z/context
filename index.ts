@@ -2,11 +2,13 @@
  * @packageDocumentation
  *
  * ## Точка входа
- * - {@link Context | Конструктор контекста}
+ * - {@link contextSchema | Создание контекста из функции-схемы}
+ * - {@link fromSchema | Создание контекста из готовой схемы}
+ * - {@link fromSnapshot | Создание контекста из снимка}
  *
  * ## Функциональность
- * - {@link Context.update | Обновление значений контекста}
- * - {@link Context.onUpdate | Подписка на обновления значений контекста}
+ * - {@link ContextObject.update | Обновление значений контекста}
+ * - {@link ContextObject.onUpdate | Подписка на обновления значений контекста}
  * - {@link ToDo.editSchema | Редактирование схемы контекста}
  *
  * ## Входные параметры
@@ -30,10 +32,11 @@ export enum ToDo {
   description = "Описание поля (для отображения в UI)",
 }
 
-export { Context } from "./context"
 export { fromSchema, fromSnapshot } from "./context"
+export { contextSchema } from "./schema"
+export type { ContextObject } from "./context"
 export { types } from "./types"
 export type { Types } from "./types.t"
 export type { Values, Snapshot, Update } from "./context.t"
 export type { Schema, SchemaType } from "./schema.t"
-export { contextDefinitionToSchema } from "./schema"
+export { contextSchema as contextDefinitionToSchema } from "./schema"

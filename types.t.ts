@@ -83,35 +83,34 @@ export type Types = {
 }
 
 export interface TypePrimitive<T extends string | number | boolean, N extends "string" | "number" | "boolean"> {
-  optional: <D extends T>(
-    defaultValue?: D
-  ) => ((options?: { title?: string }) => SchemaType<T, N, false>) & SchemaType<T, N, false>
+  optional(options?: { title?: string }): SchemaType<T, N, false>
+  optional<D extends T>(defaultValue?: D, options?: { title?: string }): SchemaType<T, N, false>
 
-  required: <D extends T>(
-    defaultValue: D
-  ) => ((options?: { title?: string; id?: true }) => SchemaType<T, N, true>) & SchemaType<T, N, true>
+  required: <D extends T>(defaultValue: D, options?: { title?: string; id?: true }) => SchemaType<T, N, true>
 }
 
 export type TypeArray = {
-  optional: <T extends string | number | boolean>(
-    defaultValue?: T[]
-  ) => SchemaType<T[], "array", false> &
-    ((options?: { title?: string; data?: string }) => SchemaType<T[], "array", false>)
+  optional: {
+    <T extends string | number | boolean>(options?: { title?: string; data?: string }): SchemaType<T[], "array", false>
+    <T extends string | number | boolean>(defaultValue?: T[], options?: { title?: string; data?: string }): SchemaType<
+      T[],
+      "array",
+      false
+    >
+  }
   required: <T extends string | number | boolean>(
-    defaultValue: T[]
-  ) => SchemaType<T[], "array", true> &
-    ((options?: { title?: string; data?: string }) => SchemaType<T[], "array", true>)
+    defaultValue: T[],
+    options?: { title?: string; data?: string }
+  ) => SchemaType<T[], "array", true>
 }
 
 export type TypeEnum = <const T extends readonly (string | number)[]>(
   ...values: T
 ) => {
-  optional: (
-    defaultValue?: T[number]
-  ) => SchemaType<string | number, "enum", false, T> &
-    ((options?: { title?: string }) => SchemaType<string | number, "enum", false, T>)
+  optional(options?: { title?: string }): SchemaType<string | number, "enum", false, T>
+  optional(defaultValue?: T[number], options?: { title?: string }): SchemaType<string | number, "enum", false, T>
   required: (
-    defaultValue: T[number]
-  ) => SchemaType<string | number, "enum", true, T> &
-    ((options?: { title?: string; id?: true }) => SchemaType<string | number, "enum", true, T>)
+    defaultValue: T[number],
+    options?: { title?: string; id?: true }
+  ) => SchemaType<string | number, "enum", true, T>
 }

@@ -1,23 +1,23 @@
 import { describe, it, expect } from "bun:test"
-import { Context } from "../context"
+import { contextSchema } from "../schema"
 
 describe("строка", () => {
   it("string", () => {
-    const { schema: stringSchema } =
+    const stringSchema =
       // #region stringDefinition
-      new Context((types) => ({
+      contextSchema((types) => ({
         short: types.string.optional(),
 
         callable: types.string.optional(),
-        callableOptions: types.string.optional()({ title: "title" }),
+        callableOptions: types.string.optional({ title: "title" }),
         callableDefault: types.string.optional("default"),
 
         optional: types.string.optional(),
-        optionalOptions: types.string.optional()({ title: "title" }),
+        optionalOptions: types.string.optional({ title: "title" }),
         optionalDefault: types.string.optional("default"),
 
         required: types.string.required("default"),
-        requiredOptions: types.string.required("default")({ title: "title" }),
+        requiredOptions: types.string.required("default", { title: "title" }),
         requiredDefault: types.string.required("default"),
       }))
     // #endregion stringDefinition

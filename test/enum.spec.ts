@@ -1,25 +1,26 @@
 import { describe, it, expect } from "bun:test"
-import { Context } from "../context"
+import { contextSchema } from "../schema"
+import { fromSchema } from "../context"
 
 describe("enum", () => {
   it("варианты декларации", () => {
     const { schema } =
       // prettier-ignore
       // #region enumDefinition
-      new Context((types) => ({
+      fromSchema(contextSchema((types) => ({
           short: types.enum().optional(),
 
           callable: types.enum().optional(),
-          callableOptions: types.enum(1, 2).optional()({ title: "enum" }),
+          callableOptions: types.enum(1, 2).optional({ title: "enum" }),
           callableDefault: types.enum("user", "admin").optional("user"),
 
           optional: types.enum().optional(),
-          optionalOptions: types.enum().optional()({ title: "enum" }),
+          optionalOptions: types.enum().optional({ title: "enum" }),
           optionalDefault: types.enum("user", "admin").optional("user"),
 
           required: types.enum("user", "admin").required("user"),
-          requiredOptions: types.enum(1, 2, 3, 4).required(4)({ title: "числовые значения" }),
-        })
+          requiredOptions: types.enum(1, 2, 3, 4).required(4, { title: "числовые значения" }),
+        }))
         // #endregion enumDefinition
       )
     expect(schema).toEqual(
@@ -73,11 +74,13 @@ describe("enum", () => {
   it("значения отсутствуют", () => {
     const { context, schema, snapshot } =
       // #region emptyType
-      new Context((types) => ({
-        short: types.enum().optional(),
-        callable: types.enum().optional(),
-        optional: types.enum().optional(),
-      }))
+      fromSchema(
+        contextSchema((types) => ({
+          short: types.enum().optional(),
+          callable: types.enum().optional(),
+          optional: types.enum().optional(),
+        }))
+      )
     // #endregion emptyType
     expect({ ...context }).toEqual(
       // #region emptyContext
@@ -122,9 +125,11 @@ describe("enum", () => {
       // #endregion emptySnapshot
     )
   })
-  const { context, update } = new Context((types) => ({
-    role: types.enum("user", "admin").required("user"),
-  }))
+  const { context, update } = fromSchema(
+    contextSchema((types) => ({
+      role: types.enum("user", "admin").required("user"),
+    }))
+  )
   it("принимает значения из enum", () => {
     update({ role: "admin" })
     expect(context.role, "Поле role должно быть 'admin'").toBe("admin")

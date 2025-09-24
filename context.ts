@@ -1,9 +1,24 @@
 import type { Snapshot, Values } from "./context.t"
-import type { NormalizeSchema } from "./schema.t"
-import { normalizeSchema } from "./schema"
-import { types } from "./types"
 import type { Schema } from "./schema.t"
-import type { Types } from "./types.t"
+
+/* --------------------------------- Типы ----------------------------------- */
+
+export interface ContextObject<C extends Schema> {
+  /** {@link Schema | Схема контекста} */
+  schema: C
+  /** Иммутабельный объект значений контекста */
+  context: Values<C>
+  /** {@link Update | Обновление значений контекста} */
+  update: (values: Partial<Values<C>>) => Partial<Values<C>>
+  /**
+   * Подписка на обновления контекста
+   *
+   * {@includeCode ./context.spec.ts#onUpdate}
+   */
+  onUpdate: (callback: (updated: Partial<Values<C>>) => void) => () => void
+  /** {@inheritDoc Snapshot} */
+  snapshot: Snapshot<C>
+}
 
 /* ------------------------------- утилиты ---------------------------------- */
 
@@ -22,29 +37,16 @@ const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.s
 
 /* -------------------------------- Контекст -------------------------------- */
 
-export class Context<S = any, C extends Schema = NormalizeSchema<S>> {
-  protected data!: Values<C>
-  /** {@link Schema | Схема контекста} */
-  schema!: C
-  protected updateSubscribers = new Set<(updated: Partial<Values<C>>) => void>()
-  /** Иммутабельный объект значений контекста */
-  context!: Values<C>
+/**
+ * Создает функциональный контекст из нормализованной схемы
+ */
+function createContextFromSchema<C extends Schema>(schema: C): ContextObject<C> {
+  // Приватные данные контекста (замыкание)
+  const data = {} as Values<C>
+  const updateSubscribers = new Set<(updated: Partial<Values<C>>) => void>()
 
-  constructor(schema: S | ((types: Types) => S))
-  constructor(schema: C, options: { raw: true })
-  constructor(schema: any, options?: { raw: true }) {
-    if (options?.raw) {
-      this.schema = schema as C
-    } else {
-      const raw = typeof schema === "function" ? (schema as (t: Types) => S)(types) : (schema as S)
-      const clean = normalizeSchema(raw) as unknown as C
-      this.schema = clean
-    }
-    this.data = {} as Values<C>
-    this.initializeContext(this.schema)
-  }
-
-  protected initializeContext(schema: C): void {
+  // Инициализация контекста
+  function initializeContext(schema: C): void {
     for (const key in schema) {
       const def = schema[key as keyof C] as any
       if (!def) continue
@@ -72,34 +74,33 @@ export class Context<S = any, C extends Schema = NormalizeSchema<S>> {
         def.type === "enum" && (val = def.required ? def.values?.[0] : null)
         def.type === "array" && (val = def.required ? freezeArray<any>([]) : null)
       }
-      ;(this.data as any)[key] = val
+      ;(data as any)[key] = val
     }
-
-    Object.seal(this.data)
-    this.context = this.#createReadOnlyContext()
+    Object.seal(data)
   }
 
-  #createReadOnlyContext(): Values<C> {
+  // Создание read-only контекста
+  function createReadOnlyContext(): Values<C> {
     const view: any = {}
-    for (const key of Object.keys(this.schema)) {
+    for (const key of Object.keys(schema)) {
       Object.defineProperty(view, key, {
         enumerable: true,
         configurable: false,
-        get: () => this.data[key as keyof Values<C>],
+        get: () => data[key as keyof Values<C>],
       })
     }
     return Object.freeze(view)
   }
 
-  /** {@link Update | Обновление значений контекста} */
-  update = (values: Partial<Values<C>>): Partial<Values<C>> => {
+  // Функция обновления
+  function update(values: Partial<Values<C>>): Partial<Values<C>> {
     const entries = Object.entries(values).filter(([, v]) => v !== undefined) as [string, any][]
     const updated: Partial<Values<C>> = {}
 
     for (const [key, nextRaw] of entries) {
-      if (!(key in this.data)) continue
+      if (!(key in data)) continue
 
-      const def: any = (this.schema as any)[key]
+      const def: any = (schema as any)[key]
       let next = nextRaw
 
       // Проверяем null для required полей
@@ -145,32 +146,27 @@ export class Context<S = any, C extends Schema = NormalizeSchema<S>> {
         )
       }
 
-      const prev = (this.data as any)[key]
+      const prev = (data as any)[key]
       if (prev !== next) {
-        ;(this.data as any)[key] = next
+        ;(data as any)[key] = next
         ;(updated as any)[key] = next
       }
     }
 
     if (Object.keys(updated).length > 0) {
-      for (const cb of this.updateSubscribers) cb(updated)
+      for (const cb of updateSubscribers) cb(updated)
     }
     return updated
   }
-  /**
-   * Подписка на обновления контекста
-   *
-   * {@includeCode ./context.spec.ts#onUpdate}
-   */
-  onUpdate: (callback: (updated: Partial<Values<C>>) => void) => () => void = (callback) => {
-    this.updateSubscribers.add(callback)
-    return () => this.updateSubscribers.delete(callback)
+
+  function onUpdate(callback: (updated: Partial<Values<C>>) => void): () => void {
+    updateSubscribers.add(callback)
+    return () => updateSubscribers.delete(callback)
   }
 
-  /** {@inheritDoc Snapshot} */
-  get snapshot() {
+  function getSnapshot(): Snapshot<C> {
     const context: Snapshot<C> = {} as Snapshot<C>
-    for (const [key, value] of Object.entries(this.schema)) {
+    for (const [key, value] of Object.entries(schema)) {
       context[key as keyof C] = {
         type: value.type,
         ...(value.required && { required: true }),
@@ -179,31 +175,46 @@ export class Context<S = any, C extends Schema = NormalizeSchema<S>> {
         ...(value.values && { values: value.values }),
         ...(value.id && { id: true }),
         ...(value.data && { data: value.data }),
-        value: this.context[key as keyof C],
+        value: readOnlyContext[key as keyof C],
       } as any
     }
     return context
+  }
+
+  // Инициализируем контекст
+  initializeContext(schema)
+  const readOnlyContext = createReadOnlyContext()
+
+  // Возвращаем объект контекста
+  return {
+    schema,
+    context: readOnlyContext,
+    update,
+    onUpdate,
+    get snapshot() {
+      return getSnapshot()
+    },
   }
 }
 
 /**
  * Создать контекст из готовой схемы (без значений). Схема может быть уже нормализована.
  */
-export function fromSchema<C extends Schema>(schema: C): Context<C, NormalizeSchema<C>> {
-  return new Context<C, NormalizeSchema<C>>(schema as unknown as NormalizeSchema<C>, { raw: true })
+export function fromSchema<C extends Schema>(schema: C): ContextObject<C> {
+  return createContextFromSchema(schema)
 }
 
 /**
  * Создать контекст из полного снимка (schema + value)
  */
-export function fromSnapshot<C extends Schema>(snapshot: Snapshot<C>): Context<C, NormalizeSchema<C>> {
+export function fromSnapshot<C extends Schema>(snapshot: Snapshot<C>): ContextObject<C> {
   // Формируем схему из snapshot без поля value
   const schema: any = {}
   for (const [key, snap] of Object.entries(snapshot as any)) {
     const { value: _value, ...rest } = snap as any
     schema[key] = rest
   }
-  const ctx = new Context<C, NormalizeSchema<C>>(schema as NormalizeSchema<C>, { raw: true })
+  const ctx = createContextFromSchema(schema as C)
   // Восстановим значения через update(), чтобы применились валидации и freeze массивов
   const values: any = {}
   for (const [key, snap] of Object.entries(snapshot as any)) {

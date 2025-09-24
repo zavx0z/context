@@ -1,13 +1,16 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test"
-import { Context } from "../index"
+import { contextSchema } from "../schema"
+import { fromSchema } from "../context"
 
 describe("update", () => {
   it("обновляет только переданные значения", () => {
-    const { context, update } = new Context((types) => ({
-      name: types.string.required("Гость"),
-      nickname: types.string.optional(),
-      age: types.number.optional(),
-    }))
+    const { context, update } = fromSchema(
+      contextSchema((types) => ({
+        name: types.string.required("Гость"),
+        nickname: types.string.optional(),
+        age: types.number.optional(),
+      }))
+    )
 
     update({ name: "Иван" })
     expect(context.name, 'Поле name должно обновиться на "Иван"').toBe("Иван")
@@ -21,9 +24,11 @@ describe("update", () => {
   })
   // #region undefined
   it("игнорирует undefined значения", () => {
-    const { context, update } = new Context((types) => ({
-      name: types.string.required("Гость"),
-    }))
+    const { context, update } = fromSchema(
+      contextSchema((types) => ({
+        name: types.string.required("Гость"),
+      }))
+    )
     // @ts-expect-error - TypeScript запрещает undefined
     update({ name: undefined })
     expect(context.name, 'Поле name осталось "Гость"').toBe("Гость")
@@ -31,13 +36,15 @@ describe("update", () => {
   // #endregion undefined
   // #region requiredNull
   describe("не позволяет устанавливать null для required полей", () => {
-    const { context, update } = new Context((types) => ({
-      name: types.string.required("Гость"),
-      age: types.number.required(18),
-      isActive: types.boolean.required(true),
-      tags: types.array.required([]),
-      role: types.enum("user", "admin").required("user"),
-    }))
+    const { context, update } = fromSchema(
+      contextSchema((types) => ({
+        name: types.string.required("Гость"),
+        age: types.number.required(18),
+        isActive: types.boolean.required(true),
+        tags: types.array.required([]),
+        role: types.enum("user", "admin").required("user"),
+      }))
+    )
     it("null для required string", () => {
       // @ts-expect-error - TypeScript запрещает null
       expect(() => update({ name: null })).toThrow('[Context.update] "name": поле не может быть null')
@@ -67,10 +74,12 @@ describe("update", () => {
   // #endregion requiredNull
   // #region arrayErrors
   describe("валидация массивов", () => {
-    const { context, update } = new Context((types) => ({
-      tags: types.array.required([]),
-      items: types.array.optional([]),
-    }))
+    const { context, update } = fromSchema(
+      contextSchema((types) => ({
+        tags: types.array.required([]),
+        items: types.array.optional([]),
+      }))
+    )
     it("nested массив", () => {
       // @ts-expect-error - TypeScript запрещает nested массив
       expect(() => update({ tags: [["nested"]] })).toThrow(
@@ -94,11 +103,13 @@ describe("update", () => {
   // #endregion arrayErrors
   // #region primitiveErrors
   describe("валидация примитивных полей", () => {
-    const { context, update } = new Context((types) => ({
-      name: types.string.required("test"),
-      age: types.number.required(18),
-      active: types.boolean.required(true),
-    }))
+    const { context, update } = fromSchema(
+      contextSchema((types) => ({
+        name: types.string.required("test"),
+        age: types.number.required(18),
+        active: types.boolean.required(true),
+      }))
+    )
     it("объект в string поле", () => {
       // @ts-expect-error - TypeScript запрещает объект в string поле
       expect(() => update({ name: { x: 1 } })).toThrow('[Context.update] "name": объекты и функции запрещены')
@@ -118,10 +129,12 @@ describe("update", () => {
   // #endregion primitiveErrors
   // #region enumErrors
   describe("валидация enum полей", () => {
-    const { context, update } = new Context((types) => ({
-      role: types.enum("user", "admin").required("user"),
-      status: types.enum("active", "inactive").optional("active"),
-    }))
+    const { context, update } = fromSchema(
+      contextSchema((types) => ({
+        role: types.enum("user", "admin").required("user"),
+        status: types.enum("active", "inactive").optional("active"),
+      }))
+    )
     it("недопустимое значение в required enum", () => {
       // @ts-expect-error - TypeScript запрещает значения, не входящие в enum
       expect(() => update({ role: "guest" })).toThrow(
@@ -140,13 +153,15 @@ describe("update", () => {
   // #endregion enumErrors
   // #region optionalNull
   it("позволяет устанавливать null для optional полей", () => {
-    const { context, update } = new Context((types) => ({
-      nickname: types.string.optional(""),
-      age: types.number.optional(4),
-      isActive: types.boolean.optional(false),
-      tags: types.array.optional([]),
-      role: types.enum("user", "admin").optional("user"),
-    }))
+    const { context, update } = fromSchema(
+      contextSchema((types) => ({
+        nickname: types.string.optional(""),
+        age: types.number.optional(4),
+        isActive: types.boolean.optional(false),
+        tags: types.array.optional([]),
+        role: types.enum("user", "admin").optional("user"),
+      }))
+    )
 
     update({ nickname: null })
     expect(context.nickname, "Поле nickname должно обновиться на null").toBe(null)
@@ -166,19 +181,21 @@ describe("update", () => {
   // #endregion optionalNull
 
   it("работает со всеми типами данных", () => {
-    const { context, update } = new Context((types) => ({
-      title: types.string.required("Заголовок"),
-      description: types.string.optional(),
-      age: types.number.required(18),
-      score: types.number.optional(),
-      isActive: types.boolean.required(true),
-      isVerified: types.boolean.optional(),
-      status: types.enum("draft", "published", "archived").required("draft"),
-      category: types.enum("tech", "design", "business").optional(),
-      tags: types.array.required<string>([]),
-      permissions: types.array.optional(),
-      flags: types.array.optional(),
-    }))
+    const { context, update } = fromSchema(
+      contextSchema((types) => ({
+        title: types.string.required("Заголовок"),
+        description: types.string.optional(),
+        age: types.number.required(18),
+        score: types.number.optional(),
+        isActive: types.boolean.required(true),
+        isVerified: types.boolean.optional(),
+        status: types.enum("draft", "published", "archived").required("draft"),
+        category: types.enum("tech", "design", "business").optional(),
+        tags: types.array.required<string>([]),
+        permissions: types.array.optional(),
+        flags: types.array.optional(),
+      }))
+    )
 
     update({
       title: "Новый заголовок",
@@ -208,11 +225,13 @@ describe("update", () => {
   })
 
   it("возвращает обновленный контекст", () => {
-    const { update } = new Context((types) => ({
-      name: types.string.required("Гость"),
-      status: types.enum("start", "process", "end").required("start"),
-      age: types.number.optional(),
-    }))
+    const { update } = fromSchema(
+      contextSchema((types) => ({
+        name: types.string.required("Гость"),
+        status: types.enum("start", "process", "end").required("start"),
+        age: types.number.optional(),
+      }))
+    )
 
     const updated = update({ name: "Иван", age: 25, status: "start" })
 
@@ -226,10 +245,12 @@ describe("update", () => {
   })
 
   it("сохраняет иммутабельность после обновления", () => {
-    const { context, update } = new Context((types) => ({
-      name: types.string.required("Гость"),
-      status: types.enum("start", "process", "end").required("start"),
-    }))
+    const { context, update } = fromSchema(
+      contextSchema((types) => ({
+        name: types.string.required("Гость"),
+        status: types.enum("start", "process", "end").required("start"),
+      }))
+    )
     update({ name: "Новое имя" })
 
     expect(() => {

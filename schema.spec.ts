@@ -1,19 +1,22 @@
 import { describe, it, expect } from "bun:test"
-import { Context } from "./context"
+import { contextSchema } from "./schema"
+import { fromSchema } from "./context"
 
 describe("Схема", () => {
   describe("enum values", () => {
     it("должен возвращать оригинальную схему через геттер", () => {
-      const ctx = new Context((types) => ({
-        name: types.string.required("Иван")({ title: "Имя пользователя" }),
-        age: types.number.optional(),
-        isActive: types.boolean.required(true)({ title: "Активен" }),
-        role: types.enum("user", "admin", "moderator").required("user")({ title: "Роль" }),
-        tags: types.array.required([])({ title: "Теги" }),
-        priority: types.enum("low", "medium", "high").optional()({ title: "Приоритет" }),
-        description: types.string.optional()({ title: "Описание" }),
-        metadata: types.array.optional()({ title: "Метаданные" }),
-      }))
+      const ctx = fromSchema(
+        contextSchema((types) => ({
+          name: types.string.required("Иван", { title: "Имя пользователя" }),
+          age: types.number.optional(),
+          isActive: types.boolean.required(true, { title: "Активен" }),
+          role: types.enum("user", "admin", "moderator").required("user", { title: "Роль" }),
+          tags: types.array.required([], { title: "Теги" }),
+          priority: types.enum("low", "medium", "high").optional({ title: "Приоритет" }),
+          description: types.string.optional({ title: "Описание" }),
+          metadata: types.array.optional({ title: "Метаданные" }),
+        }))
+      )
 
       // Получаем схему через геттер
       const result = ctx.schema
@@ -66,15 +69,17 @@ describe("Схема", () => {
     })
 
     it("должен сохранять типизацию схемы", () => {
-      const { schema } = new Context((types) => ({
-        name: types.string.required("Иван")({ title: "Имя пользователя" }),
-        age: types.number.optional(),
-        role: types.enum("user", "admin", "moderator").required("user")({ title: "Роль" }),
-        isActive: types.boolean.required(true)({ title: "Активен" }),
-        description: types.string.optional()({ title: "Описание" }),
-        priority: types.enum("low", "medium", "high").optional()({ title: "Приоритет" }),
-        tags: types.array.optional()({ title: "Теги" }),
-      }))
+      const { schema } = fromSchema(
+        contextSchema((types) => ({
+          name: types.string.required("Иван", { title: "Имя пользователя" }),
+          age: types.number.optional(),
+          role: types.enum("user", "admin", "moderator").required("user", { title: "Роль" }),
+          isActive: types.boolean.required(true, { title: "Активен" }),
+          description: types.string.optional({ title: "Описание" }),
+          priority: types.enum("low", "medium", "high").optional({ title: "Приоритет" }),
+          tags: types.array.optional({ title: "Теги" }),
+        }))
+      )
 
       // Проверяем required поля
       expect(schema.name.type).toBe("string")

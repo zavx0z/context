@@ -1,26 +1,29 @@
 import { describe, it, expect } from "bun:test"
-import { Context } from "../context"
+import { contextSchema } from "../schema"
+import { fromSchema } from "../context"
 
 describe("массив", () => {
   it("definition", () => {
     const { schema: arraySchema } =
       // #region arrayDefinition
-      new Context(
-        (types) => ({
-          short: types.array.optional(),
+      fromSchema(
+        contextSchema(
+          (types) => ({
+            short: types.array.optional(),
 
-          callable: types.array.optional(),
-          callableOptions: types.array.optional()({ title: "array" }),
-          callableDefault: types.array.optional([1, 2, 3]),
+            callable: types.array.optional(),
+            callableOptions: types.array.optional({ title: "array" }),
+            callableDefault: types.array.optional([1, 2, 3]),
 
-          optional: types.array.optional(),
-          optionalOptions: types.array.optional()({ title: "array" }),
-          optionalDefault: types.array.optional([1, 2, 3]),
+            optional: types.array.optional(),
+            optionalOptions: types.array.optional({ title: "array" }),
+            optionalDefault: types.array.optional([1, 2, 3]),
 
-          required: types.array.required([1, 2, 3]),
-          requiredOptions: types.array.required([1, 2, 3])({ title: "array" }),
-        })
-        // #endregion arrayDefinition
+            required: types.array.required([1, 2, 3]),
+            requiredOptions: types.array.required([1, 2, 3], { title: "array" }),
+          })
+          // #endregion arrayDefinition
+        )
       )
 
     expect(arraySchema).toEqual(
@@ -67,9 +70,11 @@ describe("массив", () => {
     )
   })
   describe("обновление", () => {
-    const { schema, update, context } = new Context((t) => ({
-      array: t.array.required([1, 2, 3]),
-    }))
+    const { schema, update, context } = fromSchema(
+      contextSchema((t) => ({
+        array: t.array.required([1, 2, 3]),
+      }))
+    )
     it("схема", () => {
       expect(schema).toEqual({
         array: {

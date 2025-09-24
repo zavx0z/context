@@ -1,22 +1,22 @@
 import { describe, it, expect } from "bun:test"
-import { Context } from "../context"
+import { contextSchema } from "../schema"
 
 describe("number", () => {
   it("number", () => {
-    const { schema: numberSchema } =
+    const numberSchema =
       // #region numberDefinition
-      new Context((types) => ({
+      contextSchema((types) => ({
         number: types.number.optional(),
         callable: types.number.optional(),
-        callableOptions: types.number.optional()({ title: "number" }),
+        callableOptions: types.number.optional({ title: "number" }),
         callableDefault: types.number.optional(4),
 
         optional: types.number.optional(),
-        optionalOptions: types.number.optional()({ title: "number" }),
+        optionalOptions: types.number.optional({ title: "number" }),
         optionalDefault: types.number.optional(4),
 
         required: types.number.required(4),
-        requiredOptions: types.number.required(4)({ title: "number" }),
+        requiredOptions: types.number.required(4, { title: "number" }),
       }))
     // #endregion numberDefinition
 

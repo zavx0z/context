@@ -27,9 +27,9 @@ bun add @zavx0z/context
 ## Быстрый пример
 
 ```ts
-import { Context, types } from "@zavx0z/context"
+import { contextSchema, types } from "@zavx0z/context"
 
-const ctx = new Context((t) => ({
+const ctx = contextSchema((t) => ({
   // обязательные примитивы/enum — могут быть помечены как идентификаторы
   id: t.string.required("1")({ title: "ID", id: true }),
   role: t.enum("user", "admin").required("user")({ id: true }),
@@ -97,7 +97,7 @@ const cloneB = fromSnapshot(ctx.snapshot)
 
 ## API (кратко)
 
-### `new Context((types) => schema)`
+### `contextSchema((types) => schema)`
 
 Создает контекст по фабрике схемы. Доступные фабрики: `types.string`, `types.number`, `types.boolean`, `types.array`, `types.enum(...values)`.
 

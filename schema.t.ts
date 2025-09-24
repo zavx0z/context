@@ -93,24 +93,3 @@ export type Schema = Record<
   | SchemaType<string | number, "enum", true | false, readonly (string | number)[]>
 >
 
-export type NormalizeSchema<S> = {
-  [K in keyof S]: S[K] extends SchemaType<infer A, infer N, infer R, infer V>
-    ? N extends "string"
-      ? SchemaType<string, "string", R>
-      : N extends "number"
-      ? SchemaType<number, "number", R>
-      : N extends "boolean"
-      ? SchemaType<boolean, "boolean", R>
-      : N extends "array"
-      ? A extends readonly (infer E)[]
-        ? SchemaType<
-            Array<E extends number ? number : E extends string ? string : E extends boolean ? boolean : E>,
-            "array",
-            R
-          >
-        : SchemaType<(string | number | boolean)[], "array", R>
-      : N extends "enum"
-      ? SchemaType<V extends readonly (string | number)[] ? V[number] : string | number, "enum", R, V>
-      : never
-    : never
-}

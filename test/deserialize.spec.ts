@@ -1,16 +1,18 @@
 import { describe, it, expect } from "bun:test"
-import { Context } from "../context"
+import { contextSchema } from "../schema"
 import { fromSchema, fromSnapshot } from "../context"
 
 describe("десериализация", () => {
   it("создание из снимка", () => {
     // Создаем оригинальный контекст
-    const originalContext = new Context((types) => ({
-      name: types.string.required("Гость"),
-      age: types.number.optional(),
-      isActive: types.boolean.required(true),
-      role: types.enum("user", "admin").required("user"),
-    }))
+    const originalContext = fromSchema(
+      contextSchema((types) => ({
+        name: types.string.required("Гость"),
+        age: types.number.optional(),
+        isActive: types.boolean.required(true),
+        role: types.enum("user", "admin").required("user"),
+      }))
+    )
 
     // Обновляем значения
     originalContext.update({ name: "Иван", age: 25 })
@@ -35,10 +37,12 @@ describe("десериализация", () => {
   })
 
   it("обновление клонированного контекста", () => {
-    const originalContext = new Context((types) => ({
-      name: types.string.required("Гость"),
-      age: types.number.optional(),
-    }))
+    const originalContext = fromSchema(
+      contextSchema((types) => ({
+        name: types.string.required("Гость"),
+        age: types.number.optional(),
+      }))
+    )
 
     const snapshot = originalContext.schema
     const valuesSnapshot = originalContext.context
@@ -103,9 +107,11 @@ describe("десериализация", () => {
   })
 
   it("подписка на обновления", () => {
-    const originalContext = new Context((types) => ({
-      name: types.string.required("Гость"),
-    }))
+    const originalContext = fromSchema(
+      contextSchema((types) => ({
+        name: types.string.required("Гость"),
+      }))
+    )
 
     const snapshot = originalContext.snapshot
     const clonedContext = fromSnapshot(snapshot)
