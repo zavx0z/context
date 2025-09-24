@@ -189,21 +189,21 @@ export class Context<S = any, C extends Schema = NormalizeSchema<S>> {
 /**
  * Создать контекст из готовой схемы (без значений). Схема может быть уже нормализована.
  */
-export function fromSchema<C extends Schema>(schema: C): Context<C, C> {
-  return new Context<C, C>(schema as unknown as C, { raw: true })
+export function fromSchema<C extends Schema>(schema: C): Context<C, NormalizeSchema<C>> {
+  return new Context<C, NormalizeSchema<C>>(schema as unknown as NormalizeSchema<C>, { raw: true })
 }
 
 /**
  * Создать контекст из полного снимка (schema + value)
  */
-export function fromSnapshot<C extends Schema>(snapshot: Snapshot<C>): Context<C, C> {
+export function fromSnapshot<C extends Schema>(snapshot: Snapshot<C>): Context<C, NormalizeSchema<C>> {
   // Формируем схему из snapshot без поля value
   const schema: any = {}
   for (const [key, snap] of Object.entries(snapshot as any)) {
     const { value: _value, ...rest } = snap as any
     schema[key] = rest
   }
-  const ctx = new Context<C, C>(schema as C, { raw: true })
+  const ctx = new Context<C, NormalizeSchema<C>>(schema as NormalizeSchema<C>, { raw: true })
   // Восстановим значения через update(), чтобы применились валидации и freeze массивов
   const values: any = {}
   for (const [key, snap] of Object.entries(snapshot as any)) {
