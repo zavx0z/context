@@ -1,5 +1,5 @@
 import { describe, test, expect } from "bun:test"
-import { Context, ContextClone } from "./context"
+import { Context } from "./context"
 
 // Утилита: безопасно проверить, что операция бросает TypeError (сообщение может отличаться в разных рантаймах)
 function expectThrow(fn: () => unknown) {
