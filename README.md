@@ -27,7 +27,7 @@ bun add @zavx0z/context
 ## Быстрый пример
 
 ```ts
-import { fromSchema, contextSchema } from "@zavx0z/context"
+import { contextFromSchema, contextSchema } from "@zavx0z/context"
 
 // 1. Создаём схему
 const schema = contextSchema((t) => ({

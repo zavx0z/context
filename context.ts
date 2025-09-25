@@ -1,23 +1,6 @@
 import type { Context, Snapshot, Values } from "./context.t"
 import type { Schema } from "./schema.t"
 
-/* ------------------------------- утилиты ---------------------------------- */
-
-const isPrimitiveOrNull = (v: unknown): v is string | number | boolean | null =>
-  v === null || (typeof v !== "object" && typeof v !== "function")
-
-const assertNonObject = (value: unknown, msg: string) => {
-  if (!isPrimitiveOrNull(value)) throw new TypeError(msg)
-}
-
-const isFlatPrimitiveArray = (v: unknown): v is Array<string | number | boolean | null> =>
-  Array.isArray(v) && v.every(isPrimitiveOrNull)
-
-/** Копия массива с заморозкой (элементы — примитивы, так что глубокая не нужна) */
-const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.slice()) as T
-
-/* -------------------------------- Контекст -------------------------------- */
-
 /**
  * Создает контекст из готовой схемы.
  *
@@ -34,6 +17,18 @@ const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.s
  * ```
  */
 export function contextFromSchema<C extends Schema>(schema: C): Context<C> {
+  /* ------------------------------- утилиты ---------------------------------- */
+  const isPrimitiveOrNull = (v: unknown): v is string | number | boolean | null =>
+    v === null || (typeof v !== "object" && typeof v !== "function")
+  const assertNonObject = (value: unknown, msg: string) => {
+    if (!isPrimitiveOrNull(value)) throw new TypeError(msg)
+  }
+  const isFlatPrimitiveArray = (v: unknown): v is Array<string | number | boolean | null> =>
+    Array.isArray(v) && v.every(isPrimitiveOrNull)
+  /** Копия массива с заморозкой (элементы — примитивы, так что глубокая не нужна) */
+  const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.slice()) as T
+  /* ------------------------------- утилиты ---------------------------------- */
+
   // Приватные данные контекста (замыкание)
   const data = {} as Values<C>
   const updateSubscribers = new Set<(updated: Partial<Values<C>>) => void>()

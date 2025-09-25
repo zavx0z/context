@@ -78,7 +78,7 @@ export type ExtractValue<E> = E extends SchemaType<infer T, infer N, infer R, in
  *
  * @example Создание и использование контекста
  * ```ts
- * const ctx = fromSchema(contextSchema((t) => ({
+ * const ctx = contextFromSchema(contextSchema((t) => ({
  *   name: t.string.required("Гость", { title: "Имя" }),
  *   age: t.number.optional()
  * })))
