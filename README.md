@@ -93,7 +93,6 @@ const schemaSnap = ctx.schema
 
 // Создание контекста
 const contextA = contextFromSchema(ctx.schema) // из схемы
-const contextB = contextFromSnapshot(ctx.snapshot) // из полного снимка
 ```
 
 ---
@@ -109,9 +108,9 @@ const contextB = contextFromSnapshot(ctx.snapshot) // из полного сни
 - Примитивы и enum: `.required(default, { title?, id? })`, `.optional(default?, { title? })`
 - Массивы: `.required(default[], { title?, data? })`, `.optional(default[]?, { title?, data? })`
 
-### `contextFromSchema(schema)` / `contextFromSnapshot(snapshot)`
+### `contextFromSchema(schema)`
 
-Создание контекста из схемы или полного снимка. Возвращает объект с методами:
+Создание контекста из схемы. Возвращает объект с методами:
 
 - `context` — иммутабельный доступ к значениям (только для чтения)
 - `schema` — схема (типы, required, default, title, values?, id?, data?)
@@ -124,7 +123,7 @@ const contextB = contextFromSnapshot(ctx.snapshot) // из полного сни
 ## Экспорты
 
 ```ts
-import { contextFromSchema, contextFromSnapshot, contextSchema } from "@zavx0z/context"
+import { contextFromSchema, contextSchema } from "@zavx0z/context"
 import type { Context, Schema, Values, Snapshot, Update } from "@zavx0z/context"
 ```
 

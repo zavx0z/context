@@ -4,7 +4,6 @@
  * ## Точка входа
  * - {@link contextSchema | Создание контекста из функции-схемы}
  * - {@link contextFromSchema | Создание контекста из готовой схемы}
- * - {@link contextFromSnapshot | Создание контекста из снимка}
  *
  * ## Функциональность
  * - {@link Context.update | Обновление значений контекста}
@@ -32,7 +31,7 @@ export enum ToDo {
   description = "Описание поля (для отображения в UI)",
 }
 
-export { contextFromSchema, contextFromSnapshot } from "./context"
+export { contextFromSchema } from "./context"
 export { contextSchema } from "./schema"
 export type { Types } from "./types.t"
 export type { Context, Values, Snapshot, Update } from "./context.t"

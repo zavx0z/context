@@ -184,32 +184,3 @@ export function contextFromSchema<C extends Schema>(schema: C): Context<C> {
     },
   }
 }
-
-/**
- * Создает контекст из полного снимка (схема + текущие значения).
- *
- * @param snapshot - Снимок контекста с метаданными и значениями
- * @returns Контекст, восстановленный с сохранёнными значениями
- *
- * @example
- * ```ts
- * const snapshot = ctx.snapshot
- * const restored = contextFromSnapshot(snapshot)
- * ```
- */
-export function contextFromSnapshot<C extends Schema>(snapshot: Snapshot<C>): Context<C> {
-  // Формируем схему из snapshot без поля value
-  const schema: any = {}
-  for (const [key, snap] of Object.entries(snapshot as any)) {
-    const { value: _value, ...rest } = snap as any
-    schema[key] = rest
-  }
-  const ctx = contextFromSchema(schema as C)
-  // Восстановим значения через update(), чтобы применились валидации и freeze массивов
-  const values: any = {}
-  for (const [key, snap] of Object.entries(snapshot as any)) {
-    values[key] = (snap as any).value
-  }
-  ctx.update(values)
-  return ctx
-}

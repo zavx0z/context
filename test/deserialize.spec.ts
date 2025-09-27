@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test"
 import { contextSchema } from "../schema"
-import { contextFromSchema, contextFromSnapshot } from "../context"
+import { contextFromSchema } from "../context"
 
 describe("десериализация", () => {
   it("создание из снимка", () => {
@@ -20,8 +20,16 @@ describe("десериализация", () => {
     // Создаем снимок
     const snapshot = originalContext.snapshot
 
-    // Создаем клон из снимка (через функцию)
-    const clonedContext = contextFromSnapshot(snapshot)
+    // Создаем клон из снимка (извлекаем схему и значения)
+    const schema: any = {}
+    const values: any = {}
+    for (const [key, snap] of Object.entries(snapshot as any)) {
+      const { value, ...rest } = snap as any
+      schema[key] = rest
+      values[key] = value
+    }
+    const clonedContext = contextFromSchema(schema)
+    clonedContext.update(values)
 
     // Проверяем, что структура сохранена
     expect(clonedContext.context.name, "имя должно сохраниться").toBe("Иван")
@@ -114,12 +122,20 @@ describe("десериализация", () => {
     )
 
     const snapshot = originalContext.snapshot
-    const clonedContext = contextFromSnapshot(snapshot)
+    const schema: any = {}
+    const values: any = {}
+    for (const [key, snap] of Object.entries(snapshot as any)) {
+      const { value, ...rest } = snap as any
+      schema[key] = rest
+      values[key] = value
+    }
+    const clonedContext = contextFromSchema(schema)
+    clonedContext.update(values)
 
     let updateCount = 0
     let lastUpdate: any = null
 
-    const unsubscribe = clonedContext.onUpdate((updated) => {
+    const unsubscribe = clonedContext.onUpdate((updated: any) => {
       updateCount++
       lastUpdate = updated
     })
