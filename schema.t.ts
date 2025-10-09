@@ -6,10 +6,9 @@
  * @template R Является ли поле обязательным (true | false)
  * @template V Значения только для `enum` контекстного типа
  */
-export interface SchemaType<
+interface SchemaTypeBase<
   N extends "string" | "number" | "boolean" | "array" | "enum",
   R extends boolean = false,
-  D = any,
   V extends readonly (string | number)[] | never = never
 > {
   /**
@@ -26,12 +25,6 @@ export interface SchemaType<
    * **Название поля (для отображения в UI)**
    */
   label?: string
-  /**
-   * **Значение по умолчанию**
-   *
-   * @remarks может быть как для обязательного, так и для необязательного поля
-   */
-  default?: D
   /**
    * **Значения для enum**
    *
@@ -52,6 +45,13 @@ export interface SchemaType<
    */
   data?: string
 }
+
+export type SchemaType<
+  N extends "string" | "number" | "boolean" | "array" | "enum",
+  R extends boolean = false,
+  D extends unknown = undefined,
+  V extends readonly (string | number)[] | never = never
+> = [D] extends [undefined] ? SchemaTypeBase<N, R, V> & { default?: D } : SchemaTypeBase<N, R, V> & { default: D }
 
 /**
  * # Схема контекста
@@ -86,9 +86,14 @@ export interface SchemaType<
  */
 export type Schema = Record<
   string,
-  | SchemaType<"string", true | false>
-  | SchemaType<"boolean", true | false>
-  | SchemaType<"number", true | false>
+  | SchemaType<"string", true | false, undefined>
+  | SchemaType<"string", true | false, string>
+  | SchemaType<"boolean", true | false, undefined>
+  | SchemaType<"boolean", true | false, boolean>
+  | SchemaType<"number", true | false, undefined>
+  | SchemaType<"number", true | false, number>
+  | SchemaType<"array", true | false, undefined>
   | SchemaType<"array", true | false, (string | number | boolean)[]>
+  | SchemaType<"enum", true | false, undefined, readonly (string | number)[]>
   | SchemaType<"enum", true | false, string | number, readonly (string | number)[]>
 >

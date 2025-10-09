@@ -101,24 +101,27 @@ export interface TypePrimitive<T extends string | number | boolean, N extends "s
 export type TypeArray = {
   optional: {
     (options?: { label?: string; data?: string }): SchemaType<"array", false>
-    <D extends string[] | number[] | boolean[]>(
+    <D extends (string | number | boolean)[]>(
       defaultValue?: D,
       options?: { label?: string; data?: string }
     ): SchemaType<"array", false, D>
   }
-  required: <T extends string | number | boolean>(
-    defaultValue: T[],
+  required: <D extends string | number | boolean>(
+    defaultValue: D[],
     options?: { label?: string; data?: string }
-  ) => SchemaType<"array", true, T[]>
+  ) => SchemaType<"array", true, D[]>
 }
 
-export type TypeEnum = <const T extends readonly (string | number)[]>(
-  ...values: T
+export type TypeEnum = <const V extends readonly (string | number)[]>(
+  ...values: V
 ) => {
-  optional(options?: { label?: string }): SchemaType<"enum", false, never, T>
-  optional<D extends T[number]>(defaultValue?: D, options?: { label?: string }): SchemaType<"enum", false, D, T>
-  required: <D extends T[number]>(
+  optional(options?: { label?: string }): SchemaType<"enum", false, undefined, V>
+  optional<D extends V[number] | undefined>(
+    defaultValue?: D,
+    options?: { label?: string }
+  ): SchemaType<"enum", false, D, V>
+  required: <D extends V[number]>(
     defaultValue: D,
     options?: { label?: string; id?: true }
-  ) => SchemaType<"enum", true, D, T>
+  ) => SchemaType<"enum", true, D, V>
 }
