@@ -92,34 +92,33 @@ export type Types = {
 }
 
 export interface TypePrimitive<T extends string | number | boolean, N extends "string" | "number" | "boolean"> {
-  optional(options?: { label?: string }): SchemaType<never, N, false>
-  optional<D extends T>(defaultValue?: D, options?: { label?: string }): SchemaType<D, N, false>
+  optional(options?: { label?: string }): SchemaType<N, false>
+  optional<D extends T>(defaultValue?: D, options?: { label?: string }): SchemaType<N, false, D>
 
-  required: <D extends T>(defaultValue: D, options?: { label?: string; id?: true }) => SchemaType<D, N, true>
+  required: <D extends T>(defaultValue: D, options?: { label?: string; id?: true }) => SchemaType<N, true, D>
 }
 
 export type TypeArray = {
   optional: {
-    (options?: { label?: string; data?: string }): SchemaType<never, "array", false>
-    <D extends string[] | number[] | boolean[]>(defaultValue?: D, options?: { label?: string; data?: string }): SchemaType<
-      D,
-      "array",
-      false
-    >
+    (options?: { label?: string; data?: string }): SchemaType<"array", false>
+    <D extends string[] | number[] | boolean[]>(
+      defaultValue?: D,
+      options?: { label?: string; data?: string }
+    ): SchemaType<"array", false, D>
   }
   required: <T extends string | number | boolean>(
     defaultValue: T[],
     options?: { label?: string; data?: string }
-  ) => SchemaType<T[], "array", true>
+  ) => SchemaType<"array", true, T[]>
 }
 
 export type TypeEnum = <const T extends readonly (string | number)[]>(
   ...values: T
 ) => {
-  optional(options?: { label?: string }): SchemaType<string | number, "enum", false, T>
-  optional<D extends T[number]>(defaultValue?: D, options?: { label?: string }): SchemaType<D, "enum", false, T>
+  optional(options?: { label?: string }): SchemaType<"enum", false, never, T>
+  optional<D extends T[number]>(defaultValue?: D, options?: { label?: string }): SchemaType<"enum", false, D, T>
   required: <D extends T[number]>(
     defaultValue: D,
     options?: { label?: string; id?: true }
-  ) => SchemaType<D, "enum", true, T>
+  ) => SchemaType<"enum", true, D, T>
 }

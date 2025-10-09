@@ -1,15 +1,15 @@
 /**
  * Описание типа поля для схемы контекста
  *
- * @template T JavaScript тип значения
+ * @template D JavaScript тип значения
  * @template N Название контекстного типа
  * @template R Является ли поле обязательным (true | false)
  * @template V Значения только для `enum` контекстного типа
  */
 export interface SchemaType<
-  T,
   N extends "string" | "number" | "boolean" | "array" | "enum",
   R extends boolean = false,
+  D = any,
   V extends readonly (string | number)[] | never = never
 > {
   /**
@@ -31,7 +31,7 @@ export interface SchemaType<
    *
    * @remarks может быть как для обязательного, так и для необязательного поля
    */
-  default?: T
+  default?: D
   /**
    * **Значения для enum**
    *
@@ -86,9 +86,9 @@ export interface SchemaType<
  */
 export type Schema = Record<
   string,
-  | SchemaType<string, "string", true | false>
-  | SchemaType<boolean, "boolean", true | false>
-  | SchemaType<number, "number", true | false>
-  | SchemaType<(string | number | boolean)[], "array", true | false>
-  | SchemaType<string | number, "enum", true | false, readonly (string | number)[]>
+  | SchemaType<"string", true | false>
+  | SchemaType<"boolean", true | false>
+  | SchemaType<"number", true | false>
+  | SchemaType<"array", true | false, (string | number | boolean)[]>
+  | SchemaType<"enum", true | false, string | number, readonly (string | number)[]>
 >

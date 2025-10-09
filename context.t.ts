@@ -51,19 +51,19 @@ export type Snapshot<C extends Schema> = {
  */
 export type Update<C extends Schema> = (values: Partial<Values<C>>) => Partial<Values<C>>
 
-export type ExtractValue<E> = E extends SchemaType<infer T, infer N, infer R, infer V>
+export type ExtractValue<E> = E extends SchemaType<infer N, infer R, infer D, infer V>
   ? N extends "enum"
     ? // для enum берём ЛИТЕРАЛЫ из V[number], а не общий T
       R extends true
       ? V extends readonly (string | number)[]
         ? V[number]
-        : T
-      : (V extends readonly (string | number)[] ? V[number] : T) | null
+        : D
+      : (V extends readonly (string | number)[] ? V[number] : D) | null
     : N extends "array"
     ? // для массива сохраняем точный T (например, number[])
       R extends true
-      ? T
-      : T | null
+      ? D
+      : D | null
     : N extends "string"
     ? // string примитив
       R extends true
