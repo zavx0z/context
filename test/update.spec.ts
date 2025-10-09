@@ -192,8 +192,8 @@ describe("update", () => {
         status: types.enum("draft", "published", "archived").required("draft"),
         category: types.enum("tech", "design", "business").optional(),
         tags: types.array.required<string>([]),
-        permissions: types.array.optional(),
-        flags: types.array.optional(),
+        permissions: types.array.optional<number[]>(),
+        flags: types.array.optional<boolean[]>(),
       }))
     )
 

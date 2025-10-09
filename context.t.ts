@@ -64,10 +64,22 @@ export type ExtractValue<E> = E extends SchemaType<infer T, infer N, infer R, in
       R extends true
       ? T
       : T | null
-    : // примитивы
-    R extends true
-    ? T
-    : T | null
+    : N extends "string"
+    ? // string примитив
+      R extends true
+      ? string
+      : string | null
+    : N extends "number"
+    ? // number примитив
+      R extends true
+      ? number
+      : number | null
+    : N extends "boolean"
+    ? // boolean примитив
+      R extends true
+      ? boolean
+      : boolean | null
+    : never
   : never
 
 /**

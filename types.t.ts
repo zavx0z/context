@@ -2,7 +2,7 @@ import type { SchemaType } from "./schema.t"
 
 /**
  * # Типы для описания контекста.
- * 
+ *
  * Является фабрикой для создания {@link Schema | схемы контекста}.
  * Каждый тип предоставляет методы `.optional()` и `.required()` с унифицированным API.
  *
@@ -17,13 +17,13 @@ import type { SchemaType } from "./schema.t"
  * ```
  *
  * ## Метаданные полей
- * 
+ *
  * - `label?: string` — заголовок поля для UI
  * - `id?: true` — только для обязательных примитивов и enum (отметка идентификатора)
  * - `data?: string` — только для array (имя таблицы/источника данных)
  *
  * ## Правила типизации
- * 
+ *
  * - **Опциональные** поля могут принимать `null` и имеют опциональный default
  * - **Обязательные** поля всегда должны иметь значение по умолчанию
  * - Все параметры передаются в одном вызове: `method(default?, options?)`
@@ -32,7 +32,7 @@ import type { SchemaType } from "./schema.t"
 export type Types = {
   /**
    * Строковый тип. Поддерживает значения по умолчанию и метаданные label, id.
-   * 
+   *
    * @example
    * ```ts
    * types.string.required("default", { label: "Имя", id: true })
@@ -44,7 +44,7 @@ export type Types = {
 
   /**
    * Числовой тип. Поддерживает значения по умолчанию и метаданные label, id.
-   * 
+   *
    * @example
    * ```ts
    * types.number.required(0, { label: "Возраст", id: true })
@@ -56,7 +56,7 @@ export type Types = {
 
   /**
    * Логический тип. Поддерживает значения по умолчанию и метаданные label, id.
-   * 
+   *
    * @example
    * ```ts
    * types.boolean.required(false, { label: "Активен" })
@@ -68,7 +68,7 @@ export type Types = {
 
   /**
    * Массив примитивов. Плоский и однородный. Поддерживает метаданные label, data.
-   * 
+   *
    * @example
    * ```ts
    * types.array.required<string>([], { label: "Теги", data: "tags" })
@@ -80,7 +80,7 @@ export type Types = {
 
   /**
    * Перечисления. Однородные значения строк или чисел. Значения могут отсутствовать.
-   * 
+   *
    * @example
    * ```ts
    * types.enum("user", "admin").required("user", { label: "Роль", id: true })
@@ -92,17 +92,17 @@ export type Types = {
 }
 
 export interface TypePrimitive<T extends string | number | boolean, N extends "string" | "number" | "boolean"> {
-  optional(options?: { label?: string }): SchemaType<T, N, false>
-  optional<D extends T>(defaultValue?: D, options?: { label?: string }): SchemaType<T, N, false>
+  optional(options?: { label?: string }): SchemaType<never, N, false>
+  optional<D extends T>(defaultValue?: D, options?: { label?: string }): SchemaType<D, N, false>
 
-  required: <D extends T>(defaultValue: D, options?: { label?: string; id?: true }) => SchemaType<T, N, true>
+  required: <D extends T>(defaultValue: D, options?: { label?: string; id?: true }) => SchemaType<D, N, true>
 }
 
 export type TypeArray = {
   optional: {
-    <T extends string | number | boolean>(options?: { label?: string; data?: string }): SchemaType<T[], "array", false>
-    <T extends string | number | boolean>(defaultValue?: T[], options?: { label?: string; data?: string }): SchemaType<
-      T[],
+    (options?: { label?: string; data?: string }): SchemaType<never, "array", false>
+    <D extends string[] | number[] | boolean[]>(defaultValue?: D, options?: { label?: string; data?: string }): SchemaType<
+      D,
       "array",
       false
     >
@@ -117,9 +117,9 @@ export type TypeEnum = <const T extends readonly (string | number)[]>(
   ...values: T
 ) => {
   optional(options?: { label?: string }): SchemaType<string | number, "enum", false, T>
-  optional(defaultValue?: T[number], options?: { label?: string }): SchemaType<string | number, "enum", false, T>
-  required: (
-    defaultValue: T[number],
+  optional<D extends T[number]>(defaultValue?: D, options?: { label?: string }): SchemaType<D, "enum", false, T>
+  required: <D extends T[number]>(
+    defaultValue: D,
     options?: { label?: string; id?: true }
-  ) => SchemaType<string | number, "enum", true, T>
+  ) => SchemaType<D, "enum", true, T>
 }
