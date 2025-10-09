@@ -152,6 +152,10 @@ export function contextFromSchema<C extends Schema>(schema: C): Context<C> {
     return () => updateSubscribers.delete(callback)
   }
 
+  function clearSubscribers(): void {
+    updateSubscribers.clear()
+  }
+
   function getSnapshot(): Snapshot<C> {
     const context: Snapshot<C> = {} as Snapshot<C>
     for (const [key, value] of Object.entries(schema)) {
@@ -179,6 +183,7 @@ export function contextFromSchema<C extends Schema>(schema: C): Context<C> {
     context: readOnlyContext,
     update,
     onUpdate,
+    clearSubscribers,
     get snapshot() {
       return getSnapshot()
     },

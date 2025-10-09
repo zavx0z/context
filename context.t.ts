@@ -130,6 +130,11 @@ export interface Context<C extends Schema> {
    */
   onUpdate: (callback: (updated: Partial<Values<C>>) => void) => () => void
 
+  /**
+   * Очищает все подписки на обновления контекста.
+   */
+  clearSubscribers: () => void
+
   /** Полный снимок контекста с метаданными и текущими значениями */
   snapshot: Snapshot<C>
 }
