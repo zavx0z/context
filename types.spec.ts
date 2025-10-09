@@ -147,49 +147,49 @@ describe("Определение типов", () => {
     })
   })
   describe("метаданные", () => {
-    it("title", () => {
+    it("label", () => {
       const { schema: titleSchema } =
         // #region titleDefinition
         contextFromSchema(
           contextSchema((types) => ({
-            string: types.string.optional({ title: "string" }),
-            number: types.number.optional({ title: "number" }),
-            boolean: types.boolean.optional({ title: "boolean" }),
-            array: types.array.optional({ title: "array" }),
-            enum: types.enum("a", "b", "c").optional({ title: "enum" }),
+            string: types.string.optional({ label: "string" }),
+            number: types.number.optional({ label: "number" }),
+            boolean: types.boolean.optional({ label: "boolean" }),
+            array: types.array.optional({ label: "array" }),
+            enum: types.enum("a", "b", "c").optional({ label: "enum" }),
           }))
         )
       // #endregion titleDefinition
       expect(titleSchema).toEqual(
         // #region titleSchema
         {
-          string: { type: "string", title: "string" },
-          number: { type: "number", title: "number" },
-          boolean: { type: "boolean", title: "boolean" },
-          array: { type: "array", title: "array" },
-          enum: { type: "enum", title: "enum", values: ["a", "b", "c"] },
+          string: { type: "string", label: "string" },
+          number: { type: "number", label: "number" },
+          boolean: { type: "boolean", label: "boolean" },
+          array: { type: "array", label: "array" },
+          enum: { type: "enum", label: "enum", values: ["a", "b", "c"] },
         }
       )
     })
     it("id и data", () => {
       const { schema } = contextFromSchema(
         contextSchema((types) => ({
-          idString: types.string.required("ID", { id: true, title: "ID String" }),
+          idString: types.string.required("ID", { id: true, label: "ID String" }),
           idEnum: types.enum("u", "a").required("u", { id: true }),
-          dataArray: types.array.required([1], { data: "users", title: "Users" }),
+          dataArray: types.array.required([1], { data: "users", label: "Users" }),
           plainArray: types.array.optional({ data: "logs" }),
           // @ts-expect-error опциональные поля не могут иметь id
-          optionalString: types.string.optional({ title: "opt", id: "identifier" }),
-          optionalEnum: types.enum("x", "y").optional({ title: "opt" }),
+          optionalString: types.string.optional({ label: "opt", id: "identifier" }),
+          optionalEnum: types.enum("x", "y").optional({ label: "opt" }),
         }))
       )
       expect(schema).toEqual({
-        idString: { type: "string", required: true, default: "ID", title: "ID String", id: true },
+        idString: { type: "string", required: true, default: "ID", label: "ID String", id: true },
         idEnum: { type: "enum", required: true, default: "u", values: ["u", "a"], id: true },
-        dataArray: { type: "array", required: true, default: [1], title: "Users", data: "users" },
+        dataArray: { type: "array", required: true, default: [1], label: "Users", data: "users" },
         plainArray: { type: "array", data: "logs" },
-        optionalString: { type: "string", title: "opt" },
-        optionalEnum: { type: "enum", title: "opt", values: ["x", "y"] },
+        optionalString: { type: "string", label: "opt" },
+        optionalEnum: { type: "enum", label: "opt", values: ["x", "y"] },
       })
     })
   })

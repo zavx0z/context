@@ -7,14 +7,14 @@ describe("Схема", () => {
     it("должен возвращать оригинальную схему через геттер", () => {
       const ctx = contextFromSchema(
         contextSchema((types) => ({
-          name: types.string.required("Иван", { title: "Имя пользователя" }),
+          name: types.string.required("Иван", { label: "Имя пользователя" }),
           age: types.number.optional(),
-          isActive: types.boolean.required(true, { title: "Активен" }),
-          role: types.enum("user", "admin", "moderator").required("user", { title: "Роль" }),
-          tags: types.array.required([], { title: "Теги" }),
-          priority: types.enum("low", "medium", "high").optional({ title: "Приоритет" }),
-          description: types.string.optional({ title: "Описание" }),
-          metadata: types.array.optional({ title: "Метаданные" }),
+          isActive: types.boolean.required(true, { label: "Активен" }),
+          role: types.enum("user", "admin", "moderator").required("user", { label: "Роль" }),
+          tags: types.array.required([], { label: "Теги" }),
+          priority: types.enum("low", "medium", "high").optional({ label: "Приоритет" }),
+          description: types.string.optional({ label: "Описание" }),
+          metadata: types.array.optional({ label: "Метаданные" }),
         }))
       )
 
@@ -28,7 +28,7 @@ describe("Схема", () => {
           type: "string",
           required: true,
           default: "Иван",
-          title: "Имя пользователя",
+          label: "Имя пользователя",
         },
         age: {
           type: "number",
@@ -37,33 +37,33 @@ describe("Схема", () => {
           type: "boolean",
           required: true,
           default: true,
-          title: "Активен",
+          label: "Активен",
         },
         role: {
           type: "enum",
           required: true,
           values: ["user", "admin", "moderator"],
           default: "user",
-          title: "Роль",
+          label: "Роль",
         },
         tags: {
           type: "array",
           required: true,
           default: [],
-          title: "Теги",
+          label: "Теги",
         },
         priority: {
           type: "enum",
           values: ["low", "medium", "high"],
-          title: "Приоритет",
+          label: "Приоритет",
         },
         description: {
           type: "string",
-          title: "Описание",
+          label: "Описание",
         },
         metadata: {
           type: "array",
-          title: "Метаданные",
+          label: "Метаданные",
         },
       })
     })
@@ -71,13 +71,13 @@ describe("Схема", () => {
     it("должен сохранять типизацию схемы", () => {
       const { schema } = contextFromSchema(
         contextSchema((types) => ({
-          name: types.string.required("Иван", { title: "Имя пользователя" }),
+          name: types.string.required("Иван", { label: "Имя пользователя" }),
           age: types.number.optional(),
-          role: types.enum("user", "admin", "moderator").required("user", { title: "Роль" }),
-          isActive: types.boolean.required(true, { title: "Активен" }),
-          description: types.string.optional({ title: "Описание" }),
-          priority: types.enum("low", "medium", "high").optional({ title: "Приоритет" }),
-          tags: types.array.optional({ title: "Теги" }),
+          role: types.enum("user", "admin", "moderator").required("user", { label: "Роль" }),
+          isActive: types.boolean.required(true, { label: "Активен" }),
+          description: types.string.optional({ label: "Описание" }),
+          priority: types.enum("low", "medium", "high").optional({ label: "Приоритет" }),
+          tags: types.array.optional({ label: "Теги" }),
         }))
       )
 
@@ -85,18 +85,18 @@ describe("Схема", () => {
       expect(schema.name.type).toBe("string")
       expect(schema.name.required).toBe(true)
       expect(schema.name.default).toBe("Иван")
-      expect(schema.name.title).toBe("Имя пользователя")
+      expect(schema.name.label).toBe("Имя пользователя")
 
       expect(schema.role.type).toBe("enum")
       expect(schema.role.required).toBe(true)
       expect(schema.role.default).toBe("user")
-      expect(schema.role.title).toBe("Роль")
+      expect(schema.role.label).toBe("Роль")
       expect(schema.role.values).toEqual(["user", "admin", "moderator"])
 
       expect(schema.isActive.type).toBe("boolean")
       expect(schema.isActive.required).toBe(true)
       expect(schema.isActive.default).toBe(true)
-      expect(schema.isActive.title).toBe("Активен")
+      expect(schema.isActive.label).toBe("Активен")
 
       // Проверяем optional поля
       expect(schema.age.type).toBe("number")
@@ -106,18 +106,18 @@ describe("Схема", () => {
       expect(schema.description.type).toBe("string")
       expect(schema.description.required).toBeUndefined()
       expect(schema.description.default).toBeUndefined()
-      expect(schema.description.title).toBe("Описание")
+      expect(schema.description.label).toBe("Описание")
 
       expect(schema.priority.type).toBe("enum")
       expect(schema.priority.required).toBeUndefined()
       expect(schema.priority.default).toBeUndefined()
-      expect(schema.priority.title).toBe("Приоритет")
+      expect(schema.priority.label).toBe("Приоритет")
       expect(schema.priority.values).toEqual(["low", "medium", "high"])
 
       expect(schema.tags.type).toBe("array")
       expect(schema.tags.required).toBeUndefined()
       expect(schema.tags.default).toBeUndefined()
-      expect(schema.tags.title).toBe("Теги")
+      expect(schema.tags.label).toBe("Теги")
     })
   })
 })

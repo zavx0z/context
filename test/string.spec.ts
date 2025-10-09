@@ -9,15 +9,15 @@ describe("строка", () => {
         short: types.string.optional(),
 
         callable: types.string.optional(),
-        callableOptions: types.string.optional({ title: "title" }),
+        callableOptions: types.string.optional({ label: "label" }),
         callableDefault: types.string.optional("default"),
 
         optional: types.string.optional(),
-        optionalOptions: types.string.optional({ title: "title" }),
+        optionalOptions: types.string.optional({ label: "label" }),
         optionalDefault: types.string.optional("default"),
 
         required: types.string.required("default"),
-        requiredOptions: types.string.required("default", { title: "title" }),
+        requiredOptions: types.string.required("default", { label: "label" }),
         requiredDefault: types.string.required("default"),
       }))
     // #endregion stringDefinition
@@ -32,7 +32,7 @@ describe("строка", () => {
         },
         callableOptions: {
           type: "string",
-          title: "title",
+          label: "label",
         },
         callableDefault: {
           type: "string",
@@ -43,7 +43,7 @@ describe("строка", () => {
         },
         optionalOptions: {
           type: "string",
-          title: "title",
+          label: "label",
         },
         optionalDefault: {
           type: "string",
@@ -58,7 +58,7 @@ describe("строка", () => {
           type: "string",
           default: "default",
           required: true,
-          title: "title",
+          label: "label",
         },
         requiredDefault: {
           type: "string",

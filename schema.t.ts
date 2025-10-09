@@ -25,7 +25,7 @@ export interface SchemaType<
   /**
    * **Название поля (для отображения в UI)**
    */
-  title?: string
+  label?: string
   /**
    * **Значение по умолчанию**
    *
@@ -74,7 +74,7 @@ export interface SchemaType<
  * - {@link SchemaType.values | значения перечисления}
  *
  * А так же метаданные полей контекста (для отображения в UI):
- * - {@link SchemaType.title | название }
+ * - {@link SchemaType.label | название }
  * - {@link ToDo.description | описание }
  *
  * Структура схемы стремиться быть минимальной для сокращения объёма данных.

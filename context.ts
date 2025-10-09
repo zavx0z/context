@@ -10,7 +10,7 @@ import type { Schema } from "./schema.t"
  * @example
  * ```ts
  * const schema = contextSchema((t) => ({
- *   name: t.string.required("Гость", { title: "Имя" }),
+ *   name: t.string.required("Гость", { label: "Имя" }),
  *   age: t.number.optional()
  * }))
  * const ctx = contextFromSchema(schema)
@@ -159,7 +159,7 @@ export function contextFromSchema<C extends Schema>(schema: C): Context<C> {
         type: value.type,
         ...(value.required && { required: true }),
         ...(value.default && value.default !== undefined && { default: value.default }),
-        ...(value.title && { title: value.title }),
+        ...(value.label && { label: value.label }),
         ...(value.values && { values: value.values }),
         ...(value.id && { id: true }),
         ...(value.data && { data: value.data }),

@@ -19,7 +19,7 @@ export type Snapshot<C extends Schema> = {
     type: C[K]["type"]
     required?: C[K]["required"]
     default?: C[K]["default"]
-    title?: C[K]["title"]
+    label?: C[K]["label"]
     values?: C[K]["values"]
     value: Values<C>[K]
   }

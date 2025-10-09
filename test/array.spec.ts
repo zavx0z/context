@@ -12,15 +12,15 @@ describe("массив", () => {
             short: types.array.optional(),
 
             callable: types.array.optional(),
-            callableOptions: types.array.optional({ title: "array" }),
+            callableOptions: types.array.optional({ label: "array" }),
             callableDefault: types.array.optional([1, 2, 3]),
 
             optional: types.array.optional(),
-            optionalOptions: types.array.optional({ title: "array" }),
+            optionalOptions: types.array.optional({ label: "array" }),
             optionalDefault: types.array.optional([1, 2, 3]),
 
             required: types.array.required([1, 2, 3]),
-            requiredOptions: types.array.required([1, 2, 3], { title: "array" }),
+            requiredOptions: types.array.required([1, 2, 3], { label: "array" }),
           })
           // #endregion arrayDefinition
         )
@@ -37,7 +37,7 @@ describe("массив", () => {
         },
         callableOptions: {
           type: "array",
-          title: "array",
+          label: "array",
         },
         callableDefault: {
           type: "array",
@@ -48,7 +48,7 @@ describe("массив", () => {
         },
         optionalOptions: {
           type: "array",
-          title: "array",
+          label: "array",
         },
         optionalDefault: {
           type: "array",
@@ -63,7 +63,7 @@ describe("массив", () => {
           required: true,
           type: "array",
           default: [1, 2, 3],
-          title: "array",
+          label: "array",
         },
       }
       // #endregion arraySchema

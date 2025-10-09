@@ -11,15 +11,15 @@ describe("enum", () => {
           short: types.enum().optional(),
 
           callable: types.enum().optional(),
-          callableOptions: types.enum(1, 2).optional({ title: "enum" }),
+          callableOptions: types.enum(1, 2).optional({ label: "enum" }),
           callableDefault: types.enum("user", "admin").optional("user"),
 
           optional: types.enum().optional(),
-          optionalOptions: types.enum().optional({ title: "enum" }),
+          optionalOptions: types.enum().optional({ label: "enum" }),
           optionalDefault: types.enum("user", "admin").optional("user"),
 
           required: types.enum("user", "admin").required("user"),
-          requiredOptions: types.enum(1, 2, 3, 4).required(4, { title: "числовые значения" }),
+          requiredOptions: types.enum(1, 2, 3, 4).required(4, { label: "числовые значения" }),
         }))
         // #endregion enumDefinition
       )
@@ -34,7 +34,7 @@ describe("enum", () => {
         },
         callableOptions: {
           type: "enum",
-          title: "enum",
+          label: "enum",
           values: [1, 2],
         },
         callableDefault: {
@@ -47,7 +47,7 @@ describe("enum", () => {
         },
         optionalOptions: {
           type: "enum",
-          title: "enum",
+          label: "enum",
         },
         optionalDefault: {
           type: "enum",
@@ -64,7 +64,7 @@ describe("enum", () => {
           type: "enum",
           default: 4,
           required: true,
-          title: "числовые значения",
+          label: "числовые значения",
           values: [1, 2, 3, 4],
         },
       }

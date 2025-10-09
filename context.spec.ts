@@ -20,7 +20,7 @@ describe("Context: примитивы и плоские массивы", () => {
   test("инициализация по умолчанию (required/optional + array)", () => {
     const ctx = contextFromSchema(
       contextSchema((t) => ({
-        name: t.string.required("default", { title: "Имя" }),
+        name: t.string.required("default", { label: "Имя" }),
         age: t.number.optional(),
         ok: t.boolean.required(true),
         role: t.enum("user", "admin").required("user"),
@@ -55,13 +55,13 @@ describe("Context: примитивы и плоские массивы", () => {
   test("schema сериализация не содержит функций и хранит метаданные", () => {
     const ctx = contextFromSchema(
       contextSchema((t) => ({
-        name: t.string.required("default", { title: "Имя" }),
+        name: t.string.required("default", { label: "Имя" }),
         role: t.enum("user", "admin").required("user"),
         tags: t.array.optional(), // optional array -> null
       }))
     )
     expect(ctx.schema).toEqual({
-      name: { type: "string", required: true, title: "Имя", default: "default" },
+      name: { type: "string", required: true, label: "Имя", default: "default" },
       role: { type: "enum", required: true, values: ["user", "admin"], default: "user" },
       tags: { type: "array" },
     })
@@ -117,7 +117,7 @@ describe("Context: примитивы и плоские массивы", () => {
   test("snapshot: содержит схему + актуальные значения", () => {
     const ctx = contextFromSchema(
       contextSchema((t) => ({
-        name: t.string.required("default", { title: "Имя" }),
+        name: t.string.required("default", { label: "Имя" }),
         arr: t.array.required([0, 1]),
       }))
     )
@@ -126,7 +126,7 @@ describe("Context: примитивы и плоские массивы", () => {
 
     expect(snap.name.type).toBe("string")
     expect(snap.name.required).toBe(true)
-    expect(snap.name.title).toBe("Имя")
+    expect(snap.name.label).toBe("Имя")
     expect(snap.name.value).toBe("MetaFor")
 
     expect(snap.arr.type).toBe("array")
