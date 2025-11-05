@@ -27,6 +27,22 @@ export function contextFromSchema<C extends Schema>(schema: C): Context<C> {
     Array.isArray(v) && v.every(isPrimitiveOrNull)
   /** Копия массива с заморозкой (элементы — примитивы, так что глубокая не нужна) */
   const freezeArray = <T extends Array<unknown>>(arr: T): T => Object.freeze(arr.slice()) as T
+  /** Сравнение массивов по содержимому (для плоских массивов примитивов) */
+  const arraysEqual = (
+    a: Array<string | number | boolean | null> | null,
+    b: Array<string | number | boolean | null> | null
+  ): boolean => {
+    if (a === b) return true
+    if (!Array.isArray(a) || !Array.isArray(b)) {
+      // Если один из них null или не массив, они равны только если оба null или оба не массивы
+      return a === b
+    }
+    if (a.length !== b.length) return false
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) return false
+    }
+    return true
+  }
   /* ------------------------------- утилиты ---------------------------------- */
 
   // Приватные данные контекста (замыкание)
@@ -135,7 +151,18 @@ export function contextFromSchema<C extends Schema>(schema: C): Context<C> {
       }
 
       const prev = (data as any)[key]
-      if (prev !== next) {
+      // Для массивов используем сравнение по содержимому, для остальных — по значению
+      let hasChanged: boolean
+      if (def?.type === "array") {
+        // Для массивов сравниваем по содержимому, а не по ссылке
+        const prevArray = prev as Array<string | number | boolean | null> | null
+        const nextArray = next as Array<string | number | boolean | null> | null
+        const areEqual = arraysEqual(prevArray, nextArray)
+        hasChanged = !areEqual
+      } else {
+        hasChanged = prev !== next
+      }
+      if (hasChanged) {
         ;(data as any)[key] = next
         ;(updated as any)[key] = next
       }

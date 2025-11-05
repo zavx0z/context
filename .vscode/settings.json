@@ -10,13 +10,10 @@
         "**/node_modules": true,
         "**/__pycache__": true,
         ".venv": true,
-        ".cursor": true,
         ".idea": true
     },
     "hide-files.files": [
         ".idea",
-        ".cursor",
-        ".cursor/rules"
     ],
     "explorer.fileNesting.patterns": {
         "*.html": "$(basename).{js,css,json,config.ts} ${capture}.js.map, ${capture}.min.js, ${capture}.d.ts, ${capture}.spec.ts, ${capture}.t.ts",

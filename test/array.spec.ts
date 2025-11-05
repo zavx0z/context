@@ -97,5 +97,12 @@ describe("массив", () => {
       update({ array: [2, 5, 6] })
       expect(context.array).toEqual([2, 5, 6])
     })
+    it("обновление существующими параметрами", () => {
+      // Сначала устанавливаем значение
+      update({ array: [2, 5, 6] })
+      // Затем пытаемся обновить теми же значениями - должно вернуть пустой объект
+      const updated = update({ array: [2, 5, 6] })
+      expect(updated).toBeEmptyObject()
+    })
   })
 })
